@@ -7,7 +7,6 @@ import {
   Home, 
   Users, 
   FileCheck, 
-  TrendingUp,
   Copy,
   ExternalLink,
   Clock

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { use, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -32,9 +32,10 @@ const STEPS = [
   { id: 7, name: "Complete", icon: CheckCircle },
 ];
 
-export default function ApplyPage({ params }: { params: { listingId: string } }) {
+export default function ApplyPage({ params }: { params: Promise<{ listingId: string }> }) {
   const router = useRouter();
-  const property = getPropertyById(params.listingId);
+  const { listingId } = use(params);
+  const property = getPropertyById(listingId);
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     // Personal
@@ -621,7 +622,7 @@ export default function ApplyPage({ params }: { params: { listingId: string } })
                       <div className="font-semibold text-yellow-900 mb-2">Consent & Authorization</div>
                       <div className="text-sm text-yellow-700 space-y-2">
                         <p>
-                          By clicking "Pay & Submit", you authorize LeaseFlow and the property owner to:
+                          By clicking &quot;Pay & Submit&quot;, you authorize LeaseFlow and the property owner to:
                         </p>
                         <ul className="list-disc list-inside space-y-1 ml-2">
                           <li>Obtain consumer credit reports for rental screening</li>
@@ -630,7 +631,7 @@ export default function ApplyPage({ params }: { params: { listingId: string } })
                           <li>Contact previous landlords and references</li>
                         </ul>
                         <p className="pt-2">
-                          This is a "soft pull" credit check and will not affect your credit score.
+                          This is a &quot;soft pull&quot; credit check and will not affect your credit score.
                         </p>
                       </div>
                     </div>
@@ -690,7 +691,7 @@ export default function ApplyPage({ params }: { params: { listingId: string } })
                     <ul className="text-sm text-gray-600 space-y-2">
                       <li className="flex items-start gap-2">
                         <CheckCircle className="w-4 h-4 mt-0.5 text-green-600 flex-shrink-0" />
-                        <span>We'll process your background and credit screening (typically 1-2 hours)</span>
+                        <span>We&apos;ll process your background and credit screening (typically 1-2 hours)</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <CheckCircle className="w-4 h-4 mt-0.5 text-green-600 flex-shrink-0" />
@@ -698,7 +699,7 @@ export default function ApplyPage({ params }: { params: { listingId: string } })
                       </li>
                       <li className="flex items-start gap-2">
                         <CheckCircle className="w-4 h-4 mt-0.5 text-green-600 flex-shrink-0" />
-                        <span>You'll receive an email when a decision is made</span>
+                        <span>You&apos;ll receive an email when a decision is made</span>
                       </li>
                     </ul>
                   </div>

@@ -18,8 +18,9 @@ import {
   getStatusLabel 
 } from "@/lib/data/mock-data";
 
-export default function ListingDetailPage({ params }: { params: { id: string } }) {
-  const property = getPropertyById(params.id);
+export default async function ListingDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const property = getPropertyById(id);
   
   if (!property) {
     return (
@@ -185,7 +186,7 @@ export default function ListingDetailPage({ params }: { params: { id: string } }
   );
 }
 
-function Input({ value, readOnly, className }: any) {
+function Input({ value, readOnly, className }: { value: string; readOnly?: boolean; className?: string }) {
   return (
     <input
       value={value}

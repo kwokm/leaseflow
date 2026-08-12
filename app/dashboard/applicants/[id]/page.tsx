@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { use, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { 
@@ -11,7 +11,6 @@ import {
   CheckCircle, 
   XCircle,
   AlertTriangle,
-  FileText,
   TrendingUp,
   Home,
   Briefcase,
@@ -21,12 +20,12 @@ import {
 import { 
   getApplicantById, 
   getPropertyById,
-  getReportByApplicant,
-  getStatusLabel 
+  getReportByApplicant
 } from "@/lib/data/mock-data";
 
-export default function ApplicantReportPage({ params }: { params: { id: string } }) {
-  const applicant = getApplicantById(params.id);
+export default function ApplicantReportPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const applicant = getApplicantById(id);
   const property = applicant ? getPropertyById(applicant.propertyId) : null;
   const report = applicant ? getReportByApplicant(applicant.id) : null;
   const [adverseActionOpen, setAdverseActionOpen] = useState(false);
