@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "next": "15.1.6",
+    "next": "15.1.11",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "class-variance-authority": "^0.7.0",
@@ -34,6 +34,6 @@
     "tailwindcss-animate": "^1.0.7",
     "autoprefixer": "^10.4.20",
     "eslint": "^8",
-    "eslint-config-next": "15.1.6"
+    "eslint-config-next": "15.1.11"
   }
 }
