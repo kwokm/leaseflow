@@ -35,3 +35,18 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Application packets are printed as a PDF-style document */
+@media print {
+  @page {
+    margin: 0.5in;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  .print-avoid-break {
+    break-inside: avoid;
+  }
+}

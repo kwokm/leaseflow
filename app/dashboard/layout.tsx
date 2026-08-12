@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Shield, Home, Users, Settings, HelpCircle } from "lucide-react";
+import { DashboardNav } from "@/components/dashboard-nav";
+import { Shield, HelpCircle } from "lucide-react";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 print:bg-white">
       {/* Header */}
-      <header className="border-b bg-white sticky top-0 z-50">
+      <header className="border-b bg-white sticky top-0 z-50 print:hidden">
         <div className="flex items-center justify-between px-6 py-4">
           <Link href="/dashboard" className="flex items-center gap-2">
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
@@ -35,33 +36,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       <div className="flex">
         {/* Sidebar */}
-        <aside className="w-64 bg-white border-r min-h-[calc(100vh-73px)] p-4">
-          <nav className="space-y-1">
-            <Link href="/dashboard">
-              <Button variant="ghost" className="w-full justify-start">
-                <Home className="w-4 h-4 mr-2" />
-                Dashboard
-              </Button>
-            </Link>
-            <Link href="/dashboard/listings">
-              <Button variant="ghost" className="w-full justify-start">
-                <Home className="w-4 h-4 mr-2" />
-                Properties
-              </Button>
-            </Link>
-            <Link href="/dashboard">
-              <Button variant="ghost" className="w-full justify-start">
-                <Users className="w-4 h-4 mr-2" />
-                Applicants
-              </Button>
-            </Link>
-            <Link href="/dashboard">
-              <Button variant="ghost" className="w-full justify-start">
-                <Settings className="w-4 h-4 mr-2" />
-                Settings
-              </Button>
-            </Link>
-          </nav>
+        <aside className="w-64 bg-white border-r min-h-[calc(100vh-73px)] p-4 print:hidden">
+          <DashboardNav />
 
           <div className="mt-8 p-4 bg-blue-50 rounded-lg">
             <div className="text-sm font-semibold mb-2">Demo Mode</div>
@@ -77,7 +53,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 p-8">{children}</main>
+        <main className="flex-1 p-8 print:p-0">{children}</main>
       </div>
     </div>
   );

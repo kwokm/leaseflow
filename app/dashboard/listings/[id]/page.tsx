@@ -164,16 +164,12 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
                       <Badge className={getStatusColor(applicant.status)}>
                         {getStatusLabel(applicant.status)}
                       </Badge>
-                      {(applicant.status === "completed" || 
-                        applicant.status === "approved" || 
-                        applicant.status === "declined") && (
-                        <Link href={`/dashboard/applicants/${applicant.id}`}>
-                          <Button>
-                            View Report
-                            <ExternalLink className="w-3 h-3 ml-2" />
-                          </Button>
-                        </Link>
-                      )}
+                      <Link href={`/dashboard/applications/${applicant.id}`}>
+                        <Button>
+                          View Packet
+                          <ExternalLink className="w-3 h-3 ml-2" />
+                        </Button>
+                      </Link>
                     </div>
                   </div>
                 </CardContent>
