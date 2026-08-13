@@ -204,7 +204,7 @@ export function StepHousehold({ state, patch, errors }: StepProps) {
               value={household.notes}
               onChange={(event) => set({ notes: event.target.value })}
               placeholder="Optional — context for the landlord"
-              className="w-full rounded-btn border border-line-2 bg-paper p-3 text-[15px] font-medium tracking-[-0.16px] text-ink placeholder:text-mute-2 transition-[border-color,background-color] duration-160 ease-premium hover:border-mute-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+              className="w-full rounded-btn border border-line-2 bg-paper p-3 text-[15px] font-medium tracking-[-0.16px] text-ink placeholder:text-mute-2 transition-[border-color,background-color] duration-240 ease-premium hover:border-mute-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
             />
             <FieldError id="household-notes-error" message={errors.notes} />
           </div>

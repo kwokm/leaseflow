@@ -3,6 +3,8 @@ import { BrandMark, BrandWord } from "@/components/brand";
 import { ApplicationTable } from "@/components/desk/application-table";
 import { DeskSidebar } from "@/components/desk/desk-sidebar";
 import { DeskPill, DeskToolbar, PacketWindow } from "@/components/desk/packet-window";
+import { Float } from "@/components/motion/float";
+import { Reveal, RevealItem, RevealStagger } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/button";
 import { deskHeroApplicants } from "@/lib/desk/display";
 import { getPropertyById } from "@/lib/data/mock-data";
@@ -82,7 +84,7 @@ export default function Home() {
               <Link
                 key={item.label}
                 href={item.href}
-                className="text-[14px] font-medium tracking-[-0.2px] text-mute transition-colors duration-160 ease-premium hover:text-ink"
+                className="text-[14px] font-medium tracking-[-0.2px] text-mute transition-colors duration-240 ease-premium hover:text-ink"
               >
                 {item.label}
               </Link>
@@ -120,23 +122,25 @@ export default function Home() {
           </div>
 
           <div className="stage-wrap" id="desk">
-            <PacketWindow title="Application packet • 742 Evergreen Terrace" meta="Desk • 3 files">
-              <div className="desk">
-                <DeskSidebar staticActive="Applications" />
-                <div className="min-w-0">
-                  <DeskToolbar meta="3 in queue">
-                    <DeskPill active>All properties</DeskPill>
-                    <DeskPill>Received</DeskPill>
-                  </DeskToolbar>
-                  <ApplicationTable rows={heroRows} packetLinks selectedId="app-1" />
+            <Float>
+              <PacketWindow title="Application packet • 742 Evergreen Terrace" meta="Desk • 3 files">
+                <div className="desk">
+                  <DeskSidebar staticActive="Applications" />
+                  <div className="min-w-0">
+                    <DeskToolbar meta="3 in queue">
+                      <DeskPill active>All properties</DeskPill>
+                      <DeskPill>Received</DeskPill>
+                    </DeskToolbar>
+                    <ApplicationTable rows={heroRows} packetLinks selectedId="app-1" />
+                  </div>
                 </div>
-              </div>
-            </PacketWindow>
+              </PacketWindow>
+            </Float>
           </div>
         </section>
 
         <section id="platform" className="bg-white pb-16 sm:pb-28" aria-labelledby="platform-title">
-          <div className="mx-auto max-w-shell px-5 sm:px-8">
+          <Reveal className="mx-auto max-w-shell px-5 sm:px-8">
             <p className="mb-[18px] text-[13px] font-medium tracking-[-0.13px] text-mute">
               Platform
             </p>
@@ -146,21 +150,26 @@ export default function Home() {
               tone="Applicants pay. The packet lands scored. You approve or decline."
               className="max-w-[28ch]"
             />
-          </div>
+          </Reveal>
         </section>
 
         <section className="pb-16 sm:pb-24" aria-labelledby="how-title">
           <div className="mx-auto max-w-shell px-5 sm:px-8">
-            <Headline
-              id="how-title"
-              lead="Four steps, start to decision."
-              tone="Most applications complete in about ten minutes."
-              className="max-w-3xl"
-            />
+            <Reveal>
+              <Headline
+                id="how-title"
+                lead="Four steps, start to decision."
+                tone="Most applications complete in about ten minutes."
+                className="max-w-3xl"
+              />
+            </Reveal>
 
-            <ol className="mt-10 grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-line bg-line shadow-window sm:grid-cols-2 lg:grid-cols-4">
+            <RevealStagger
+              as="ol"
+              className="mt-10 grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-line bg-line shadow-window sm:grid-cols-2 lg:grid-cols-4"
+            >
               {STEPS.map((step) => (
-                <li key={step.n} className="bg-paper p-6">
+                <RevealItem key={step.n} as="li" className="bg-paper p-6">
                   <p className="num text-[13px] font-medium text-mute-2">{step.n}</p>
                   <p className="mt-3 text-[17px] font-semibold leading-6 tracking-[-0.3px] text-ink">
                     {step.lead}
@@ -168,24 +177,26 @@ export default function Home() {
                   <p className="mt-1.5 text-[14px] font-medium leading-5 tracking-[-0.14px] text-mute">
                     {step.tone}
                   </p>
-                </li>
+                </RevealItem>
               ))}
-            </ol>
+            </RevealStagger>
           </div>
         </section>
 
         <section id="rates" className="pb-16 sm:pb-28" aria-labelledby="rates-title">
           <div className="mx-auto max-w-shell px-5 sm:px-8">
-            <p className="mb-3.5 text-[13px] font-medium tracking-[-0.13px] text-mute">Fees</p>
-            <Headline
-              id="rates-title"
-              lead="Applicants pay the fee."
-              tone="Landlords do not pay to use the desk. The renter covers screening when they apply."
-              className="max-w-[22ch]"
-            />
+            <Reveal>
+              <p className="mb-3.5 text-[13px] font-medium tracking-[-0.13px] text-mute">Fees</p>
+              <Headline
+                id="rates-title"
+                lead="Applicants pay the fee."
+                tone="Landlords do not pay to use the desk. The renter covers screening when they apply."
+                className="max-w-[22ch]"
+              />
+            </Reveal>
 
-            <div className="mt-14 grid grid-cols-1 overflow-hidden rounded-lg border border-line bg-paper shadow-window sm:grid-cols-2">
-              <article className="p-7">
+            <RevealStagger className="mt-14 grid grid-cols-1 overflow-hidden rounded-lg border border-line bg-paper shadow-window sm:grid-cols-2">
+              <RevealItem as="article" className="p-7">
                 <p className="mb-2 text-[14px] font-medium text-mute">Standard</p>
                 <p className="num mb-3 text-[40px] font-medium leading-[44px] tracking-[-0.4px] text-ink">
                   $39.99
@@ -193,8 +204,11 @@ export default function Home() {
                 <p className="max-w-[32ch] text-[15px] font-medium leading-[1.5] text-mute">
                   Credit, criminal, and eviction, sealed into the packet with a LeaseScore.
                 </p>
-              </article>
-              <article className="border-t border-line p-7 sm:border-l sm:border-t-0">
+              </RevealItem>
+              <RevealItem
+                as="article"
+                className="border-t border-line p-7 sm:border-l sm:border-t-0"
+              >
                 <p className="mb-2 text-[14px] font-medium text-mute">Premium</p>
                 <p className="num mb-3 text-[40px] font-medium leading-[44px] tracking-[-0.4px] text-ink">
                   $59.99
@@ -202,13 +216,13 @@ export default function Home() {
                 <p className="max-w-[32ch] text-[15px] font-medium leading-[1.5] text-mute">
                   Standard plus income. Employer, stated pay, and rent multiple on the same file.
                 </p>
-              </article>
-            </div>
+              </RevealItem>
+            </RevealStagger>
           </div>
         </section>
 
         <section id="apply" className="pb-20" aria-labelledby="apply-title">
-          <div className="mx-auto max-w-shell px-5 sm:px-8">
+          <Reveal className="mx-auto max-w-shell px-5 sm:px-8">
             <PacketWindow title={`Apply • ${property.address.split(",")[0]}`}>
               <div className="flex flex-col gap-5 px-6 py-7 md:flex-row md:items-center md:justify-between">
                 <div>
@@ -230,7 +244,7 @@ export default function Home() {
                 </Button>
               </div>
             </PacketWindow>
-          </div>
+          </Reveal>
         </section>
       </main>
 

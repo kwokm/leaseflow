@@ -41,7 +41,7 @@ export function DashboardNav() {
             href={item.href}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors duration-160 ease-premium",
+              "flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors duration-240 ease-premium",
               active
                 ? "bg-primary/10 text-primary"
                 : "text-ink-2 hover:bg-accent hover:text-accent-foreground"
@@ -70,7 +70,7 @@ export function DashboardNav() {
               href={item.href}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors",
+                "flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors duration-240 ease-premium",
                 active
                   ? "bg-primary/10 text-primary font-medium"
                   : "text-mute hover:bg-accent hover:text-accent-foreground"

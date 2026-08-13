@@ -1,32 +1,40 @@
 /**
  * Apply-flow motion tokens. Quiet and expensive — no springs, no bounce.
- * Durations stay in the 150–250ms band except the credit-score reveal.
+ * Aligns with design/animations-rules.md.
  */
-export const EASE_OUT = [0.22, 1, 0.36, 1] as const;
-export const EASE_IN_OUT = [0.4, 0, 0.2, 1] as const;
+import { durationInteraction, easeReveal, easeSpatial } from "@/lib/motion/tokens";
+
+export const EASE_OUT = easeReveal;
+export const EASE_IN_OUT = easeSpatial;
 
 export const DURATION = {
   micro: 0.16,
-  ui: 0.2,
-  step: 0.24,
-  exit: 0.18,
-  reveal: 0.64,
+  ui: durationInteraction,
+  step: 0.55,
+  exit: 0.28,
+  reveal: 0.7,
 } as const;
 
-export const STAGGER = 0.036;
+export const STAGGER = 0.12;
 
 export const stepSlide = {
-  enter: (direction: number) => ({
-    x: direction * 16,
-  }),
-  center: {
-    x: 0,
-    transition: { duration: DURATION.step, ease: EASE_OUT },
+  enter: {
+    opacity: 0,
+    scale: 0.9,
+    y: 20,
   },
-  leave: (direction: number) => ({
-    x: direction * -12,
-    transition: { duration: DURATION.exit, ease: EASE_IN_OUT },
-  }),
+  center: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { duration: DURATION.step, ease: easeSpatial },
+  },
+  leave: {
+    opacity: 0,
+    scale: 0.96,
+    y: 8,
+    transition: { duration: DURATION.exit, ease: easeSpatial },
+  },
 };
 
 export const staggerContainer = {
@@ -40,7 +48,7 @@ export const staggerContainer = {
 };
 
 export const staggerItem = {
-  hidden: { opacity: 0, y: 8 },
+  hidden: { opacity: 0, y: 30 },
   show: {
     opacity: 1,
     y: 0,

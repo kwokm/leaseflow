@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, Lock } from "lucide-react";
 import { BrandMark, BrandWord } from "@/components/brand";
 import { PacketWindow } from "@/components/desk/packet-window";
+import { SpatialMount, SpatialOrigin } from "@/components/motion/spatial";
 import { PageWash } from "@/components/page-wash";
 import { Button } from "@/components/ui/button";
 import { shortAddress } from "@/lib/desk/display";
@@ -128,7 +129,9 @@ export function ApplyWizard({ property }: { property: Property }) {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-white print:bg-white">
-      <PageWash />
+      <SpatialOrigin>
+        <PageWash />
+      </SpatialOrigin>
 
       <a href="#apply-step" className="skip-link">
         Skip to the current step
@@ -152,10 +155,11 @@ export function ApplyWizard({ property }: { property: Property }) {
       </header>
 
       <div className="relative z-10 mx-auto max-w-shell px-5 py-8 sm:px-8 lg:py-12">
-        <PacketWindow
-          title={`Application packet • ${shortAddress(property.address)}`}
-          meta="Desk • 3 files"
-        >
+        <SpatialMount>
+          <PacketWindow
+            title={`Application packet • ${shortAddress(property.address)}`}
+            meta="Desk • 3 files"
+          >
           <div className="desk apply-desk">
         <nav aria-label="Application steps" className="desk-rail print:hidden">
           {APPLY_STEPS.map((entry) => {
@@ -224,13 +228,14 @@ export function ApplyWizard({ property }: { property: Property }) {
           </div>
         </main>
           </div>
-        </PacketWindow>
+          </PacketWindow>
+        </SpatialMount>
       </div>
 
       <footer className="relative z-10 print:hidden">
         <div className="mx-auto flex max-w-shell flex-wrap items-center justify-between gap-3 px-5 py-6 text-[13px] font-medium text-mute sm:px-8">
           <p>Demo prototype · mock data only, no consumer reporting agency is used.</p>
-          <Link href="/" className="text-ink-2 transition-colors duration-160 ease-premium hover:text-ink">
+          <Link href="/" className="text-ink-2 transition-colors duration-240 ease-premium hover:text-ink">
             Back to LeaseFlow
           </Link>
         </div>

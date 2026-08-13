@@ -13,24 +13,31 @@ import {
 
 export function StepTransition({
   step,
-  direction,
   children,
 }: {
   step: number;
-  direction: number;
+  direction?: number;
   children: React.ReactNode;
 }) {
   const reduced = useReducedMotion();
 
   if (reduced) {
-    return <div key={step}>{children}</div>;
+    return (
+      <motion.div
+        key={step}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.1 }}
+      >
+        {children}
+      </motion.div>
+    );
   }
 
   return (
-    <AnimatePresence mode="wait" custom={direction} initial={false}>
+    <AnimatePresence mode="wait" initial={false}>
       <motion.div
         key={step}
-        custom={direction}
         variants={stepSlide}
         initial="enter"
         animate="center"

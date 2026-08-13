@@ -123,7 +123,7 @@ export default function NewListingPage() {
               <button
                 type="button"
                 onClick={() => setFormData({ ...formData, screeningPackage: "standard" })}
-                className={`p-4 border-2 rounded-lg text-left transition-all ${
+                className={`p-4 border-2 rounded-lg text-left transition-all duration-240 ease-premium ${
                   formData.screeningPackage === "standard"
                     ? "border-primary bg-primary/5"
                     : "border-line hover:border-line-2"
@@ -142,7 +142,7 @@ export default function NewListingPage() {
               <button
                 type="button"
                 onClick={() => setFormData({ ...formData, screeningPackage: "premium" })}
-                className={`p-4 border-2 rounded-lg text-left transition-all ${
+                className={`p-4 border-2 rounded-lg text-left transition-all duration-240 ease-premium ${
                   formData.screeningPackage === "premium"
                     ? "border-primary bg-primary/5"
                     : "border-line hover:border-line-2"
