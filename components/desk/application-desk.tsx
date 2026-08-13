@@ -83,7 +83,7 @@ export function ApplicationDesk({
       <ApplicationTable
         rows={scoped}
         showExtras={extras}
-        hrefFor={(row) => `/dashboard/applications/${row.id}`}
+        packetLinks
       />
     </>
   );

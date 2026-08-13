@@ -137,7 +137,7 @@ export default function Home() {
                     <DeskPill active>All properties</DeskPill>
                     <DeskPill active>Received</DeskPill>
                   </DeskToolbar>
-                  <ApplicationTable rows={heroRows} hrefFor={(row) => `/dashboard/applications/${row.id}`} />
+                  <ApplicationTable rows={heroRows} packetLinks />
                 </div>
               </div>
             </PacketWindow>

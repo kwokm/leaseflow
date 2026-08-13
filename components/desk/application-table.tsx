@@ -45,13 +45,14 @@ function Row({
 
 export function ApplicationTable({
   rows,
-  hrefFor,
+  packetLinks = false,
   selectedId,
   showExtras = false,
   empty = "No applications in this queue.",
 }: {
   rows: Applicant[];
-  hrefFor?: (row: Applicant) => string;
+  /** Open `/dashboard/applications/[id]` when a row is activated. */
+  packetLinks?: boolean;
   selectedId?: string;
   /** Owner desk: LeaseScore plus credit and income multiple. */
   showExtras?: boolean;
@@ -79,7 +80,7 @@ export function ApplicationTable({
         <tbody>
           {rows.map((row) => {
             const property = getPropertyById(row.propertyId);
-            const href = hrefFor?.(row);
+            const href = packetLinks ? `/dashboard/applications/${row.id}` : undefined;
             const multiple = incomeMultiple(row);
             const credit = creditScore(row);
             const name = `${row.firstName} ${row.lastName}`;
