@@ -1,6 +1,6 @@
 import type { ScreeningPackage } from "@/lib/data/mock-data";
 
-export const APPLY_STATE_VERSION = 2;
+export const APPLY_STATE_VERSION = 3;
 
 /**
  * A file the renter picked in the browser. `url` is an object URL that only
@@ -203,6 +203,17 @@ export const APPLY_STEPS: StepDefinition[] = [
 
 export const TOTAL_STEPS = APPLY_STEPS.length;
 
+function dummyFile(name: string, mime: string, size: number): LocalFile {
+  return {
+    id: `demo-${name}`,
+    name,
+    size,
+    mime,
+    addedAt: "2026-08-01T12:00:00.000Z",
+  };
+}
+
+/** Empty draft — kept for tests and as the merge base. */
 export function createInitialState(listingId: string, pkg: ScreeningPackage): ApplyState {
   return {
     version: APPLY_STATE_VERSION,
@@ -250,6 +261,85 @@ export function createInitialState(listingId: string, pkg: ScreeningPackage): Ap
       expiry: "",
       cvc: "",
       billingZip: "",
+    },
+  };
+}
+
+/**
+ * Preloaded Jane Doe packet so the prototype can be clicked through
+ * without typing. Files have metadata only — previews clear on reload.
+ */
+export function createDemoState(listingId: string, pkg: ScreeningPackage): ApplyState {
+  return {
+    version: APPLY_STATE_VERSION,
+    listingId,
+    step: 1,
+    furthestStep: TOTAL_STEPS,
+    screeningPackage: pkg,
+    personal: {
+      firstName: "Jane",
+      lastName: "Doe",
+      email: "jane.doe@leaseflow.dev",
+      phone: "(555) 010-0142",
+      dateOfBirth: "04/12/1994",
+      ssn: "123-45-6789",
+      street: "88 Pine Court",
+      unit: "2A",
+      city: "San Francisco",
+      state: "CA",
+      zip: "94102",
+    },
+    idFront: dummyFile("demo-id-front.png", "image/png", 184320),
+    idBack: dummyFile("demo-id-back.png", "image/png", 176128),
+    income: {
+      employer: "LeaseFlow Demo Co",
+      position: "Product designer",
+      monthlyIncome: "8500",
+      startDate: "03/2022",
+      otherIncome: "",
+    },
+    paystubs: [
+      dummyFile("paystub-june-2026.pdf", "application/pdf", 98240),
+      dummyFile("paystub-july-2026.pdf", "application/pdf", 101376),
+    ],
+    bank: { bankName: "First Republic Demo", accountLast4: "4421" },
+    statements: [
+      dummyFile("statement-june-2026.pdf", "application/pdf", 220160),
+      dummyFile("statement-july-2026.pdf", "application/pdf", 214016),
+    ],
+    experian: {
+      status: "connected",
+      score: 720,
+      scoreModel: "VantageScore 3.0 (demo)",
+      pulledAt: "2026-08-01T12:10:00.000Z",
+      onTimePaymentRate: 99,
+      openAccounts: 8,
+      oldestAccountYears: 7,
+      recentInquiries: 1,
+      publicRecords: 0,
+      factors: [
+        "No missed payments reported in the last 24 months",
+        "Revolving utilization in the low 30% range",
+      ],
+    },
+    household: {
+      pets: [],
+      occupants: [],
+      smoker: false,
+      priorEviction: false,
+      notes: "No additional occupants. Quiet household.",
+    },
+    consent: {
+      fcra: true,
+      backgroundAck: true,
+      signature: "Jane Doe",
+    },
+    payment: {
+      cardName: "Jane Doe",
+      cardNumber: "4242424242424242",
+      expiry: "12/28",
+      cvc: "123",
+      billingZip: "94102",
     },
   };
 }

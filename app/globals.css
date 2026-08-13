@@ -101,18 +101,20 @@
     font-feature-settings: "tnum" 1;
   }
 
-  /* Ported 1:1 from design/attio-inspired/styles.css — do not invent a second bloom. */
+  /*
+   * Full-page lavender wash from the locked landing screenshot:
+   * lighter at the top center, deeper toward the edges and bottom,
+   * with fine vertical pinstripes across the whole field.
+   */
   .hero-wash {
     position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 62%;
+    inset: 0;
+    height: 100%;
     pointer-events: none;
     background: radial-gradient(
-      90% 80% at 50% 100%,
+      120% 90% at 50% 0%,
       var(--wash) 0%,
-      var(--wash-mid) 45%,
+      var(--wash-mid) 52%,
       var(--wash-deep) 100%
     );
   }
@@ -123,7 +125,7 @@
     inset: 0;
     background-image: repeating-linear-gradient(
       90deg,
-      rgba(255, 255, 255, 0.78) 0 1px,
+      rgba(255, 255, 255, 0.42) 0 1px,
       transparent 1px 12px
     );
   }
@@ -132,12 +134,161 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: radial-gradient(70% 110% at 50% 0%, #ffffff 28%, rgba(255, 255, 255, 0) 68%);
+    background: radial-gradient(
+      80% 55% at 50% 0%,
+      rgba(255, 255, 255, 0.55) 0%,
+      rgba(255, 255, 255, 0) 70%
+    );
   }
 
-  /* Apply / desk: same bloom, full viewport so every step sits on it. */
   .hero-wash-shell {
     height: 100%;
+  }
+
+  /* Desk table, avatars, and status pills — ported from design/attio-inspired. */
+  .app-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    letter-spacing: -0.014em;
+  }
+
+  .app-table th {
+    text-align: left;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--mute-2);
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .app-table td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink-2);
+    white-space: nowrap;
+  }
+
+  .app-table tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .app-table tbody tr:hover {
+    background: #fafafa;
+  }
+
+  .app-table tr.is-selected {
+    background: #f4f7ff;
+  }
+
+  .app-table tr.is-selected:hover {
+    background: #eef3ff;
+  }
+
+  .app-table .num,
+  .app-table th.num {
+    text-align: right;
+  }
+
+  .score {
+    font-weight: 600;
+    color: var(--ink);
+    font-size: 13.5px;
+    letter-spacing: -0.03em;
+  }
+
+  .who {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .ava {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    flex-shrink: 0;
+  }
+
+  .ava-lg {
+    width: 40px;
+    height: 40px;
+    font-size: 12px;
+  }
+
+  .ava-sj {
+    background: #e8e4f4;
+    color: #3d3558;
+  }
+  .ava-er {
+    background: #ece8f2;
+    color: #3f3a4d;
+  }
+  .ava-jw {
+    background: #e8e8ec;
+    color: #3f3f46;
+  }
+  .ava-ap {
+    background: #efeaf4;
+    color: #433c52;
+  }
+  .ava-jd {
+    background: #e6eaf8;
+    color: #343a58;
+  }
+  .ava-dk {
+    background: #e9e9ee;
+    color: #3a3a42;
+  }
+
+  .status {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: #f3f3f5;
+    color: var(--ink-2);
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .status-ok {
+    background: var(--ok-bg);
+    color: var(--ok);
+  }
+
+  .status-no {
+    background: var(--no-bg);
+    color: var(--no);
+  }
+
+  .desk-pill {
+    display: inline-flex;
+    align-items: center;
+    height: 28px;
+    padding: 0 10px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    color: var(--ink-2);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: -0.14px;
+  }
+
+  .desk-pill.is-on {
+    background: var(--rail);
+    border-color: var(--line-2);
+    color: var(--ink);
   }
 
   .skip-link {

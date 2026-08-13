@@ -1,4 +1,4 @@
-import { APPLY_STATE_VERSION, createInitialState, type ApplyState, type LocalFile } from "./types";
+import { APPLY_STATE_VERSION, createDemoState, type ApplyState, type LocalFile } from "./types";
 import type { ScreeningPackage } from "@/lib/data/mock-data";
 
 const DRAFT_PREFIX = "leaseflow:apply:";
@@ -20,7 +20,7 @@ function stripUrls(files: (LocalFile | null)[]): void {
 }
 
 export function loadDraft(listingId: string, pkg: ScreeningPackage): ApplyState {
-  const fresh = createInitialState(listingId, pkg);
+  const fresh = createDemoState(listingId, pkg);
   if (typeof window === "undefined") return fresh;
 
   try {
@@ -39,9 +39,14 @@ export function loadDraft(listingId: string, pkg: ScreeningPackage): ApplyState 
       experian: { ...fresh.experian, ...parsed.experian },
       household: { ...fresh.household, ...parsed.household },
       consent: { ...fresh.consent, ...parsed.consent },
-      payment: { ...fresh.payment, ...parsed.payment },
-      paystubs: parsed.paystubs ?? [],
-      statements: parsed.statements ?? [],
+      // Card details are not persisted; refill the demo card so Review stays clickable.
+      payment: parsed.payment?.cardNumber
+        ? { ...fresh.payment, ...parsed.payment }
+        : fresh.payment,
+      paystubs: parsed.paystubs ?? fresh.paystubs,
+      statements: parsed.statements ?? fresh.statements,
+      idFront: parsed.idFront ?? fresh.idFront,
+      idBack: parsed.idBack ?? fresh.idBack,
     };
 
     stripUrls([merged.idFront, merged.idBack, ...merged.paystubs, ...merged.statements]);

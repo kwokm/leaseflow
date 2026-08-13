@@ -251,7 +251,7 @@ export const mockApplicants: Applicant[] = [
   },
   {
     id: "app-4",
-    propertyId: "prop-2",
+    propertyId: "prop-1",
     status: "declined",
     firstName: "James",
     lastName: "Wilson",
@@ -866,7 +866,7 @@ export const mockPayments: Payment[] = [
     kind: "screening_fee",
     description: "Standard screening fee",
     applicantId: "app-4",
-    propertyId: "prop-2",
+    propertyId: "prop-1",
     amount: 39.99,
     status: "refunded",
     method: "Visa ···9931",

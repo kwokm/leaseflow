@@ -5,8 +5,10 @@ import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
 import { ArrowLeft, ArrowRight, Check, Lock } from "lucide-react";
 import { BrandMark, BrandWord } from "@/components/brand";
+import { PacketWindow } from "@/components/desk/packet-window";
 import { PageWash } from "@/components/page-wash";
 import { Button } from "@/components/ui/button";
+import { shortAddress } from "@/lib/desk/display";
 import { Progress } from "@/components/ui/progress";
 import { StepStart } from "@/components/apply/step-start";
 import { StepYou } from "@/components/apply/step-you";
@@ -19,8 +21,8 @@ import { StepTransition } from "@/components/apply/motion";
 import type { StepProps } from "@/components/apply/step-shell";
 import { DURATION, EASE_OUT } from "@/lib/apply/motion";
 import { clearDraft, loadDraft, saveDraft, saveSubmission } from "@/lib/apply/storage";
-import { APPLY_STEPS, TOTAL_STEPS, createInitialState, type ApplyState } from "@/lib/apply/types";
-import { validateStep, type StepErrors } from "@/lib/apply/validate";
+import { APPLY_STEPS, TOTAL_STEPS, createDemoState, type ApplyState } from "@/lib/apply/types";
+import type { StepErrors } from "@/lib/apply/validate";
 import type { Property } from "@/lib/data/mock-data";
 import { cn } from "@/lib/utils";
 
@@ -47,7 +49,7 @@ const STEP_COMPONENTS: Record<number, (props: StepProps) => React.ReactElement> 
 
 export function ApplyWizard({ property }: { property: Property }) {
   const [state, setState] = React.useState<ApplyState>(() =>
-    createInitialState(property.id, property.screeningPackage)
+    createDemoState(property.id, property.screeningPackage)
   );
   const [errors, setErrors] = React.useState<StepErrors>({});
   const [hydrated, setHydrated] = React.useState(false);
@@ -113,12 +115,8 @@ export function ApplyWizard({ property }: { property: Property }) {
   };
 
   const goNext = () => {
-    const found = validateStep(step, state);
-    if (Object.keys(found).length > 0) {
-      setErrors(found);
-      headingRef.current?.focus();
-      return;
-    }
+    // Prototype: never gate on validation. Jane Doe is prefilled so every
+    // step is browseable with Back / Next or the rail.
     if (step === 8) {
       submit();
       return;
@@ -127,7 +125,8 @@ export function ApplyWizard({ property }: { property: Property }) {
   };
 
   const goTo = (target: number) => {
-    if (target <= state.furthestStep) moveTo(target);
+    if (target < 1 || target > TOTAL_STEPS) return;
+    moveTo(target);
   };
 
   const progress = Math.round((step / TOTAL_STEPS) * 100);
@@ -177,27 +176,25 @@ export function ApplyWizard({ property }: { property: Property }) {
         </div>
       </header>
 
-      <div className="relative z-10 mx-auto grid max-w-shell gap-8 px-5 py-8 sm:px-8 lg:grid-cols-[212px_minmax(0,1fr)] lg:py-12">
+      <div className="relative z-10 mx-auto max-w-shell px-5 py-8 sm:px-8 lg:py-12">
+        <PacketWindow title={`Application • ${shortAddress(property.address)}`}>
+          <div className="grid lg:grid-cols-[212px_minmax(0,1fr)]">
         {/* Step rail — desktop only; the progress bar covers small screens. */}
-        <nav aria-label="Application steps" className="hidden lg:block print:hidden">
-          <ol className="sticky top-36 space-y-0.5">
+        <nav aria-label="Application steps" className="hidden border-r border-line bg-rail p-2 pt-2.5 lg:block print:hidden">
+          <ol className="space-y-0.5">
             {APPLY_STEPS.map((entry) => {
               const done = entry.id < step;
               const current = entry.id === step;
-              const reachable = entry.id <= state.furthestStep;
 
               return (
                 <li key={entry.id}>
                   <button
                     type="button"
-                    disabled={!reachable || state.step === 9}
                     aria-current={current ? "step" : undefined}
                     onClick={() => goTo(entry.id)}
                     className={cn(
                       "relative flex min-h-[44px] w-full items-center gap-2.5 rounded-md px-2.5 text-left text-[13px] font-medium tracking-[-0.13px] transition-[color,background-color] duration-200 ease-premium",
-                      current ? "text-ink" : "text-mute",
-                      reachable && !current && "hover:text-ink",
-                      !reachable && "cursor-default opacity-60"
+                      current ? "text-ink" : "text-mute hover:text-ink"
                     )}
                   >
                     {current && !reduced && (
@@ -230,7 +227,7 @@ export function ApplyWizard({ property }: { property: Property }) {
           </ol>
         </nav>
 
-        <main id="apply-step" className="min-w-0">
+        <main id="apply-step" className="min-w-0 px-5 py-6 sm:px-8 sm:py-8">
           <div ref={headingRef} tabIndex={-1} className="outline-none">
             {errorCount > 0 && (
               <div
@@ -254,26 +251,32 @@ export function ApplyWizard({ property }: { property: Property }) {
             </StepTransition>
           </div>
 
-          {step < 9 && (
-            <div className="sticky bottom-4 z-20 mt-8 print:hidden">
-              <div className="flex flex-col-reverse gap-3 rounded-lg border border-line bg-paper/80 px-4 py-3 shadow-mini backdrop-blur-md sm:flex-row sm:items-center sm:justify-between">
-                {step > 1 ? (
-                  <Button type="button" variant="outline" size="touch" onClick={() => moveTo(step - 1)}>
-                    <ArrowLeft className="h-4 w-4" aria-hidden />
-                    Back
-                  </Button>
-                ) : (
-                  <span className="hidden sm:block" />
-                )}
+          <div className="sticky bottom-4 z-20 mt-8 print:hidden">
+            <div className="flex flex-col-reverse gap-3 rounded-lg border border-line bg-paper/80 px-4 py-3 shadow-mini backdrop-blur-md sm:flex-row sm:items-center sm:justify-between">
+              {step > 1 ? (
+                <Button type="button" variant="outline" size="touch" onClick={() => moveTo(step - 1)}>
+                  <ArrowLeft className="h-4 w-4" aria-hidden />
+                  Back
+                </Button>
+              ) : (
+                <span className="hidden sm:block" />
+              )}
 
+              {step < 9 ? (
                 <Button type="button" size="touch" onClick={goNext} className="sm:min-w-[168px]">
                   {step === 8 ? "Pay and submit" : "Continue"}
                   <ArrowRight className="h-4 w-4" aria-hidden />
                 </Button>
-              </div>
+              ) : (
+                <Button asChild size="touch" className="sm:min-w-[168px]">
+                  <Link href="/dashboard">Open the desk</Link>
+                </Button>
+              )}
             </div>
-          )}
+          </div>
         </main>
+          </div>
+        </PacketWindow>
       </div>
 
       <footer className="relative z-10 print:hidden">

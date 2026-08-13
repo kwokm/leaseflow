@@ -28,17 +28,17 @@ export default function NewListingPage() {
   };
 
   return (
-    <div className="max-w-3xl space-y-6">
+    <div className="space-y-6 p-5 sm:p-6">
       <div>
-        <Link href="/dashboard">
+        <Link href="/dashboard/listings">
           <Button variant="ghost" size="sm" className="mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Dashboard
+            Back to properties
           </Button>
         </Link>
-        <h1 className="text-3xl font-bold text-ink">Create new listing</h1>
+        <h1 className="text-[28px] font-semibold tracking-[-0.7px] text-ink">Create a listing</h1>
         <p className="text-mute mt-1">
-          Set up a new property and start receiving applications
+          Address, rent, and which package applicants pay for.
         </p>
       </div>
 

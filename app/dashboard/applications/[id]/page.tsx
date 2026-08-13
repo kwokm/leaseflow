@@ -2,6 +2,8 @@
 
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
+import { Avatar } from "@/components/desk/avatar";
+import { StatusPill } from "@/components/desk/status-pill";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -43,8 +45,6 @@ import {
   getScoreColor,
   getScoreLabel,
   getScreeningFee,
-  getStatusColor,
-  getStatusLabel,
   groupDocuments,
   type Payment,
 } from "@/lib/data/mock-data";
@@ -170,12 +170,12 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
   const decided = applicant.status === "approved" || applicant.status === "declined";
 
   return (
-    <div className="space-y-6 max-w-5xl">
+    <div className="space-y-6 p-5 sm:p-6">
       <div className="print:hidden">
-        <Link href="/dashboard/applications">
-          <Button variant="ghost" size="sm" className="mb-4">
+        <Link href="/dashboard">
+          <Button variant="ghost" size="sm" className="mb-2">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to applications
+            Back to the desk
           </Button>
         </Link>
       </div>
@@ -190,10 +190,9 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold text-ink">{fullName}</h1>
-            <Badge className={getStatusColor(applicant.status)}>
-              {getStatusLabel(applicant.status)}
-            </Badge>
+            <Avatar firstName={applicant.firstName} lastName={applicant.lastName} large />
+            <h1 className="text-[28px] font-semibold tracking-[-0.7px] text-ink">{fullName}</h1>
+            <StatusPill status={applicant.status} />
           </div>
           <p className="text-mute mt-1">{property.address}</p>
           <div className="flex flex-wrap items-center gap-3 mt-3">

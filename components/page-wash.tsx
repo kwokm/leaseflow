@@ -1,16 +1,10 @@
 import { cn } from "@/lib/utils";
 
 /**
- * The locked hero wash, reused. White paper field + the same 62% bottom bloom
- * as design/attio-inspired `.hero-wash`. No second palette.
+ * Full-page lavender wash + pinstripes from the locked landing screenshot.
+ * Used on landing, apply, and the owner desk so the product is one surface.
  */
-export function PageWash({
-  quiet = false,
-  className,
-}: {
-  quiet?: boolean;
-  className?: string;
-}) {
+export function PageWash({ className }: { className?: string }) {
   return (
     <div
       className={cn(
@@ -19,7 +13,7 @@ export function PageWash({
       )}
       aria-hidden
     >
-      <div className={cn("hero-wash", !quiet && "hero-wash-shell", quiet && "opacity-70")} />
+      <div className="hero-wash hero-wash-shell" />
     </div>
   );
 }
