@@ -2,11 +2,10 @@
 
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Avatar } from "@/components/desk/avatar";
 import { StatusPill } from "@/components/desk/status-pill";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -16,37 +15,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  ArrowLeft,
-  AlertTriangle,
-  Briefcase,
-  Car,
-  CheckCircle,
-  Clock,
-  Download,
-  FileText,
-  Gauge,
-  Home,
-  Paperclip,
-  PawPrint,
-  Printer,
-  Scale,
-  Shield,
-  TrendingUp,
-  Users,
-  XCircle,
-} from "lucide-react";
-import {
   getApplicantById,
   getApplicationDetails,
   getExperianPull,
-  getPaymentsByApplicant,
   getPropertyById,
   getReportByApplicant,
-  getScoreColor,
-  getScoreLabel,
-  getScreeningFee,
   groupDocuments,
-  type Payment,
 } from "@/lib/data/mock-data";
 import { downloadPacket } from "@/lib/packet-document";
 import { getSubmission } from "@/lib/apply/storage";
@@ -58,38 +32,43 @@ import {
   submissionExperian,
   submissionReport,
 } from "@/lib/apply/to-packet";
+import { setDecision, withDecision } from "@/lib/desk/decisions";
+import { creditScore, incomeMultiple, shortAddress } from "@/lib/desk/display";
 import type { ApplyState } from "@/lib/apply/types";
+import type { ApplicationStatus } from "@/lib/data/mock-data";
 
-function Field({ label, value }: { label: string; value: React.ReactNode }) {
+function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div>
-      <div className="text-sm text-mute">{label}</div>
-      <div className="font-medium text-ink mt-0.5">{value}</div>
+    <div className="flex items-start justify-between gap-4 border-b border-line py-2.5 last:border-b-0">
+      <dt className="text-[13px] font-medium text-mute">{label}</dt>
+      <dd className="min-w-0 text-right text-[13px] font-medium text-ink">{value}</dd>
     </div>
   );
 }
 
-function SectionHeading({
-  icon: Icon,
+function Section({
+  title,
   children,
 }: {
-  icon: React.ComponentType<{ className?: string }>;
+  title: string;
   children: React.ReactNode;
 }) {
   return (
-    <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-      <Icon className="w-5 h-5" />
+    <section className="border-b border-line px-5 py-5 last:border-b-0 sm:px-6">
+      <h2 className="mb-3 text-[12px] font-medium uppercase tracking-[0.06em] text-mute-2">
+        {title}
+      </h2>
       {children}
-    </h2>
+    </section>
   );
 }
 
 export default function ApplicationPacketPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const router = useRouter();
   const [adverseActionOpen, setAdverseActionOpen] = useState(false);
+  const [statusOverride, setStatusOverride] = useState<ApplicationStatus | null>(null);
 
-  // Applications submitted from this browser live in localStorage, so they can
-  // only be resolved after mount.
   const local = isLocalApplicantId(id);
   const [submission, setSubmission] = useState<ApplyState | undefined>();
   const [submissionChecked, setSubmissionChecked] = useState(!local);
@@ -100,11 +79,14 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
     setSubmissionChecked(true);
   }, [id, local]);
 
-  const applicant = local
+  const seeded = local
     ? submission
       ? submissionApplicant(submission)
       : undefined
     : getApplicantById(id);
+  const applicant = seeded
+    ? { ...withDecision(seeded), ...(statusOverride ? { status: statusOverride } : {}) }
+    : undefined;
   const property = applicant ? getPropertyById(applicant.propertyId) : undefined;
   const report = local
     ? submission
@@ -127,105 +109,73 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
     : applicant
       ? getExperianPull(applicant.id)
       : undefined;
-  const payments: Payment[] =
-    local && submission
-      ? [
-          {
-            id: `pay-${submission.confirmationId}`,
-            kind: "screening_fee",
-            description: `${submission.screeningPackage === "premium" ? "Premium" : "Standard"} screening fee`,
-            applicantId: applicant?.id,
-            propertyId: submission.listingId,
-            amount: getScreeningFee(submission.screeningPackage),
-            status: "paid",
-            method: "Demo card",
-            createdAt: submission.submittedAt ?? "",
-          },
-        ]
-      : applicant
-        ? getPaymentsByApplicant(applicant.id)
-        : [];
 
   if (local && !submissionChecked) {
-    return <div className="py-12 text-mute">Loading the application…</div>;
+    return <p className="px-6 py-12 text-[13px] text-mute">Loading the application…</p>;
   }
 
   if (!applicant || !property) {
     return (
-      <div className="text-center py-12">
-        <h2 className="text-2xl font-bold mb-2">Application not found</h2>
-        <p className="text-mute mb-4">
+      <div className="px-6 py-12 text-center">
+        <p className="text-[15px] font-medium text-ink">Application not found</p>
+        <p className="mt-1 text-[13px] text-mute">
           {local
             ? "Applications submitted in this prototype are stored in the browser that submitted them."
             : "This application is no longer available."}
         </p>
-        <Link href="/dashboard/applications">
-          <Button>Back to applications</Button>
-        </Link>
+        <Button asChild className="mt-4">
+          <Link href="/dashboard">Back to the desk</Link>
+        </Button>
       </div>
     );
   }
 
   const fullName = `${applicant.firstName} ${applicant.lastName}`;
   const decided = applicant.status === "approved" || applicant.status === "declined";
+  const multiple = incomeMultiple(applicant);
+  const credit = creditScore(applicant);
+
+  function decide(next: "approved" | "declined") {
+    setDecision(id, next);
+    setStatusOverride(next);
+    router.push("/dashboard");
+  }
 
   return (
-    <div className="space-y-6 p-5 sm:p-6">
-      <div className="print:hidden">
-        <Link href="/dashboard">
-          <Button variant="ghost" size="sm" className="mb-2">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to the desk
-          </Button>
-        </Link>
-      </div>
-
-      {/* Print-only document header */}
-      <div className="hidden print:block border-b-2 border-primary pb-3 mb-4">
-        <div className="text-2xl font-bold">Application Packet — {fullName}</div>
-        <div className="text-sm text-mute">{property.address}</div>
-      </div>
-
-      {/* Header */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-        <div>
-          <div className="flex items-center gap-3">
-            <Avatar firstName={applicant.firstName} lastName={applicant.lastName} large />
-            <h1 className="text-[28px] font-semibold tracking-[-0.7px] text-ink">{fullName}</h1>
-            <StatusPill status={applicant.status} />
-          </div>
-          <p className="text-mute mt-1">{property.address}</p>
-          <div className="flex flex-wrap items-center gap-3 mt-3">
-            <span className="text-sm text-mute">{applicant.email}</span>
-            <span className="text-mute-3">·</span>
-            <span className="text-sm text-mute">{applicant.phone}</span>
-            <span className="text-mute-3">·</span>
-            <span className="text-sm text-mute">
-              Applied {new Date(applicant.appliedAt).toLocaleDateString()}
-            </span>
+    <div>
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4 sm:px-6">
+        <div className="flex min-w-0 items-center gap-3">
+          <Avatar firstName={applicant.firstName} lastName={applicant.lastName} large />
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-[18px] font-semibold tracking-[-0.3px] text-ink">{fullName}</h1>
+              <StatusPill status={applicant.status} />
+            </div>
+            <p className="mt-0.5 truncate text-[13px] text-mute">
+              {shortAddress(property.address)} · {applicant.email}
+            </p>
           </div>
         </div>
-
         <div className="flex flex-wrap items-center gap-2 print:hidden">
-          <Button variant="outline" onClick={() => window.print()}>
-            <Printer className="w-4 h-4 mr-2" />
+          <Button asChild variant="outline" size="sm">
+            <Link href="/dashboard">Back</Link>
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => window.print()}>
             Print
           </Button>
           <Button
             variant="outline"
+            size="sm"
             onClick={() => downloadPacket({ applicant, property, details, report, experian })}
           >
-            <Download className="w-4 h-4 mr-2" />
             Download
           </Button>
           {!decided && (
             <>
-              <Button className="bg-ok hover:bg-[#0e8543]">
-                <CheckCircle className="w-4 h-4 mr-2" />
+              <Button size="sm" onClick={() => decide("approved")}>
                 Approve
               </Button>
-              <Button variant="destructive" onClick={() => setAdverseActionOpen(true)}>
-                <XCircle className="w-4 h-4 mr-2" />
+              <Button variant="destructive" size="sm" onClick={() => setAdverseActionOpen(true)}>
                 Decline
               </Button>
             </>
@@ -233,588 +183,163 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
         </div>
       </div>
 
-      {/* Demo Banner */}
-      <div className="bg-mist border border-line rounded-lg p-4 print:hidden">
-        <div className="flex items-start gap-3">
-          <AlertTriangle className="w-5 h-5 text-blue mt-0.5" />
-          <div>
-            <div className="font-semibold text-ink">Demo data</div>
-            <div className="text-sm text-slate">
-              This packet contains mock data for demonstration purposes. No real credit bureau or
-              background check services were used.
-            </div>
-          </div>
-        </div>
-      </div>
+      <Section title="Identity">
+        <dl>
+          <Row label="Applicant" value={fullName} />
+          <Row label="Email" value={applicant.email} />
+          <Row label="Phone" value={applicant.phone} />
+          <Row label="Date of birth" value={details?.dateOfBirth ?? "—"} />
+          <Row label="SSN" value={details ? `•••-••-${details.ssnLast4}` : "—"} />
+          <Row label="Current address" value={details?.currentAddress.address ?? "—"} />
+        </dl>
+      </Section>
 
-      {/* LeaseScore */}
-      {report ? (
-        <Card className="border-2 border-primary/20 print-avoid-break">
-          <CardContent className="p-8">
-            <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-              <div>
-                <div className="text-sm font-medium text-mute mb-2">LeaseScore™</div>
-                <div className={`text-6xl font-bold ${getScoreColor(report.credit.leaseScore)}`}>
-                  {report.credit.leaseScore}
-                </div>
-                <div className="text-lg text-mute mt-2">
-                  {getScoreLabel(report.credit.leaseScore)} Credit
-                </div>
-              </div>
-              <div className="md:text-right">
-                <div className="text-sm text-mute mb-4">Score range 300–850</div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 md:justify-end">
-                    <div className="w-3 h-3 rounded-full bg-ok"></div>
-                    <span className="text-sm">750+ Excellent</span>
-                  </div>
-                  <div className="flex items-center gap-2 md:justify-end">
-                    <div className="w-3 h-3 rounded-full bg-warn"></div>
-                    <span className="text-sm">650-749 Good</span>
-                  </div>
-                  <div className="flex items-center gap-2 md:justify-end">
-                    <div className="w-3 h-3 rounded-full bg-no"></div>
-                    <span className="text-sm">&lt;650 Fair</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      ) : (
-        <Card className="border-dashed print-avoid-break">
-          <CardContent className="p-8 flex items-start gap-4">
-            <Clock className="w-6 h-6 text-mute-3 mt-1" />
-            <div>
-              <div className="text-lg font-semibold">LeaseScore™ pending</div>
-              <p className="text-mute text-sm mt-1">
-                {applicant.status === "invited"
-                  ? "This applicant has been invited but has not started their application yet."
-                  : "Screening runs once the applicant completes their application and pays the screening fee."}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Experian (demo) credit file */}
-      <div className="print-avoid-break">
-        <SectionHeading icon={Gauge}>Credit report</SectionHeading>
-        {experian ? (
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
-                <div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Badge variant="blue">{experian.provider}</Badge>
-                    <span className="text-sm text-mute">{experian.scoreModel}</span>
-                  </div>
-                  <div className="mt-4 text-5xl font-semibold tracking-[-1.4px] text-ink">
-                    {experian.score}
-                  </div>
-                  <p className="mt-2 text-sm text-mute">
-                    Pulled {new Date(experian.pulledAt).toLocaleString()} ·{" "}
-                    {experian.fileMatched ? "File matched" : "No file match"}
-                  </p>
-                </div>
-
-                <dl className="grid w-full max-w-sm grid-cols-2 gap-x-6 gap-y-3 text-sm">
-                  {[
-                    ["On-time payments", `${experian.onTimePaymentRate}%`],
-                    ["Open accounts", String(experian.openAccounts)],
-                    ["Oldest account", `${experian.oldestAccountYears} years`],
-                    ["Recent inquiries", String(experian.recentInquiries)],
-                    ["Public records", String(experian.publicRecords)],
-                    ["Cost to applicant", "$0.00"],
-                  ].map(([label, value]) => (
-                    <div key={label} className="flex justify-between gap-3">
-                      <dt className="text-mute">{label}</dt>
-                      <dd className="font-medium text-ink">{value}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </div>
-
-              {experian.factors.length > 0 && (
-                <ul className="mt-6 space-y-2 border-t border-line pt-4 text-sm">
-                  {experian.factors.map((factor) => (
-                    <li key={factor} className="flex items-start gap-2 text-ink-2">
-                      <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-mute-3" />
-                      {factor}
-                    </li>
-                  ))}
-                </ul>
-              )}
-
-              <p className="mt-4 text-xs text-mute">
-                Mock pull generated for this prototype. No consumer reporting agency was contacted
-                and no bureau credentials were collected.
-              </p>
-            </CardContent>
-          </Card>
+      <Section title="LeaseScore">
+        {report ? (
+          <dl>
+            <Row label="LeaseScore" value={<span className="score">{report.credit.leaseScore}</span>} />
+            <Row label="Credit" value={credit ?? "—"} />
+            <Row label="Income" value={multiple ? `${multiple.toFixed(1)}× rent` : "—"} />
+            <Row label="Status" value={<StatusPill status={applicant.status} />} />
+          </dl>
         ) : (
-          <Card className="border-dashed">
-            <CardContent className="p-6 text-sm text-mute">
-              No credit report is attached to this application yet.
-            </CardContent>
-          </Card>
+          <p className="text-[13px] text-mute">
+            {applicant.status === "invited"
+              ? "Invited — the packet has not been submitted yet."
+              : "Screening lands here once the applicant finishes."}
+          </p>
         )}
-      </div>
+      </Section>
 
-      {/* Application Summary */}
-      <div className="print-avoid-break">
-        <SectionHeading icon={FileText}>Application summary</SectionHeading>
-        <Card>
-          <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Field label="Property" value={property.address} />
-            <Field label="Monthly rent" value={`$${property.rent.toLocaleString()}`} />
-            <Field
-              label="Screening package"
-              value={property.screeningPackage === "premium" ? "Premium" : "Standard"}
+      <Section title="Experian (demo)">
+        {experian ? (
+          <dl>
+            <Row label="Provider" value={experian.provider} />
+            <Row label="Score" value={<span className="score">{experian.score}</span>} />
+            <Row label="Model" value={experian.scoreModel} />
+            <Row label="On-time payments" value={`${experian.onTimePaymentRate}%`} />
+            <Row label="Open accounts" value={experian.openAccounts} />
+            <Row label="Public records" value={experian.publicRecords} />
+          </dl>
+        ) : (
+          <p className="text-[13px] text-mute">No demo credit pull on this file.</p>
+        )}
+        <p className="mt-3 text-[12px] text-mute-2">
+          Mock pull only. No consumer reporting agency was contacted.
+        </p>
+      </Section>
+
+      <Section title="Income">
+        {report ? (
+          <dl>
+            <Row label="Employer" value={report.income.employer} />
+            <Row label="Position" value={report.income.position} />
+            <Row
+              label="Monthly income"
+              value={`$${report.income.monthlyIncome.toLocaleString()}`}
             />
-            <Field
-              label="Applied"
-              value={new Date(applicant.appliedAt).toLocaleDateString()}
+            <Row label="Rent multiple" value={multiple ? `${multiple.toFixed(1)}×` : "—"} />
+            <Row label="Verified" value={report.income.verified ? "Yes" : "No"} />
+          </dl>
+        ) : details ? (
+          <dl>
+            <Row label="Employer" value={details.employment.employer} />
+            <Row
+              label="Stated monthly income"
+              value={`$${details.employment.monthlyIncome.toLocaleString()}`}
             />
-            <Field
-              label="Completed"
-              value={
-                applicant.completedAt
-                  ? new Date(applicant.completedAt).toLocaleDateString()
-                  : "Not completed"
-              }
+          </dl>
+        ) : (
+          <p className="text-[13px] text-mute">No income on this file yet.</p>
+        )}
+      </Section>
+
+      <Section title="Documents">
+        {details && details.documents.length > 0 ? (
+          <table className="app-table">
+            <thead>
+              <tr>
+                <th>File</th>
+                <th>Type</th>
+                <th>Added</th>
+              </tr>
+            </thead>
+            <tbody>
+              {groupDocuments(details.documents).flatMap((group) =>
+                group.documents.map((doc) => (
+                  <tr key={`${group.type}-${doc.name}`}>
+                    <td>{doc.name}</td>
+                    <td>{group.label}</td>
+                    <td>{new Date(doc.uploadedAt).toLocaleDateString()}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        ) : (
+          <p className="text-[13px] text-mute">No documents were uploaded with this application.</p>
+        )}
+      </Section>
+
+      <Section title="Background">
+        {report ? (
+          <dl>
+            <Row
+              label="Criminal"
+              value={report.background.criminal === "clear" ? "Clear" : "Records found"}
             />
-            <Field
-              label="Desired move-in"
-              value={
-                details ? new Date(details.desiredMoveIn).toLocaleDateString() : "Not provided"
-              }
+            <Row
+              label="Eviction"
+              value={report.background.eviction === "clear" ? "Clear" : "Records found"}
             />
-            <Field
-              label="Screening fee"
-              value={
-                payments.length ? (
-                  <span className="capitalize">
-                    ${payments[0].amount.toFixed(2)} · {payments[0].status}
-                  </span>
-                ) : (
-                  "No payment on file"
-                )
-              }
+            <Row
+              label="Registry"
+              value={report.background.sexOffender === "clear" ? "Clear" : "Records found"}
             />
-            <Field
-              label="Date of birth"
-              value={
-                details ? new Date(details.dateOfBirth).toLocaleDateString() : "Not provided"
-              }
+            {report.background.details ? (
+              <Row label="Notes" value={report.background.details} />
+            ) : null}
+          </dl>
+        ) : (
+          <p className="text-[13px] text-mute">Background has not landed on this packet yet.</p>
+        )}
+      </Section>
+
+      <Section title="FCRA">
+        <p className="text-[13px] font-medium leading-5 text-mute">
+          Screening reports are consumer reports under the FCRA. This packet is a prototype — names,
+          scores, and tradelines are mock data, and no consumer reporting agency is used.
+        </p>
+        {details ? (
+          <dl className="mt-3">
+            <Row label="Signature" value={details.consent.signature} />
+            <Row
+              label="Consent"
+              value={new Date(details.consent.acceptedAt).toLocaleString()}
             />
-            <Field label="SSN" value={details ? `•••-••-${details.ssnLast4}` : "Not provided"} />
-          </CardContent>
-        </Card>
-      </div>
+          </dl>
+        ) : null}
+      </Section>
 
-      {details ? (
-        <>
-          {/* Current Residence */}
-          <div className="print-avoid-break">
-            <SectionHeading icon={Home}>Current residence</SectionHeading>
-            <Card>
-              <CardContent className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Field label="Address" value={details.currentAddress.address} />
-                <Field label="Resident since" value={details.currentAddress.since} />
-                <Field
-                  label="Monthly rent"
-                  value={
-                    details.currentAddress.monthlyRent
-                      ? `$${details.currentAddress.monthlyRent.toLocaleString()}`
-                      : "Not provided"
-                  }
-                />
-                <Field
-                  label="Landlord"
-                  value={`${details.currentAddress.landlordName} · ${details.currentAddress.landlordPhone}`}
-                />
-                <Field
-                  label="Reason for leaving"
-                  value={details.currentAddress.reasonForLeaving}
-                />
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Employment (self-reported) */}
-          <div className="print-avoid-break">
-            <SectionHeading icon={Briefcase}>Employment (self-reported)</SectionHeading>
-            <Card>
-              <CardContent className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Field label="Employer" value={details.employment.employer} />
-                <Field label="Position" value={details.employment.position} />
-                <Field label="Start date" value={details.employment.startDate} />
-                <Field
-                  label="Supervisor"
-                  value={`${details.employment.supervisor} · ${details.employment.supervisorPhone}`}
-                />
-                <Field
-                  label="Stated monthly income"
-                  value={`$${details.employment.monthlyIncome.toLocaleString()}`}
-                />
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Household */}
-          <div className="print-avoid-break">
-            <SectionHeading icon={Users}>Household</SectionHeading>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-mute">Occupants</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2 text-sm">
-                  {details.occupants.map((occupant) => (
-                    <div key={occupant.name}>
-                      <div className="font-medium">{occupant.name}</div>
-                      <div className="text-mute">
-                        {occupant.relationship} · {occupant.age}
-                      </div>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-mute flex items-center gap-2">
-                    <PawPrint className="w-4 h-4" />
-                    Pets
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2 text-sm">
-                  {details.pets.length === 0 ? (
-                    <span className="text-mute-2">None</span>
-                  ) : (
-                    details.pets.map((pet) => (
-                      <div key={`${pet.type}-${pet.breed}`}>
-                        <div className="font-medium">{pet.type}</div>
-                        <div className="text-mute">
-                          {pet.breed} · {pet.weight}
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-mute flex items-center gap-2">
-                    <Car className="w-4 h-4" />
-                    Vehicles
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2 text-sm">
-                  {details.vehicles.length === 0 ? (
-                    <span className="text-mute-2">None</span>
-                  ) : (
-                    details.vehicles.map((vehicle) => (
-                      <div key={vehicle.plate}>
-                        <div className="font-medium">
-                          {vehicle.year} {vehicle.make} {vehicle.model}
-                        </div>
-                        <div className="text-mute">{vehicle.plate}</div>
-                      </div>
-                    ))
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-
-          {/* Disclosures */}
-          <div className="grid grid-cols-1 gap-4 print-avoid-break">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Disclosures</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-sm">
-                <div className="flex items-center justify-between">
-                  <span className="text-mute">Smoker</span>
-                  <span className="font-medium">{details.disclosures.smoker ? "Yes" : "No"}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-mute">Prior eviction</span>
-                  <span className="font-medium">
-                    {details.disclosures.priorEviction ? "Yes" : "No"}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-mute">Bankruptcy</span>
-                  <span className="font-medium">
-                    {details.disclosures.bankruptcy ? "Yes" : "No"}
-                  </span>
-                </div>
-                {details.disclosures.notes && (
-                  <p className="text-mute pt-2 border-t">{details.disclosures.notes}</p>
-                )}
-              </CardContent>
-            </Card>
-
-          </div>
-
-          {/* Documents — photo ID, pay stubs, and bank statements */}
-          <div className="print-avoid-break">
-            <SectionHeading icon={Paperclip}>Documents</SectionHeading>
-            {details.documents.length === 0 ? (
-              <Card>
-                <CardContent className="p-6 text-sm text-mute">
-                  No documents were uploaded with this application.
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="space-y-4">
-                {groupDocuments(details.documents).map((group) => (
-                  <Card key={group.type}>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm font-medium text-mute">
-                        {group.label}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-2 text-sm">
-                      {group.documents.map((doc) => (
-                        <div
-                          key={`${doc.name}-${doc.uploadedAt}`}
-                          className="flex items-center justify-between gap-3 rounded-btn border border-line px-3 py-2"
-                        >
-                          <div className="flex min-w-0 items-center gap-2">
-                            <FileText className="w-4 h-4 shrink-0 text-mute-3" />
-                            <span className="truncate font-medium text-ink">{doc.name}</span>
-                          </div>
-                          <span className="shrink-0 text-mute">
-                            {doc.sizeLabel ? `${doc.sizeLabel} · ` : ""}
-                            {new Date(doc.uploadedAt).toLocaleDateString()}
-                          </span>
-                        </div>
-                      ))}
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </div>
-        </>
-      ) : (
-        <Card className="print-avoid-break">
-          <CardContent className="p-8 text-center text-mute">
-            This applicant has been invited but has not submitted an application yet.
-          </CardContent>
-        </Card>
-      )}
-
-      {report && (
-        <>
-          {/* Credit Summary */}
-          <div className="print-avoid-break">
-            <SectionHeading icon={TrendingUp}>Credit summary</SectionHeading>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-              {[
-                { label: "Payment history", value: `${report.credit.paymentHistory}%` },
-                { label: "Utilization", value: `${report.credit.creditUtilization}%` },
-                { label: "Accounts", value: report.credit.totalAccounts },
-                { label: "Derogatory marks", value: report.credit.derogatoryMarks },
-                { label: "Hard inquiries", value: report.credit.hardInquiries },
-              ].map((stat) => (
-                <Card key={stat.label}>
-                  <CardContent className="p-4">
-                    <div className="text-2xl font-bold">{stat.value}</div>
-                    <div className="text-xs text-mute mt-1">{stat.label}</div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-
-          {/* Background Check */}
-          <div className="print-avoid-break">
-            <SectionHeading icon={Shield}>Background check</SectionHeading>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {[
-                { label: "Criminal", value: report.background.criminal },
-                { label: "Eviction", value: report.background.eviction },
-                { label: "Sex offender", value: report.background.sexOffender },
-              ].map((check) => {
-                const clear = check.value === "clear";
-                return (
-                  <Card
-                    key={check.label}
-                    className={clear ? "border-line bg-ok-bg" : "border-line bg-no-bg"}
-                  >
-                    <CardContent className="p-4 flex items-center gap-2">
-                      {clear ? (
-                        <CheckCircle className="w-5 h-5 text-ok" />
-                      ) : (
-                        <XCircle className="w-5 h-5 text-no" />
-                      )}
-                      <span className="font-medium">
-                        {check.label}: {clear ? "Clear" : "Records found"}
-                      </span>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-
-            {report.background.details && (
-              <Card className="mt-4 border-line">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <AlertTriangle className="w-5 h-5 text-no" />
-                    Additional details
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm">{report.background.details}</p>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-
-          {/* Income Verification */}
-          <div className="print-avoid-break">
-            <SectionHeading icon={Briefcase}>Income and employment (verified)</SectionHeading>
-            <Card>
-              <CardContent className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Field label="Employer" value={report.income.employer} />
-                  <Field label="Position" value={report.income.position} />
-                  <Field
-                    label="Monthly income"
-                    value={
-                      <span className="text-ok">
-                        ${report.income.monthlyIncome.toLocaleString()}
-                      </span>
-                    }
-                  />
-                  <Field
-                    label="Verification status"
-                    value={
-                      report.income.verified ? (
-                        <span className="text-ok">Verified</span>
-                      ) : (
-                        <span className="text-no">Not verified</span>
-                      )
-                    }
-                  />
-                </div>
-
-                <div className="mt-6 p-4 bg-mist rounded-lg">
-                  <div className="text-sm font-medium mb-1">Rent-to-income ratio</div>
-                  <div className="text-3xl font-bold text-primary">
-                    {Math.round((property.rent / report.income.monthlyIncome) * 100)}%
-                  </div>
-                  <p className="text-sm text-mute mt-1">
-                    {property.rent / report.income.monthlyIncome <= 0.3
-                      ? "Within recommended 30% guideline"
-                      : "Above recommended 30% guideline"}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Residential History — verified addresses, when screening returned any */}
-          <div className={`print-avoid-break ${report.residentialHistory.length ? "" : "hidden"}`}>
-            <SectionHeading icon={Home}>Residential history (verified)</SectionHeading>
-            <div className="space-y-3">
-              {report.residentialHistory.map((residence) => (
-                <Card key={residence.address}>
-                  <CardContent className="p-6 flex items-start justify-between gap-4">
-                    <div>
-                      <div className="font-semibold">{residence.address}</div>
-                      <div className="text-sm text-mute mt-1">
-                        {residence.from} - {residence.to}
-                      </div>
-                    </div>
-                    {residence.landlordVerified ? (
-                      <Badge className="bg-ok-bg text-ok">
-                        <CheckCircle className="w-3 h-3 mr-1" />
-                        Verified
-                      </Badge>
-                    ) : (
-                      <Badge variant="secondary">Not verified</Badge>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* Consent */}
-      {details && (
-        <div className="print-avoid-break">
-          <SectionHeading icon={Scale}>Consent and authorization</SectionHeading>
-          <Card>
-            <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Field label="Electronic signature" value={details.consent.signature} />
-              <Field
-                label="FCRA consent accepted"
-                value={new Date(details.consent.acceptedAt).toLocaleString()}
-              />
-              <Field label="IP address" value={details.consent.ipAddress} />
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      <p className="text-xs text-mute-2 hidden print:block pt-4 border-t">
-        Generated by LeaseFlow (demo prototype). Screening data is fictional — no consumer
-        reporting agency was used.
-      </p>
-
-      {/* Adverse Action Dialog */}
       <Dialog open={adverseActionOpen} onOpenChange={setAdverseActionOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Scale className="w-5 h-5" />
-              Adverse action notice preview
-            </DialogTitle>
+            <DialogTitle>Decline this packet</DialogTitle>
             <DialogDescription>
-              If you decline this application, the applicant will receive this notice per FCRA
-              requirements.
+              Demo notice only. The queue pill will change to Declined. No notice is sent.
             </DialogDescription>
           </DialogHeader>
-          <div className="border rounded-lg p-6 bg-mist text-sm space-y-4">
-            <div>
-              <strong>NOTICE OF ADVERSE ACTION</strong>
-            </div>
-            <div>Dear {fullName},</div>
-            <div>
-              Your application for the property at {property.address} has been declined based in
-              whole or in part on information obtained in your consumer report.
-            </div>
-            <div>
-              <strong>Consumer Reporting Agency:</strong>
-              <br />
-              LeaseFlow Screening Services (Demo)
-              <br />
-              (555) 123-4567
-              <br />
-              support@leaseflow.app
-            </div>
-            <div>
-              You have the right to obtain a free copy of your consumer report from the agency
-              within 60 days. You also have the right to dispute the accuracy or completeness of
-              any information in your report.
-            </div>
-            <div className="text-xs text-mute">
-              This is a demo notice for prototype purposes only.
-            </div>
-          </div>
+          <p className="text-[13px] leading-5 text-mute">
+            {fullName} at {shortAddress(property.address)} will show as Declined on the desk. This
+            is mock data — no consumer reporting agency is used.
+          </p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setAdverseActionOpen(false)}>
               Cancel
             </Button>
-            <Button variant="destructive">Send notice and decline</Button>
+            <Button variant="destructive" onClick={() => decide("declined")}>
+              Decline
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

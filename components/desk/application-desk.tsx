@@ -2,74 +2,69 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { Applicant, ApplicationStatus } from "@/lib/data/mock-data";
-import { getAllApplications } from "@/lib/data/mock-data";
-import { loadSubmissions } from "@/lib/apply/storage";
-import { submissionApplicant } from "@/lib/apply/to-packet";
-import { sortDeskFirst } from "@/lib/desk/display";
+import { loadDeskApplicants } from "@/lib/desk/queue";
 import { ApplicationTable } from "@/components/desk/application-table";
 import { DeskPill, DeskToolbar } from "@/components/desk/packet-window";
 
-type PropertyFilter = "all" | string;
 type StatusFilter = "all" | "received" | ApplicationStatus;
 
 export function ApplicationDesk({
   propertyId,
-  extras = false,
+  extras = true,
   chrome = true,
+  selectedId,
 }: {
   propertyId?: string;
   extras?: boolean;
   chrome?: boolean;
+  selectedId?: string;
 }) {
-  const [submitted, setSubmitted] = useState<Applicant[]>([]);
-  const [propertyFilter, setPropertyFilter] = useState<PropertyFilter>(propertyId ?? "all");
+  const [rows, setRows] = useState<Applicant[]>([]);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
 
   useEffect(() => {
-    setSubmitted(loadSubmissions().map(submissionApplicant));
+    setRows(loadDeskApplicants());
   }, []);
 
-  const applications = useMemo(
-    () => sortDeskFirst([...submitted, ...getAllApplications()]),
-    [submitted]
-  );
-
-  const scoped = applications.filter((row) => {
-    const listing = propertyId ?? (propertyFilter === "all" ? undefined : propertyFilter);
-    if (listing && row.propertyId !== listing) return false;
-    if (statusFilter === "all") return true;
-    if (statusFilter === "received") {
-      return row.status === "completed" || row.status === "approved" || row.status === "declined";
-    }
-    return row.status === statusFilter;
-  });
+  const scoped = useMemo(() => {
+    return rows.filter((row) => {
+      if (propertyId && row.propertyId !== propertyId) return false;
+      if (statusFilter === "all") return true;
+      if (statusFilter === "received") {
+        return row.status === "completed" || row.status === "approved" || row.status === "declined";
+      }
+      return row.status === statusFilter;
+    });
+  }, [rows, propertyId, statusFilter]);
 
   return (
     <>
       {chrome ? (
-      <DeskToolbar meta={`${scoped.length} in queue`}>
-        <DeskPill
-          active={propertyFilter === "all" && !propertyId}
-          onClick={() => {
-            setPropertyFilter("all");
-            setStatusFilter("all");
-          }}
-        >
-          All properties
-        </DeskPill>
-        <DeskPill
-          active={statusFilter === "received"}
-          onClick={() => setStatusFilter(statusFilter === "received" ? "all" : "received")}
-        >
-          Received
-        </DeskPill>
-      </DeskToolbar>
+        <DeskToolbar meta={`${scoped.length} in queue`}>
+          <DeskPill
+            active={statusFilter === "all"}
+            onClick={() => setStatusFilter("all")}
+          >
+            All properties
+          </DeskPill>
+          <DeskPill
+            active={statusFilter === "received"}
+            onClick={() => setStatusFilter(statusFilter === "received" ? "all" : "received")}
+          >
+            Received
+          </DeskPill>
+        </DeskToolbar>
       ) : null}
       <ApplicationTable
         rows={scoped}
         showExtras={extras}
         packetLinks
-        selectedId={scoped[0]?.id}
+        selectedId={selectedId ?? scoped[0]?.id}
+        empty={
+          propertyId
+            ? "No applicants on this listing yet."
+            : "No applications in this queue."
+        }
       />
     </>
   );

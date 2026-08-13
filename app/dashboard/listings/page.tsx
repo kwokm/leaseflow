@@ -1,27 +1,23 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { DeskPill, DeskToolbar } from "@/components/desk/packet-window";
 import { StatusPill } from "@/components/desk/status-pill";
-import {
-  getApplicantsByProperty,
-  mockProperties,
-  type ApplicationStatus,
-} from "@/lib/data/mock-data";
+import { mockProperties } from "@/lib/data/mock-data";
+import { loadDeskApplicants, listingRollup } from "@/lib/desk/queue";
 import { shortAddress } from "@/lib/desk/display";
-
-function leadStatus(statuses: ApplicationStatus[]): ApplicationStatus {
-  if (statuses.includes("approved")) return "approved";
-  if (statuses.includes("completed")) return "completed";
-  if (statuses.includes("declined")) return "declined";
-  if (statuses.includes("in_progress")) return "in_progress";
-  return "invited";
-}
+import type { Applicant } from "@/lib/data/mock-data";
 
 export default function ListingsPage() {
   const router = useRouter();
+  const [applicants, setApplicants] = useState<Applicant[]>([]);
+
+  useEffect(() => {
+    setApplicants(loadDeskApplicants());
+  }, []);
 
   return (
     <>
@@ -39,14 +35,16 @@ export default function ListingsPage() {
               <th>Listing</th>
               <th className="num">Rent</th>
               <th className="num">Applicants</th>
+              <th className="num">LeaseScore</th>
               <th>Lead status</th>
               <th>Package</th>
             </tr>
           </thead>
           <tbody>
             {mockProperties.map((property) => {
-              const applicants = getApplicantsByProperty(property.id);
-              const status = leadStatus(applicants.map((row) => row.status));
+              const rollup = listingRollup(
+                applicants.filter((row) => row.propertyId === property.id)
+              );
 
               return (
                 <tr
@@ -69,9 +67,14 @@ export default function ListingsPage() {
                     </div>
                   </td>
                   <td className="num">${property.rent.toLocaleString()}</td>
-                  <td className="num">{applicants.length}</td>
+                  <td className="num">{rollup.count}</td>
+                  <td className="num score">{rollup.leadScore ?? "—"}</td>
                   <td>
-                    {applicants.length ? <StatusPill status={status} /> : <span className="status">Empty</span>}
+                    {rollup.leadStatus ? (
+                      <StatusPill status={rollup.leadStatus} />
+                    ) : (
+                      <span className="status">Empty</span>
+                    )}
                   </td>
                   <td className="capitalize">{property.screeningPackage}</td>
                 </tr>

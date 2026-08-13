@@ -20,8 +20,8 @@ function titleFor(pathname: string): string {
   const listing = pathname.match(/^\/dashboard\/listings\/([^/]+)/);
   if (listing && listing[1] !== "new") {
     const property = getPropertyById(listing[1]);
-    if (property) return `Application packet • ${shortAddress(property.address)}`;
-    return "Application packet";
+    if (property) return shortAddress(property.address);
+    return "Listing";
   }
 
   if (pathname.startsWith("/dashboard/listings")) return "Properties";
