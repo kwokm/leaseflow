@@ -30,7 +30,7 @@ function ReviewBlock({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-lg border border-line bg-paper p-5 transition-[border-color,box-shadow] duration-200 ease-premium">
+    <section className="rounded-lg border border-line bg-paper p-5 shadow-mini transition-[border-color,box-shadow] duration-200 ease-premium">
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-[17px] font-semibold tracking-[-0.3px] text-ink">{title}</h2>
         <Button type="button" variant="ghost" size="sm" onClick={() => goTo(step)}>
@@ -141,7 +141,7 @@ export function StepReview({ state, patch, errors, property, goTo }: StepProps) 
       </ReviewBlock>
 
       {/* FCRA-style authorization */}
-      <section className="rounded-lg border border-line bg-paper p-5">
+      <section className="rounded-lg border border-line bg-paper p-5 shadow-mini">
         <h2 className="text-[17px] font-semibold tracking-[-0.3px] text-ink">
           Authorization and disclosure
         </h2>
@@ -209,7 +209,7 @@ export function StepReview({ state, patch, errors, property, goTo }: StepProps) 
       </section>
 
       {/* Mock payment */}
-      <section className="rounded-lg border border-line bg-paper p-5">
+      <section className="rounded-lg border border-line bg-paper p-5 shadow-mini">
         <div className="flex items-center gap-2">
           <CreditCard className="h-5 w-5 text-mute" aria-hidden />
           <h2 className="text-[17px] font-semibold tracking-[-0.3px] text-ink">Payment</h2>

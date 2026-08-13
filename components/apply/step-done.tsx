@@ -28,7 +28,7 @@ export function StepDone({ state, property }: StepProps) {
       </p>
 
       {/* Renter receipt — printable */}
-      <section className="print-avoid-break rounded-lg border border-line bg-paper p-5">
+      <section className="print-avoid-break rounded-lg border border-line bg-paper p-5 shadow-mini">
         <div className="flex flex-wrap items-start justify-between gap-3 border-b border-line pb-4">
           <div>
             <p className="text-[13px] font-medium text-mute">Receipt</p>

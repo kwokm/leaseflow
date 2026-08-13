@@ -84,71 +84,70 @@ export function StepStart({ state, patch, property }: StepProps) {
         <legend className="mb-3 text-[17px] font-semibold tracking-[-0.3px] text-ink">
           Choose a screening package
         </legend>
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-          {PACKAGES.map((pkg) => {
-            const selected = state.screeningPackage === pkg.id;
-            return (
-              <label
-                key={pkg.id}
-                className={cn(
-                  // The radio itself is visually hidden, so the card carries the focus ring.
-                  "relative flex cursor-pointer flex-col rounded-lg border bg-paper p-5",
-                  "transition-[border-color,box-shadow,background-color] duration-200 ease-premium",
-                  "focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-ink",
-                  selected
-                    ? "border-ink shadow-mini"
-                    : "border-line hover:border-line-2 hover:shadow-mini"
-                )}
-              >
-                <input
-                  type="radio"
-                  name="screening-package"
-                  value={pkg.id}
-                  checked={selected}
-                  onChange={() => patch({ screeningPackage: pkg.id })}
-                  className="sr-only"
-                />
-                <span className="flex items-start justify-between gap-3">
-                  <span>
-                    <span className="block text-[17px] font-semibold tracking-[-0.3px] text-ink">
-                      {pkg.name}
+        <div className="overflow-hidden rounded-lg border border-line bg-paper shadow-window">
+          <div className="grid grid-cols-1 md:grid-cols-2">
+            {PACKAGES.map((pkg, index) => {
+              const selected = state.screeningPackage === pkg.id;
+              return (
+                <label
+                  key={pkg.id}
+                  className={cn(
+                    // The radio itself is visually hidden, so the column carries the focus ring.
+                    "relative flex cursor-pointer flex-col p-6",
+                    "transition-[background-color,box-shadow] duration-200 ease-premium",
+                    "focus-within:z-10 focus-within:outline focus-within:outline-2 focus-within:outline-offset-[-2px] focus-within:outline-ink",
+                    index > 0 && "border-t border-line md:border-l md:border-t-0",
+                    selected ? "bg-wash/40" : "bg-paper hover:bg-mist"
+                  )}
+                >
+                  <input
+                    type="radio"
+                    name="screening-package"
+                    value={pkg.id}
+                    checked={selected}
+                    onChange={() => patch({ screeningPackage: pkg.id })}
+                    className="sr-only"
+                  />
+                  <span className="flex items-start justify-between gap-3">
+                    <span>
+                      <span className="block text-[14px] font-medium text-mute">{pkg.name}</span>
+                      <span className="mt-0.5 block text-[14px] font-medium text-mute">
+                        {pkg.blurb}
+                      </span>
                     </span>
-                    <span className="mt-0.5 block text-[14px] font-medium text-mute">
-                      {pkg.blurb}
-                    </span>
-                  </span>
-                  <span
-                    aria-hidden
-                    className={cn(
-                      "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border",
-                      selected ? "border-ink bg-ink text-paper" : "border-line-2 bg-paper"
-                    )}
-                  >
-                    {selected && <Check className="h-3 w-3" strokeWidth={3} />}
-                  </span>
-                </span>
-
-                <span className="num mt-4 block text-[32px] font-semibold leading-none tracking-[-0.9px] text-ink">
-                  ${pkg.price.toFixed(2)}
-                </span>
-                <span className="mt-1 block text-[13px] font-medium text-mute">
-                  One-time, paid by you
-                </span>
-
-                <ul className="mt-4 space-y-2 border-t border-line pt-4">
-                  {pkg.features.map((feature) => (
-                    <li
-                      key={feature}
-                      className="flex items-start gap-2 text-[14px] font-medium tracking-[-0.14px] text-ink-2"
+                    <span
+                      aria-hidden
+                      className={cn(
+                        "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-[background-color,border-color,color] duration-200 ease-premium",
+                        selected ? "border-ink bg-ink text-paper" : "border-line-2 bg-paper"
+                      )}
                     >
-                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-ok" aria-hidden />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-              </label>
-            );
-          })}
+                      {selected && <Check className="h-3 w-3" strokeWidth={3} />}
+                    </span>
+                  </span>
+
+                  <span className="num mt-4 block text-[40px] font-medium leading-[44px] tracking-[-0.4px] text-ink">
+                    ${pkg.price.toFixed(2)}
+                  </span>
+                  <span className="mt-1 block text-[13px] font-medium text-mute">
+                    One-time, paid by you
+                  </span>
+
+                  <ul className="mt-5 space-y-2 border-t border-line pt-4">
+                    {pkg.features.map((feature) => (
+                      <li
+                        key={feature}
+                        className="flex items-start gap-2 text-[14px] font-medium tracking-[-0.14px] text-ink-2"
+                      >
+                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-ok" aria-hidden />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                </label>
+              );
+            })}
+          </div>
         </div>
       </fieldset>
 

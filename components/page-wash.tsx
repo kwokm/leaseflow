@@ -2,7 +2,8 @@ import { cn } from "@/lib/utils";
 
 /**
  * Lavender page wash ported from design/attio-inspired/styles.css.
- * `quiet` keeps more white in the veil so forms and the desk stay readable.
+ * Same bloom as the landing hero: radial at the bottom, pinstripes, white fade
+ * only at the top of the bloom. The field above stays --wash, never gray.
  */
 export function PageWash({
   quiet = false,
@@ -15,6 +16,8 @@ export function PageWash({
     <div
       className={cn("page-wash print:hidden", quiet && "page-wash-quiet", className)}
       aria-hidden
-    />
+    >
+      <div className="page-wash-bloom" />
+    </div>
   );
 }

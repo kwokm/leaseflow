@@ -38,7 +38,7 @@ export function Panel({
   return (
     <section
       className={cn(
-        "rounded-lg border border-line bg-paper p-5 transition-[border-color,box-shadow] duration-200 ease-premium",
+        "rounded-lg border border-line bg-paper p-5 shadow-mini transition-[border-color,box-shadow] duration-200 ease-premium",
         className
       )}
     >
