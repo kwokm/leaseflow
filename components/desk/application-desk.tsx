@@ -5,6 +5,7 @@ import type { Applicant, ApplicationStatus } from "@/lib/data/mock-data";
 import { loadDeskApplicants } from "@/lib/desk/queue";
 import { ApplicationTable } from "@/components/desk/application-table";
 import { DeskPill, DeskToolbar } from "@/components/desk/packet-window";
+import { Reveal } from "@/components/motion/reveal";
 
 type StatusFilter = "all" | "received" | ApplicationStatus;
 
@@ -38,7 +39,7 @@ export function ApplicationDesk({
   }, [rows, propertyId, statusFilter]);
 
   return (
-    <>
+    <Reveal>
       {chrome ? (
         <DeskToolbar meta={`${scoped.length} in queue`}>
           <DeskPill
@@ -66,6 +67,6 @@ export function ApplicationDesk({
             : "No applications in this queue."
         }
       />
-    </>
+    </Reveal>
   );
 }

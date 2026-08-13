@@ -9,6 +9,7 @@ import { StatusPill } from "@/components/desk/status-pill";
 import { mockProperties } from "@/lib/data/mock-data";
 import { loadDeskApplicants, listingRollup } from "@/lib/desk/queue";
 import { shortAddress } from "@/lib/desk/display";
+import { Reveal } from "@/components/motion/reveal";
 import type { Applicant } from "@/lib/data/mock-data";
 
 export default function ListingsPage() {
@@ -20,7 +21,7 @@ export default function ListingsPage() {
   }, []);
 
   return (
-    <>
+    <Reveal>
       <DeskToolbar meta={`${mockProperties.length} listings`}>
         <DeskPill active>All properties</DeskPill>
         <Button asChild size="sm">
@@ -83,6 +84,6 @@ export default function ListingsPage() {
           </tbody>
         </table>
       </div>
-    </>
+    </Reveal>
   );
 }

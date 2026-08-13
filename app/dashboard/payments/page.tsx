@@ -5,6 +5,7 @@ import {
   getPropertyById,
   mockPayments,
 } from "@/lib/data/mock-data";
+import { Reveal } from "@/components/motion/reveal";
 import { shortAddress } from "@/lib/desk/display";
 
 const kindLabels: Record<string, string> = {
@@ -19,7 +20,7 @@ export default function PaymentsPage() {
   );
 
   return (
-    <>
+    <Reveal>
       <DeskToolbar meta="Preview · mock ledger">
         <span className="desk-pill is-on">Received</span>
       </DeskToolbar>
@@ -55,7 +56,7 @@ export default function PaymentsPage() {
                     {applicant ? (
                       <Link
                         href={`/dashboard/applications/${applicant.id}`}
-                        className="text-ink hover:underline"
+                        className="text-ink transition-colors duration-240 ease-premium hover:underline"
                       >
                         {applicant.firstName} {applicant.lastName}
                       </Link>
@@ -88,6 +89,6 @@ export default function PaymentsPage() {
           </tbody>
         </table>
       </div>
-    </>
+    </Reveal>
   );
 }

@@ -34,6 +34,7 @@ import {
 } from "@/lib/apply/to-packet";
 import { setDecision, withDecision } from "@/lib/desk/decisions";
 import { creditScore, incomeMultiple, shortAddress } from "@/lib/desk/display";
+import { Reveal } from "@/components/motion/reveal";
 import type { ApplyState } from "@/lib/apply/types";
 import type { ApplicationStatus } from "@/lib/data/mock-data";
 
@@ -54,12 +55,14 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="border-b border-line px-5 py-5 last:border-b-0 sm:px-6">
-      <h2 className="mb-3 text-[12px] font-medium uppercase tracking-[0.06em] text-mute-2">
-        {title}
-      </h2>
-      {children}
-    </section>
+    <Reveal>
+      <section className="border-b border-line px-5 py-5 last:border-b-0 sm:px-6">
+        <h2 className="mb-3 text-[12px] font-medium uppercase tracking-[0.06em] text-mute-2">
+          {title}
+        </h2>
+        {children}
+      </section>
+    </Reveal>
   );
 }
 
@@ -116,7 +119,7 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
 
   if (!applicant || !property) {
     return (
-      <div className="px-6 py-12 text-center">
+      <Reveal className="px-6 py-12 text-center">
         <p className="text-[15px] font-medium text-ink">Application not found</p>
         <p className="mt-1 text-[13px] text-mute">
           {local
@@ -126,7 +129,7 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
         <Button asChild className="mt-4">
           <Link href="/dashboard">Back to the desk</Link>
         </Button>
-      </div>
+      </Reveal>
     );
   }
 
@@ -143,6 +146,7 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
 
   return (
     <div>
+      <Reveal>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4 sm:px-6">
         <div className="flex min-w-0 items-center gap-3">
           <Avatar firstName={applicant.firstName} lastName={applicant.lastName} large />
@@ -182,6 +186,7 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
           )}
         </div>
       </div>
+      </Reveal>
 
       <Section title="Identity">
         <dl>

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, Lock } from "lucide-react";
 import { BrandMark, BrandWord } from "@/components/brand";
 import { PacketWindow } from "@/components/desk/packet-window";
+import { Reveal } from "@/components/motion/reveal";
 import { SpatialMount, SpatialOrigin } from "@/components/motion/spatial";
 import { PageWash } from "@/components/page-wash";
 import { Button } from "@/components/ui/button";
@@ -233,12 +234,12 @@ export function ApplyWizard({ property }: { property: Property }) {
       </div>
 
       <footer className="relative z-10 print:hidden">
-        <div className="mx-auto flex max-w-shell flex-wrap items-center justify-between gap-3 px-5 py-6 text-[13px] font-medium text-mute sm:px-8">
+        <Reveal className="mx-auto flex max-w-shell flex-wrap items-center justify-between gap-3 px-5 py-6 text-[13px] font-medium text-mute sm:px-8">
           <p>Demo prototype · mock data only, no consumer reporting agency is used.</p>
           <Link href="/" className="text-ink-2 transition-colors duration-240 ease-premium hover:text-ink">
             Back to LeaseFlow
           </Link>
-        </div>
+        </Reveal>
       </footer>
     </div>
   );

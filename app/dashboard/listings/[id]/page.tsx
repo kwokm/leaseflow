@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { getPropertyById } from "@/lib/data/mock-data";
 import { loadDeskApplicantsForListing, listingRollup } from "@/lib/desk/queue";
 import { shortAddress } from "@/lib/desk/display";
+import { Reveal } from "@/components/motion/reveal";
 import type { Applicant } from "@/lib/data/mock-data";
 
 export default function ListingDetailPage({
@@ -30,17 +31,19 @@ export default function ListingDetailPage({
 
   return (
     <>
-      <DeskToolbar meta={`${rollup.count} applicant${rollup.count === 1 ? "" : "s"}`}>
-        <Button asChild variant="outline" size="sm">
-          <Link href="/dashboard/listings">All listings</Link>
-        </Button>
-        <Button asChild variant="outline" size="sm">
-          <Link href={`/apply/${property.id}`}>Apply link</Link>
-        </Button>
-        <span className="desk-pill capitalize">{property.screeningPackage}</span>
-      </DeskToolbar>
+      <Reveal>
+        <DeskToolbar meta={`${rollup.count} applicant${rollup.count === 1 ? "" : "s"}`}>
+          <Button asChild variant="outline" size="sm">
+            <Link href="/dashboard/listings">All listings</Link>
+          </Button>
+          <Button asChild variant="outline" size="sm">
+            <Link href={`/apply/${property.id}`}>Apply link</Link>
+          </Button>
+          <span className="desk-pill capitalize">{property.screeningPackage}</span>
+        </DeskToolbar>
+      </Reveal>
 
-      <div className="border-b border-line px-5 py-5 sm:px-6">
+      <Reveal className="border-b border-line px-5 py-5 sm:px-6">
         <p className="text-[18px] font-semibold tracking-[-0.3px] text-ink">
           {shortAddress(property.address)}
         </p>
@@ -58,7 +61,7 @@ export default function ListingDetailPage({
             </div>
           ))}
         </dl>
-      </div>
+      </Reveal>
 
       <ApplicationDesk propertyId={property.id} extras chrome={false} />
     </>

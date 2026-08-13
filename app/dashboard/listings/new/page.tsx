@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Sparkles } from "lucide-react";
+import { Reveal, RevealItem, RevealStagger } from "@/components/motion/reveal";
 
 export default function NewListingPage() {
   const router = useRouter();
@@ -29,7 +30,7 @@ export default function NewListingPage() {
 
   return (
     <div className="space-y-6 p-5 sm:p-6">
-      <div>
+      <Reveal>
         <Link href="/dashboard/listings">
           <Button variant="ghost" size="sm" className="mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -40,9 +41,11 @@ export default function NewListingPage() {
         <p className="text-mute mt-1">
           Address, rent, and which package applicants pay for.
         </p>
-      </div>
+      </Reveal>
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        <RevealStagger className="space-y-6">
+        <RevealItem>
         <Card>
           <CardHeader>
             <CardTitle>Property details</CardTitle>
@@ -112,7 +115,9 @@ export default function NewListingPage() {
             </div>
           </CardContent>
         </Card>
+        </RevealItem>
 
+        <RevealItem>
         <Card>
           <CardHeader>
             <CardTitle>Screening package</CardTitle>
@@ -163,7 +168,9 @@ export default function NewListingPage() {
             </div>
           </CardContent>
         </Card>
+        </RevealItem>
 
+        <RevealItem>
         <div className="flex gap-4">
           <Button type="submit" size="lg" className="flex-1">
             Create Listing
@@ -174,6 +181,8 @@ export default function NewListingPage() {
             </Button>
           </Link>
         </div>
+        </RevealItem>
+        </RevealStagger>
       </form>
     </div>
   );

@@ -12,6 +12,8 @@ import {
   mockThreads,
 } from "@/lib/data/mock-data";
 import { shortAddress } from "@/lib/desk/display";
+import { Reveal } from "@/components/motion/reveal";
+import { SpatialPane } from "@/components/motion/spatial";
 import { cn } from "@/lib/utils";
 
 export default function MessagesPage() {
@@ -24,7 +26,7 @@ export default function MessagesPage() {
   const property = thread ? getPropertyById(thread.propertyId) : undefined;
 
   return (
-    <>
+    <Reveal>
       <DeskToolbar meta="Preview · sending is off">
         <span className="desk-pill is-on">Inbox</span>
       </DeskToolbar>
@@ -42,8 +44,8 @@ export default function MessagesPage() {
                 onClick={() => setSelectedId(item.id)}
                 aria-current={active ? "true" : undefined}
                 className={cn(
-                  "flex w-full items-start gap-2.5 border-b border-line px-4 py-3 text-left",
-                  active ? "bg-[#f4f7ff]" : "hover:bg-mist"
+                  "flex w-full items-start gap-2.5 border-b border-line px-4 py-3 text-left transition-colors duration-240 ease-premium",
+                  active ? "bg-[#f4f0f8]" : "hover:bg-mist"
                 )}
               >
                 {person ? (
@@ -64,7 +66,7 @@ export default function MessagesPage() {
 
         <div className="flex min-w-0 flex-col">
           {thread && (
-            <>
+            <SpatialPane paneKey={thread.id} className="flex min-h-0 flex-1 flex-col">
               <div className="flex items-center justify-between gap-3 border-b border-line px-5 py-3">
                 <div>
                   <p className="text-[14px] font-semibold text-ink">
@@ -97,10 +99,10 @@ export default function MessagesPage() {
                   </div>
                 ))}
               </div>
-            </>
+            </SpatialPane>
           )}
         </div>
       </div>
-    </>
+    </Reveal>
   );
 }

@@ -249,7 +249,7 @@ export default function Home() {
       </main>
 
       <footer id="legal" className="relative z-10 pb-10 pt-6 text-mute">
-        <div className="mx-auto flex max-w-shell flex-col gap-6 px-5 sm:px-8 md:flex-row md:items-center md:justify-between">
+        <Reveal className="mx-auto flex max-w-shell flex-col gap-6 px-5 sm:px-8 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-2.5 text-ink">
             <BrandMark size={20} />
             <BrandWord />
@@ -258,7 +258,7 @@ export default function Home() {
             Screening reports are consumer reports under the FCRA. This site is a prototype — names,
             scores, and tradelines are mock data, and no consumer reporting agency is used.
           </p>
-        </div>
+        </Reveal>
       </footer>
     </div>
   );
