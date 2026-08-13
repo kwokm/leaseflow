@@ -120,9 +120,16 @@
   /* Pattern A / A2 — opacity + transform only. Start hidden before paint. */
   .reveal-block,
   .reveal-item,
-  .reveal-lead,
-  .reveal-cta {
+  .reveal-tone,
+  .reveal-cta,
+  .reveal-spatial {
     opacity: 0;
+  }
+
+  .reveal-block,
+  .reveal-item,
+  .reveal-tone,
+  .reveal-cta {
     transition:
       transform var(--dur-slow) var(--ease-power3),
       opacity var(--dur-slow) var(--ease-power3);
@@ -141,8 +148,7 @@
     transform: translateY(var(--shift-md));
   }
 
-  .reveal-shift-lg,
-  .reveal-lead {
+  .reveal-shift-lg {
     transform: translateY(var(--shift-lg));
   }
 
@@ -150,8 +156,10 @@
     transform: translateY(var(--shift-xl));
   }
 
-  .reveal-lead {
-    display: inline-block;
+  .reveal-tone {
+    display: block;
+    transform: translateY(var(--shift-lg));
+    transition-delay: 240ms;
   }
 
   .reveal-cta {
@@ -159,46 +167,64 @@
     transition-delay: 0.4s;
   }
 
+  .reveal-spatial {
+    transform: scale(0.9) translateY(20px);
+    transition:
+      transform 800ms var(--ease-spatial),
+      opacity 800ms var(--ease-spatial);
+  }
+
   .reveal-delay {
     opacity: 0;
   }
 
-  .reveal-stagger > .reveal-item:nth-child(8n + 1) {
+  .reveal-stagger > .reveal-item:nth-child(8n + 1),
+  .reveal-stagger > .reveal-spatial:nth-child(8n + 1) {
     --i: 0;
   }
-  .reveal-stagger > .reveal-item:nth-child(8n + 2) {
+  .reveal-stagger > .reveal-item:nth-child(8n + 2),
+  .reveal-stagger > .reveal-spatial:nth-child(8n + 2) {
     --i: 1;
   }
-  .reveal-stagger > .reveal-item:nth-child(8n + 3) {
+  .reveal-stagger > .reveal-item:nth-child(8n + 3),
+  .reveal-stagger > .reveal-spatial:nth-child(8n + 3) {
     --i: 2;
   }
-  .reveal-stagger > .reveal-item:nth-child(8n + 4) {
+  .reveal-stagger > .reveal-item:nth-child(8n + 4),
+  .reveal-stagger > .reveal-spatial:nth-child(8n + 4) {
     --i: 3;
   }
-  .reveal-stagger > .reveal-item:nth-child(8n + 5) {
+  .reveal-stagger > .reveal-item:nth-child(8n + 5),
+  .reveal-stagger > .reveal-spatial:nth-child(8n + 5) {
     --i: 4;
   }
-  .reveal-stagger > .reveal-item:nth-child(8n + 6) {
+  .reveal-stagger > .reveal-item:nth-child(8n + 6),
+  .reveal-stagger > .reveal-spatial:nth-child(8n + 6) {
     --i: 5;
   }
-  .reveal-stagger > .reveal-item:nth-child(8n + 7) {
+  .reveal-stagger > .reveal-item:nth-child(8n + 7),
+  .reveal-stagger > .reveal-spatial:nth-child(8n + 7) {
     --i: 6;
   }
-  .reveal-stagger > .reveal-item:nth-child(8n + 8) {
+  .reveal-stagger > .reveal-item:nth-child(8n + 8),
+  .reveal-stagger > .reveal-spatial:nth-child(8n + 8) {
     --i: 7;
   }
 
-  .reveal-item {
+  .reveal-item,
+  .reveal-spatial {
     transition-delay: calc((var(--i, 0) * var(--stagger-loose)));
   }
 
   .is-visible.reveal-block,
   .is-visible.reveal-item,
   .is-visible.reveal-cta,
+  .is-visible.reveal-spatial,
   .is-visible .reveal-block,
   .is-visible .reveal-item,
-  .is-visible .reveal-lead,
-  .is-visible .reveal-cta {
+  .is-visible .reveal-tone,
+  .is-visible .reveal-cta,
+  .is-visible .reveal-spatial {
     opacity: 1;
     transform: none;
   }
@@ -219,7 +245,7 @@
     transition:
       transform 600ms var(--ease-power3),
       opacity 600ms var(--ease-power3);
-    transition-delay: calc(280ms + var(--w, 0) * var(--stagger-tight));
+    transition-delay: calc(var(--w, 0) * var(--stagger-tight));
   }
 
   .is-visible .line-mask > span,
@@ -673,8 +699,9 @@
 
   .reveal-block,
   .reveal-item,
-  .reveal-lead,
+  .reveal-tone,
   .reveal-cta,
+  .reveal-spatial,
   .line-mask > span,
   [data-word] {
     opacity: 1 !important;

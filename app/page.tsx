@@ -7,6 +7,7 @@ import { Float } from "@/components/motion/float";
 import { InView } from "@/components/motion/in-view";
 import { Reveal, RevealItem, RevealStagger } from "@/components/motion/reveal";
 import { SectionHeadline } from "@/components/motion/section-headline";
+import { SplitWords } from "@/components/motion/split-words";
 import { Button } from "@/components/ui/button";
 import { deskHeroApplicants } from "@/lib/desk/display";
 import { getPropertyById } from "@/lib/data/mock-data";
@@ -86,13 +87,15 @@ export default function Home() {
       <main id="main">
         <section className="hero" id="top" aria-labelledby="hero-title">
           <div className="hero-wash" aria-hidden />
-          <div className="hero-copy">
-            <h1 id="hero-title">Welcome to the packet.</h1>
-            <p className="hero-sub">
+          <InView className="hero-copy">
+            <h1 id="hero-title">
+              <SplitWords>Welcome to the packet.</SplitWords>
+            </h1>
+            <p className="hero-sub reveal-tone">
               LeaseFlow is the screening service that collects applications, runs credit and
               background, and hands you a LeaseScore you can approve or decline.
             </p>
-            <div className="hero-ctas">
+            <div className="hero-ctas reveal-cta">
               <Button asChild size="cta">
                 <Link href={DESK_HREF}>Open the desk</Link>
               </Button>
@@ -100,7 +103,7 @@ export default function Home() {
                 <Link href={APPLY_HREF}>Apply as renter</Link>
               </Button>
             </div>
-          </div>
+          </InView>
 
           <div className="stage-wrap" id="desk">
             <Float>
@@ -150,7 +153,7 @@ export default function Home() {
               className="mt-10 grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-line bg-line shadow-window sm:grid-cols-2 lg:grid-cols-4"
             >
               {STEPS.map((step) => (
-                <RevealItem key={step.n} as="li" className="bg-paper p-6">
+                <RevealItem key={step.n} as="li" motion="spatial" className="bg-paper p-6">
                   <p className="num text-[13px] font-medium text-mute-2">{step.n}</p>
                   <p className="mt-3 text-[17px] font-semibold leading-6 tracking-[-0.3px] text-ink">
                     {step.lead}
@@ -179,7 +182,7 @@ export default function Home() {
             </InView>
 
             <RevealStagger className="mt-14 grid grid-cols-1 overflow-hidden rounded-lg border border-line bg-paper shadow-window sm:grid-cols-2">
-              <RevealItem as="article" className="p-7">
+              <RevealItem as="article" motion="spatial" className="p-7">
                 <p className="mb-2 text-[14px] font-medium text-mute">Standard</p>
                 <p className="num mb-3 text-[40px] font-medium leading-[44px] tracking-[-0.4px] text-ink">
                   $39.99
@@ -190,6 +193,7 @@ export default function Home() {
               </RevealItem>
               <RevealItem
                 as="article"
+                motion="spatial"
                 className="border-t border-line p-7 sm:border-l sm:border-t-0"
               >
                 <p className="mb-2 text-[14px] font-medium text-mute">Premium</p>
@@ -206,29 +210,29 @@ export default function Home() {
 
         <section id="apply" className="pb-20" aria-labelledby="apply-title">
           <InView className="mx-auto max-w-shell px-5 sm:px-8">
-            <PacketWindow title={`Apply • ${property.address.split(",")[0]}`}>
-              <div className="flex flex-col gap-5 px-6 py-7 md:flex-row md:items-center md:justify-between">
-                <div className="reveal-block reveal-shift-lg">
-                  <p className="text-[13px] font-medium tracking-[-0.13px] text-mute">For renters</p>
-                  <h2
-                    id="apply-title"
-                    className="mt-2 text-[24px] font-medium leading-[27.6px] tracking-[-0.24px] text-ink"
-                  >
-                    Apply for {property.address.split(",")[0]}
-                  </h2>
-                  <p className="mt-1.5 text-[14px] font-medium text-mute">
-                    {property.bedrooms} bedroom ·{" "}
-                    <span className="num">${property.rent.toLocaleString()}</span> per month · you
-                    pay the screening fee.
-                  </p>
-                </div>
-                <div className="reveal-cta shrink-0">
-                  <Button asChild size="cta">
+            <div className="reveal-spatial">
+              <PacketWindow title={`Apply • ${property.address.split(",")[0]}`}>
+                <div className="flex flex-col gap-5 px-6 py-7 md:flex-row md:items-center md:justify-between">
+                  <div>
+                    <p className="text-[13px] font-medium tracking-[-0.13px] text-mute">For renters</p>
+                    <h2
+                      id="apply-title"
+                      className="mt-2 text-[24px] font-medium leading-[27.6px] tracking-[-0.24px] text-ink"
+                    >
+                      Apply for {property.address.split(",")[0]}
+                    </h2>
+                    <p className="mt-1.5 text-[14px] font-medium text-mute">
+                      {property.bedrooms} bedroom ·{" "}
+                      <span className="num">${property.rent.toLocaleString()}</span> per month · you
+                      pay the screening fee.
+                    </p>
+                  </div>
+                  <Button asChild size="cta" className="shrink-0">
                     <Link href={APPLY_HREF}>Apply as renter</Link>
                   </Button>
                 </div>
-              </div>
-            </PacketWindow>
+              </PacketWindow>
+            </div>
           </InView>
         </section>
       </main>

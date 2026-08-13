@@ -74,10 +74,11 @@ Displacement scales with element size. Big blocks ~60px; inline 10–15px. Never
 * **Timing:** `700ms` power3. Grid stagger `150ms`, index capped at 8.
 * **Reversible:** toggle `.is-visible` (IO `rootMargin: 0px 0px -20% 0px`). Grids may fire later.
 * **FOUC:** start hidden in CSS before paint. A delay class must also set `opacity: 0`.
-* Large muted secondary headers use Pattern A2 (split-text) instead of a single block slide.
+* Grey secondary headers float as one block (`40px` / `700ms` power3). They do **not** split.
+* Landing cards (steps, fees, apply module) use Pattern B spatial expansion as a whole — no inner text motion.
 
-### Pattern A2: Masked word reveal (landing secondary headers)
-**Where to use:** The large gray (`.tone`) secondary headers on `/` — and any headline that should emerge from the line above.
+### Pattern A2: Masked word reveal (black headlines)
+**Where to use:** The hero H1 and black section titles on `/` (“The desk that finishes the file.”, “Four steps…”, “Applicants pay the fee.”). Grey secondaries do **not** use this.
 **Behavior:** Each line `overflow: hidden`; words start `yPercent: 100` behind the mask and rise into view.
 
 ```css

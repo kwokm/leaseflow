@@ -43,11 +43,17 @@ export function RevealItem({
   children,
   className,
   as = "div",
+  motion = "slide",
 }: {
   children: ReactNode;
   className?: string;
   as?: "div" | "li" | "article";
+  motion?: "slide" | "spatial";
 }) {
   const Tag = as;
-  return <Tag className={cn("reveal-item", className)}>{children}</Tag>;
+  return (
+    <Tag className={cn(motion === "spatial" ? "reveal-spatial" : "reveal-item", className)}>
+      {children}
+    </Tag>
+  );
 }
