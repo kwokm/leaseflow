@@ -58,9 +58,9 @@ const config: Config = {
           bg: "#F8EEF0",
         },
         wash: {
-          DEFAULT: "#E6ECFF",
-          mid: "#BCCBFF",
-          deep: "#86A0EE",
+          DEFAULT: "#F4F0F8",
+          mid: "#E8E4F4",
+          deep: "#E4E0F0",
         },
 
         // Semantic aliases used by the existing shadcn primitives.

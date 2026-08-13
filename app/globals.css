@@ -24,9 +24,9 @@
     --dark: #101010;
     --dark-2: #2d3238;
     --on-dark: #eceff3;
-    --wash: #e6ecff;
-    --wash-mid: #bccbff;
-    --wash-deep: #86a0ee;
+    --wash: #f4f0f8;
+    --wash-mid: #e8e4f4;
+    --wash-deep: #e4e0f0;
     --rail: #f4f4f6;
     --blue: #266df0;
     --blue-soft: rgba(38, 109, 240, 0.12);
@@ -102,8 +102,8 @@
   }
 
   /*
-   * Locked 1:1 from design/attio-inspired/styles.css.
-   * White page. Bloom is 62% from the BOTTOM. Do not invert.
+   * Bloom sampled from Michael's landing PNG — pale lilac, not Attio blue.
+   * Do not use #E6ECFF / #BCCBFF / #86A0EE.
    */
   .hero {
     position: relative;
@@ -119,12 +119,7 @@
     bottom: 0;
     height: 62%;
     pointer-events: none;
-    background: radial-gradient(
-      90% 80% at 50% 100%,
-      #e6ecff 0%,
-      #bccbff 45%,
-      #86a0ee 100%
-    );
+    background: radial-gradient(90% 80% at 50% 100%, #F4F0F8 0%, #E8E4F4 45%, #E4E0F0 100%);
   }
 
   .hero-wash::before {
