@@ -40,8 +40,8 @@ export default function PaymentsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Payments</h1>
-        <p className="text-gray-600 mt-1">Screening fees, deposits, and payouts</p>
+        <h1 className="text-3xl font-bold text-ink">Payments</h1>
+        <p className="text-mute mt-1">Screening fees, deposits, and payouts</p>
       </div>
 
       {/* Stub notice */}
@@ -61,14 +61,14 @@ export default function PaymentsPage() {
         {stats.map((stat) => (
           <Card key={stat.label}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">{stat.label}</CardTitle>
-              <stat.icon className="w-4 h-4 text-gray-400" />
+              <CardTitle className="text-sm font-medium text-mute">{stat.label}</CardTitle>
+              <stat.icon className="w-4 h-4 text-mute-3" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold">
                 ${stat.value.toLocaleString(undefined, { minimumFractionDigits: 2 })}
               </div>
-              <p className="text-xs text-gray-500 mt-1">{stat.hint}</p>
+              <p className="text-xs text-mute-2 mt-1">{stat.hint}</p>
             </CardContent>
           </Card>
         ))}
@@ -86,7 +86,7 @@ export default function PaymentsPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b bg-gray-50 text-left text-xs uppercase tracking-wide text-gray-500">
+                <tr className="border-b bg-mist text-left text-xs uppercase tracking-wide text-mute-2">
                   <th scope="col" className="px-6 py-3 font-medium">
                     Date
                   </th>
@@ -117,18 +117,18 @@ export default function PaymentsPage() {
                     : undefined;
 
                   return (
-                    <tr key={payment.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 text-gray-600 whitespace-nowrap">
+                    <tr key={payment.id} className="hover:bg-mist transition-colors">
+                      <td className="px-6 py-4 text-mute whitespace-nowrap">
                         {new Date(payment.createdAt).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4">
-                        <div className="font-medium text-gray-900">{payment.description}</div>
-                        <div className="text-xs text-gray-500">
+                        <div className="font-medium text-ink">{payment.description}</div>
+                        <div className="text-xs text-mute-2">
                           {kindLabels[payment.kind]}
                           {property ? ` · ${property.address}` : ""}
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-gray-600">
+                      <td className="px-6 py-4 text-mute">
                         {applicant ? (
                           <Link
                             href={`/dashboard/applications/${applicant.id}`}
@@ -140,7 +140,7 @@ export default function PaymentsPage() {
                           "—"
                         )}
                       </td>
-                      <td className="px-6 py-4 text-gray-600">{payment.method}</td>
+                      <td className="px-6 py-4 text-mute">{payment.method}</td>
                       <td className="px-6 py-4">
                         <Badge className={`capitalize ${getPaymentStatusColor(payment.status)}`}>
                           {payment.status}
@@ -148,7 +148,7 @@ export default function PaymentsPage() {
                       </td>
                       <td
                         className={`px-6 py-4 text-right font-semibold ${
-                          payment.kind === "payout" ? "text-gray-600" : "text-gray-900"
+                          payment.kind === "payout" ? "text-mute" : "text-ink"
                         }`}
                       >
                         {payment.kind === "payout" ? "-" : "+"}$

@@ -36,8 +36,8 @@ export default function NewListingPage() {
             Back to Dashboard
           </Button>
         </Link>
-        <h1 className="text-3xl font-bold text-gray-900">Create New Listing</h1>
-        <p className="text-gray-600 mt-1">
+        <h1 className="text-3xl font-bold text-ink">Create new listing</h1>
+        <p className="text-mute mt-1">
           Set up a new property and start receiving applications
         </p>
       </div>
@@ -45,12 +45,12 @@ export default function NewListingPage() {
       <form onSubmit={handleSubmit} className="space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle>Property Details</CardTitle>
+            <CardTitle>Property details</CardTitle>
             <CardDescription>Basic information about the rental property</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="address">Property Address *</Label>
+              <Label htmlFor="address">Property address *</Label>
               <Input
                 id="address"
                 placeholder="123 Main Street, City, State ZIP"
@@ -87,7 +87,7 @@ export default function NewListingPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="rent">Monthly Rent *</Label>
+                <Label htmlFor="rent">Monthly rent *</Label>
                 <Input
                   id="rent"
                   type="number"
@@ -101,7 +101,7 @@ export default function NewListingPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="availableDate">Available Date *</Label>
+              <Label htmlFor="availableDate">Available date *</Label>
               <Input
                 id="availableDate"
                 type="date"
@@ -115,7 +115,7 @@ export default function NewListingPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Screening Package</CardTitle>
+            <CardTitle>Screening package</CardTitle>
             <CardDescription>Choose the level of tenant screening</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -126,12 +126,12 @@ export default function NewListingPage() {
                 className={`p-4 border-2 rounded-lg text-left transition-all ${
                   formData.screeningPackage === "standard"
                     ? "border-primary bg-primary/5"
-                    : "border-gray-200 hover:border-gray-300"
+                    : "border-line hover:border-line-2"
                 }`}
               >
                 <div className="font-semibold text-lg mb-1">Standard</div>
-                <div className="text-sm text-gray-600 mb-3">$39.99 per applicant</div>
-                <ul className="text-sm space-y-1 text-gray-600">
+                <div className="text-sm text-mute mb-3">$39.99 per applicant</div>
+                <ul className="text-sm space-y-1 text-mute">
                   <li>✓ Credit report</li>
                   <li>✓ Criminal background</li>
                   <li>✓ Eviction history</li>
@@ -145,15 +145,15 @@ export default function NewListingPage() {
                 className={`p-4 border-2 rounded-lg text-left transition-all ${
                   formData.screeningPackage === "premium"
                     ? "border-primary bg-primary/5"
-                    : "border-gray-200 hover:border-gray-300"
+                    : "border-line hover:border-line-2"
                 }`}
               >
                 <div className="flex items-center gap-2 mb-1">
                   <div className="font-semibold text-lg">Premium</div>
                   <Sparkles className="w-4 h-4 text-primary" />
                 </div>
-                <div className="text-sm text-gray-600 mb-3">$59.99 per applicant</div>
-                <ul className="text-sm space-y-1 text-gray-600">
+                <div className="text-sm text-mute mb-3">$59.99 per applicant</div>
+                <ul className="text-sm space-y-1 text-mute">
                   <li>✓ Everything in Standard</li>
                   <li>✓ Income verification</li>
                   <li>✓ Employment verification</li>

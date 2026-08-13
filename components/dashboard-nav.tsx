@@ -44,7 +44,7 @@ export function DashboardNav() {
               "flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
               active
                 ? "bg-primary/10 text-primary"
-                : "text-gray-700 hover:bg-accent hover:text-accent-foreground"
+                : "text-ink-2 hover:bg-accent hover:text-accent-foreground"
             )}
           >
             <item.icon className="w-4 h-4" />
@@ -59,7 +59,7 @@ export function DashboardNav() {
       })}
 
       <div className="pt-4">
-        <div className="px-3 pb-1 text-xs font-semibold uppercase tracking-wide text-gray-400">
+        <div className="px-3 pb-1 text-xs font-semibold uppercase tracking-wide text-mute-3">
           Manage
         </div>
         {secondaryNav.map((item) => {
@@ -73,7 +73,7 @@ export function DashboardNav() {
                 "flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors",
                 active
                   ? "bg-primary/10 text-primary font-medium"
-                  : "text-gray-600 hover:bg-accent hover:text-accent-foreground"
+                  : "text-mute hover:bg-accent hover:text-accent-foreground"
               )}
             >
               <item.icon className="w-4 h-4" />
@@ -83,7 +83,7 @@ export function DashboardNav() {
         })}
         <div
           aria-disabled="true"
-          className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-400"
+          className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-mute-3"
         >
           <Settings className="w-4 h-4" />
           <span className="flex-1">Settings</span>

@@ -2,41 +2,169 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Tokens ported from design/attio-inspired/styles.css — that directory is the
+ * visual source of truth. Values here are the computed styles, not guesses.
+ */
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 0.5rem;
+    --ink: #1c1d1f;
+    --ink-2: #2d3238;
+    --mute: #6d7988;
+    --mute-2: #8d99a8;
+    --mute-3: #b3bdc9;
+    --slate: #4e5967;
+    --line: #e3e7ec;
+    --line-2: #c9d0d9;
+    --ghost: #eceff3;
+    --paper: #ffffff;
+    --mist: #fafafb;
+    --fill: #202124;
+    --fill-text: #f3f4f6;
+    --dark: #101010;
+    --dark-2: #2d3238;
+    --on-dark: #eceff3;
+    --wash: #e6ecff;
+    --wash-mid: #bccbff;
+    --wash-deep: #86a0ee;
+    --rail: #f4f4f6;
+    --blue: #266df0;
+    --blue-soft: rgba(38, 109, 240, 0.12);
+    --ok: #12a150;
+    --ok-bg: #eef8f1;
+    --warn: #f5b400;
+    --no: #e15c6b;
+    --no-bg: #f8eef0;
+    --shadow: 0 1px 1px rgba(28, 29, 31, 0.04), 0 28px 60px -18px rgba(40, 50, 90, 0.22);
+    --radius: 12px;
+    --btn-r: 10px;
+    --pad: clamp(20px, 5.5vw, 56px);
   }
 }
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-line;
   }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 96px;
+    -webkit-text-size-adjust: 100%;
+  }
+
   body {
-    @apply bg-background text-foreground;
+    min-width: 320px;
+    background: var(--paper);
+    color: var(--ink);
+    /* Body 16/22/500, letter-spacing -0.16px */
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 22px;
+    letter-spacing: -0.16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-optical-sizing: auto;
+  }
+
+  /* Visible focus everywhere — the outline is never removed, only offset. */
+  :focus {
+    outline: none;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  img,
+  svg {
+    display: block;
+    max-width: 100%;
   }
 }
 
-/* Application packets are printed as a PDF-style document */
+@layer components {
+  /* Two-tone headline: lead stays ink, the continuation drops to mute. */
+  .tone {
+    color: var(--mute);
+  }
+
+  .num {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+  }
+
+  /* The hero wash from the reference: radial bloom, hairline rules, white fade. */
+  .hero-wash {
+    background: radial-gradient(
+      90% 80% at 50% 100%,
+      var(--wash) 0%,
+      var(--wash-mid) 45%,
+      var(--wash-deep) 100%
+    );
+  }
+
+  .hero-wash::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.78) 0 1px,
+      transparent 1px 12px
+    );
+  }
+
+  .hero-wash::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(70% 110% at 50% 0%, #ffffff 28%, rgba(255, 255, 255, 0) 68%);
+  }
+
+  .skip-link {
+    position: absolute;
+    left: 12px;
+    top: -56px;
+    z-index: 80;
+    background: var(--ink);
+    color: #fff;
+    padding: 10px 14px;
+    border-radius: var(--btn-r);
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .skip-link:focus {
+    top: 12px;
+  }
+}
+
+/* Honour reduced-motion: keep state changes instant, never animated. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Application packets and renter receipts are printed as PDF-style documents */
 @media print {
   @page {
     margin: 0.5in;

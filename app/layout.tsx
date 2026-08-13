@@ -2,11 +2,17 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+// Variable Inter so the optical-size axis (14–32) is available to headings.
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
 
 export const metadata: Metadata = {
-  title: "LeaseFlow - Modern Tenant Screening Made Simple",
-  description: "Professional tenant screening and rental applications for landlords and property managers",
+  title: "LeaseFlow — Rental applications and screening",
+  description:
+    "Collect rental applications, documents, and screening reports in one place. Demo prototype.",
 };
 
 export default function RootLayout({
@@ -15,8 +21,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
+    <html lang="en" className={inter.variable}>
+      <body className="font-sans antialiased">{children}</body>
     </html>
   );
 }

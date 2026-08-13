@@ -5,7 +5,7 @@ import { Shield, HelpCircle } from "lucide-react";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-gray-50 print:bg-white">
+    <div className="min-h-screen bg-mist print:bg-white">
       {/* Header */}
       <header className="border-b bg-white sticky top-0 z-50 print:hidden">
         <div className="flex items-center justify-between px-6 py-4">
@@ -13,7 +13,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <Shield className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-900">LeaseFlow</span>
+            <span className="text-xl font-bold text-ink">LeaseFlow</span>
           </Link>
 
           <div className="flex items-center gap-4">
@@ -24,7 +24,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div className="flex items-center gap-3 pl-4 border-l">
               <div className="text-right">
                 <div className="text-sm font-medium">John Landlord</div>
-                <div className="text-xs text-gray-500">Property Manager</div>
+                <div className="text-xs text-mute-2">Property Manager</div>
               </div>
               <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
                 <span className="text-sm font-semibold text-primary">JL</span>
@@ -39,9 +39,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <aside className="w-64 bg-white border-r min-h-[calc(100vh-73px)] p-4 print:hidden">
           <DashboardNav />
 
-          <div className="mt-8 p-4 bg-blue-50 rounded-lg">
-            <div className="text-sm font-semibold mb-2">Demo Mode</div>
-            <p className="text-xs text-gray-600 mb-3">
+          <div className="mt-8 p-4 bg-mist rounded-lg">
+            <div className="text-sm font-semibold mb-2">Demo mode</div>
+            <p className="text-xs text-mute mb-3">
               View as Renter to see the application flow
             </p>
             <Link href="/apply/prop-1">

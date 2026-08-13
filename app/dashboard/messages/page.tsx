@@ -27,8 +27,8 @@ export default function MessagesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Messages</h1>
-        <p className="text-gray-600 mt-1">Conversations with applicants</p>
+        <h1 className="text-3xl font-bold text-ink">Messages</h1>
+        <p className="text-mute mt-1">Conversations with applicants</p>
       </div>
 
       {/* Stub notice */}
@@ -59,11 +59,11 @@ export default function MessagesPage() {
                   aria-current={active ? "true" : undefined}
                   className={cn(
                     "w-full text-left p-4 transition-colors",
-                    active ? "bg-primary/5" : "hover:bg-gray-50"
+                    active ? "bg-primary/5" : "hover:bg-mist"
                   )}
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="font-medium text-gray-900 truncate">
+                    <span className="font-medium text-ink truncate">
                       {person ? `${person.firstName} ${person.lastName}` : "Unknown applicant"}
                     </span>
                     {item.unread > 0 && (
@@ -72,9 +72,9 @@ export default function MessagesPage() {
                       </span>
                     )}
                   </div>
-                  <div className="text-xs text-gray-500 mt-0.5">{item.subject}</div>
-                  <div className="text-sm text-gray-600 mt-1 line-clamp-2">{last?.body}</div>
-                  <div className="text-xs text-gray-400 mt-1">
+                  <div className="text-xs text-mute-2 mt-0.5">{item.subject}</div>
+                  <div className="text-sm text-mute mt-1 line-clamp-2">{last?.body}</div>
+                  <div className="text-xs text-mute-3 mt-1">
                     {last ? new Date(last.sentAt).toLocaleDateString() : ""}
                   </div>
                 </button>
@@ -87,9 +87,9 @@ export default function MessagesPage() {
         <Card className="lg:col-span-2 flex flex-col">
           {!thread ? (
             <CardContent className="flex-1 flex flex-col items-center justify-center py-16 text-center">
-              <MessageSquare className="w-12 h-12 text-gray-300 mb-4" />
+              <MessageSquare className="w-12 h-12 text-mute-3 mb-4" />
               <h3 className="text-lg font-semibold mb-1">No conversations yet</h3>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-mute">
                 Messages from applicants will appear here.
               </p>
             </CardContent>
@@ -99,7 +99,7 @@ export default function MessagesPage() {
                 <div className="font-semibold">
                   {applicant ? `${applicant.firstName} ${applicant.lastName}` : "Applicant"}
                 </div>
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-mute">
                   {thread.subject}
                   {property ? ` · ${property.address}` : ""}
                 </div>
@@ -126,14 +126,14 @@ export default function MessagesPage() {
                           "max-w-[80%] rounded-lg px-4 py-2 text-sm",
                           fromLandlord
                             ? "bg-primary text-primary-foreground"
-                            : "bg-gray-100 text-gray-900"
+                            : "bg-rail text-ink"
                         )}
                       >
                         <p>{message.body}</p>
                         <div
                           className={cn(
                             "text-xs mt-1",
-                            fromLandlord ? "text-primary-foreground/70" : "text-gray-500"
+                            fromLandlord ? "text-primary-foreground/70" : "text-mute-2"
                           )}
                         >
                           {new Date(message.sentAt).toLocaleString()}

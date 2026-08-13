@@ -25,9 +25,9 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
   if (!property) {
     return (
       <div className="text-center py-12">
-        <h2 className="text-2xl font-bold mb-2">Property Not Found</h2>
+        <h2 className="text-2xl font-bold mb-2">Property not found</h2>
         <Link href="/dashboard">
-          <Button>Back to Dashboard</Button>
+          <Button>Back to dashboard</Button>
         </Link>
       </div>
     );
@@ -49,8 +49,8 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
       {/* Property Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">{property.address}</h1>
-          <div className="flex items-center gap-4 mt-2 text-gray-600">
+          <h1 className="text-3xl font-bold text-ink">{property.address}</h1>
+          <div className="flex items-center gap-4 mt-2 text-mute">
             <span className="flex items-center gap-1">
               <Home className="w-4 h-4" />
               {property.bedrooms} bed · {property.bathrooms} bath
@@ -79,7 +79,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
       {/* Application Link */}
       <Card>
         <CardHeader>
-          <CardTitle>Application Link</CardTitle>
+          <CardTitle>Application link</CardTitle>
           <CardDescription>Share this link with prospective tenants</CardDescription>
         </CardHeader>
         <CardContent>
@@ -112,11 +112,11 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
         {applicants.length === 0 ? (
           <Card>
             <CardContent className="py-12 text-center">
-              <div className="text-gray-400 mb-4">
+              <div className="text-mute-3 mb-4">
                 <Users className="w-16 h-16 mx-auto" />
               </div>
               <h3 className="text-lg font-semibold mb-2">No applicants yet</h3>
-              <p className="text-gray-600 mb-4">
+              <p className="text-mute mb-4">
                 Share your application link to start receiving applications
               </p>
               <Button>
@@ -132,8 +132,8 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-                        <span className="text-sm font-semibold text-gray-600">
+                      <div className="w-12 h-12 bg-line rounded-full flex items-center justify-center">
+                        <span className="text-sm font-semibold text-mute">
                           {applicant.firstName[0]}{applicant.lastName[0]}
                         </span>
                       </div>
@@ -141,10 +141,10 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
                         <div className="font-semibold text-lg">
                           {applicant.firstName} {applicant.lastName}
                         </div>
-                        <div className="text-sm text-gray-600">
+                        <div className="text-sm text-mute">
                           {applicant.email} · {applicant.phone}
                         </div>
-                        <div className="text-xs text-gray-500 mt-1">
+                        <div className="text-xs text-mute-2 mt-1">
                           Applied {new Date(applicant.appliedAt).toLocaleDateString()}
                           {applicant.completedAt && (
                             <> · Completed {new Date(applicant.completedAt).toLocaleDateString()}</>
@@ -158,7 +158,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
                           <div className="text-2xl font-bold text-primary">
                             {applicant.leaseScore}
                           </div>
-                          <div className="text-xs text-gray-500">LeaseScore</div>
+                          <div className="text-xs text-mute-2">LeaseScore</div>
                         </div>
                       )}
                       <Badge className={getStatusColor(applicant.status)}>

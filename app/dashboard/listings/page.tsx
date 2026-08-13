@@ -11,8 +11,8 @@ export default function ListingsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Properties</h1>
-          <p className="text-gray-600 mt-1">Manage your rental listings</p>
+          <h1 className="text-3xl font-bold text-ink">Properties</h1>
+          <p className="text-mute mt-1">Manage your rental listings</p>
         </div>
         <Link href="/dashboard/listings/new">
           <Button size="lg">
@@ -43,7 +43,7 @@ export default function ListingsPage() {
                     <CardDescription className="mt-2 flex items-center gap-4">
                       <span>{property.bedrooms} bed · {property.bathrooms} bath</span>
                       <span>·</span>
-                      <span className="font-semibold text-gray-900">
+                      <span className="font-semibold text-ink">
                         ${property.rent.toLocaleString()}/mo
                       </span>
                       <span>·</span>
@@ -59,25 +59,25 @@ export default function ListingsPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-6 text-sm">
                     <div>
-                      <span className="text-gray-600">Total Applicants: </span>
+                      <span className="text-mute">Total applicants: </span>
                       <span className="font-semibold">{statusCounts.total}</span>
                     </div>
                     {statusCounts.pending > 0 && (
                       <div>
-                        <span className="text-gray-600">Pending: </span>
-                        <span className="font-semibold text-blue-600">{statusCounts.pending}</span>
+                        <span className="text-mute">Pending: </span>
+                        <span className="font-semibold text-blue">{statusCounts.pending}</span>
                       </div>
                     )}
                     {statusCounts.completed > 0 && (
                       <div>
-                        <span className="text-gray-600">Completed: </span>
-                        <span className="font-semibold text-purple-600">{statusCounts.completed}</span>
+                        <span className="text-mute">Completed: </span>
+                        <span className="font-semibold text-ink-2">{statusCounts.completed}</span>
                       </div>
                     )}
                     {statusCounts.approved > 0 && (
                       <div>
-                        <span className="text-gray-600">Approved: </span>
-                        <span className="font-semibold text-green-600">{statusCounts.approved}</span>
+                        <span className="text-mute">Approved: </span>
+                        <span className="font-semibold text-ok">{statusCounts.approved}</span>
                       </div>
                     )}
                   </div>
@@ -103,11 +103,11 @@ export default function ListingsPage() {
       {mockProperties.length === 0 && (
         <Card>
           <CardContent className="py-12 text-center">
-            <div className="text-gray-400 mb-4">
+            <div className="text-mute-3 mb-4">
               <Plus className="w-16 h-16 mx-auto" />
             </div>
             <h3 className="text-lg font-semibold mb-2">No properties yet</h3>
-            <p className="text-gray-600 mb-4">
+            <p className="text-mute mb-4">
               Create your first listing to start receiving applications
             </p>
             <Link href="/dashboard/listings/new">

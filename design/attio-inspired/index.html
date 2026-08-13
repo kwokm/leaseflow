@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LeaseFlow — The desk for tenant screening</title>
+  <meta name="description" content="LeaseFlow collects applications, runs credit and background, and hands you a LeaseScore you can approve or decline.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <div class="chrome-stick">
+    <div class="announce" id="announce" role="region" aria-label="Announcement">
+      <p>Applicant-paid packets. Landlords use the desk free →</p>
+      <button class="announce-x" type="button" aria-label="Dismiss announcement">&times;</button>
+    </div>
+
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="brand" href="#top" aria-label="LeaseFlow home">
+          <svg class="brand-mark" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+            <rect width="24" height="24" rx="6.5" fill="currentColor"/>
+            <rect x="6.2" y="5.2" width="11.6" height="13.6" rx="2" fill="none" stroke="#fff" stroke-width="1.55"/>
+            <path d="M6.2 9.4h11.6" stroke="#fff" stroke-width="1.55"/>
+          </svg>
+          <span class="brand-word">leaseflow</span>
+        </a>
+
+        <nav class="nav" id="site-nav" aria-label="Primary">
+          <div class="nav-item has-menu">
+            <button class="nav-btn" type="button" aria-expanded="false" aria-haspopup="true" aria-controls="menu-platform">
+              Platform
+              <svg class="chev" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path d="M2.5 4.5 L6 8 L9.5 4.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="menu" id="menu-platform" role="menu">
+              <a role="menuitem" href="#platform">The packet</a>
+              <a role="menuitem" href="#desk">Applications desk</a>
+              <a role="menuitem" href="#queue">The queue</a>
+              <a role="menuitem" href="#packet">Credit, criminal, eviction, income</a>
+            </div>
+          </div>
+          <div class="nav-item has-menu">
+            <button class="nav-btn" type="button" aria-expanded="false" aria-haspopup="true" aria-controls="menu-resources">
+              Resources
+              <svg class="chev" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path d="M2.5 4.5 L6 8 L9.5 4.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="menu" id="menu-resources" role="menu">
+              <a role="menuitem" href="#apply">Renter apply</a>
+              <a role="menuitem" href="#rates">Screening fees</a>
+              <a role="menuitem" href="#legal">FCRA notes</a>
+            </div>
+          </div>
+          <a class="nav-link" href="#desk">Customers</a>
+          <a class="nav-link" href="#rates">Pricing</a>
+        </nav>
+
+        <div class="header-actions">
+          <a class="btn btn-ghost btn-sm" href="#desk">Sign in</a>
+          <a class="btn btn-fill btn-sm" href="#desk">Start for free</a>
+          <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu">
+            <span></span><span></span>
+          </button>
+        </div>
+      </div>
+    </header>
+  </div>
+
+  <main id="main">
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="hero-wash" aria-hidden="true"></div>
+      <div class="hero-copy">
+        <a class="hero-pill" href="#desk">How landlords review a packet →</a>
+        <h1 id="hero-title">Welcome to the packet.</h1>
+        <p class="hero-sub">LeaseFlow is the screening service that collects applications, runs credit and background, and hands you a LeaseScore you can approve or decline.</p>
+        <div class="hero-ctas">
+          <a class="btn btn-ghost btn-lg" href="#apply">Apply as renter</a>
+          <a class="btn btn-fill btn-lg" href="#desk">Start for free</a>
+        </div>
+      </div>
+
+      <div class="stage-wrap">
+        <div class="window" id="desk" aria-label="Applications desk">
+          <div class="window-bar">
+            <span class="tl tl-r" aria-hidden="true"></span>
+            <span class="tl tl-y" aria-hidden="true"></span>
+            <span class="tl tl-g" aria-hidden="true"></span>
+          </div>
+          <div class="desk" id="applications">
+            <aside class="desk-rail" aria-label="Desk navigation">
+              <button class="workspace" type="button">
+                Evergreen desk
+                <svg class="chev" viewBox="0 0 12 12" width="10" height="10" aria-hidden="true"><path d="M2.5 4.5 L6 8 L9.5 4.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <a class="rail-item is-active" href="#desk">
+                <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M2.5 7.2 8 2.8l5.5 4.4v6A1.4 1.4 0 0 1 12.1 14H3.9A1.4 1.4 0 0 1 2.5 12.6z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+                Home
+              </a>
+              <a class="rail-item" href="#queue">
+                <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><rect x="2" y="2" width="5.2" height="5.2" rx="1.2" fill="currentColor"/><rect x="8.8" y="2" width="5.2" height="5.2" rx="1.2" fill="currentColor" opacity=".45"/><rect x="2" y="8.8" width="5.2" height="5.2" rx="1.2" fill="currentColor" opacity=".45"/><rect x="8.8" y="8.8" width="5.2" height="5.2" rx="1.2" fill="currentColor" opacity=".45"/></svg>
+                Applications
+              </a>
+              <a class="rail-item" href="#rates">
+                <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><rect x="2.5" y="3" width="11" height="10" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M5 6.5h6M5 9.2h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                Payments
+              </a>
+              <a class="rail-item" href="#desk">
+                <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M2.5 4.2h7.2L12.8 7v5.2A1.4 1.4 0 0 1 11.4 13.6H2.5A1.4 1.4 0 0 1 1.1 12.2V5.6A1.4 1.4 0 0 1 2.5 4.2z" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M9.7 4.2v2.4h3.1" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>
+                Messages
+              </a>
+              <a class="rail-item" href="#desk">
+                <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M3 13.2V6.4L8 2.8l5 3.6v6.8H3z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M6.4 13.2V9h3.2v4.2" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>
+                Properties
+              </a>
+            </aside>
+            <div class="desk-main">
+              <div class="home-topbar">
+                <span class="home-crumb">Home</span>
+                <span class="home-tools">Help</span>
+              </div>
+              <div class="home-body">
+                <h2 class="home-greet">Good morning.</h2>
+                <form class="ask" action="#desk" method="get">
+                  <input type="search" name="q" placeholder="Ask about an applicant…" aria-label="Ask about an applicant">
+                  <button class="ask-go" type="submit" aria-label="Ask">
+                    <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3 8h9M8.5 4.5 12.5 8 8.5 11.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                </form>
+                <p class="reviews-label">Upcoming reviews</p>
+                <ol class="reviews">
+                  <li class="review is-open">
+                    <span class="review-time">10:00 – 10:20</span>
+                    <article class="review-card">
+                      <div class="review-head">
+                        <span class="ava ava-sj" aria-hidden="true">SJ</span>
+                        <div>
+                          <p class="review-name">Sarah Johnson packet</p>
+                          <p class="review-meta">742 Evergreen Terrace · LeaseScore <span class="num">785</span></p>
+                        </div>
+                        <span class="status">Completed</span>
+                      </div>
+                      <div class="review-body">
+                        <span>Credit <span class="num">742</span></span>
+                        <span>Criminal clear</span>
+                        <span>Eviction none</span>
+                        <span>Income <span class="num">2.6×</span></span>
+                      </div>
+                    </article>
+                  </li>
+                  <li class="review">
+                    <span class="review-time">11:30 – 11:50</span>
+                    <article class="review-card">
+                      <div class="review-head">
+                        <span class="ava ava-er" aria-hidden="true">ER</span>
+                        <div>
+                          <p class="review-name">Emily Rodriguez</p>
+                          <p class="review-meta">123 Main Street 4B · LeaseScore <span class="num">820</span></p>
+                        </div>
+                        <span class="status status-ok">Approved</span>
+                      </div>
+                    </article>
+                  </li>
+                  <li class="review">
+                    <span class="review-time">2:00 – 2:20</span>
+                    <article class="review-card">
+                      <div class="review-head">
+                        <span class="ava ava-jw" aria-hidden="true">JW</span>
+                        <div>
+                          <p class="review-name">James Wilson</p>
+                          <p class="review-meta">742 Evergreen Terrace · LeaseScore <span class="num">580</span></p>
+                        </div>
+                        <span class="status status-no">Declined</span>
+                      </div>
+                    </article>
+                  </li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="logo-band" aria-label="Properties and packet slices">
+      <div class="logo-grid">
+        <a class="logo-cell has-arrow" href="#desk">742 Evergreen</a>
+        <span class="logo-cell">123 Main 4B</span>
+        <a class="logo-cell has-arrow" href="#desk">456 Oak Ave</a>
+        <span class="logo-cell">88 Pine Court</span>
+        <span class="logo-cell">210 Maple</span>
+        <a class="logo-cell has-arrow" href="#packet">Credit</a>
+        <span class="logo-cell">Criminal</span>
+        <span class="logo-cell">Eviction</span>
+        <span class="logo-cell">Income</span>
+        <span class="logo-cell">Identity</span>
+        <span class="logo-cell">Standard</span>
+        <span class="logo-cell">Premium</span>
+        <span class="logo-cell">LeaseScore</span>
+        <a class="logo-cell has-arrow" href="#platform">Packet</a>
+        <span class="logo-cell">Desk</span>
+      </div>
+    </section>
+
+    <section class="block platform-block" id="platform" aria-labelledby="platform-title">
+      <div class="block-inner">
+        <p class="pill-blue">Platform</p>
+        <h2 id="platform-title" class="display display-wide">The desk that never loses a file. <span class="tone">Applicants pay. The packet lands scored. You approve or decline.</span></h2>
+
+        <div class="plat-split">
+          <div class="plat-tabs" role="tablist" aria-label="Platform">
+            <button class="plat-tab is-active" type="button" role="tab" id="tab-applications" aria-selected="true" aria-controls="panel-applications" data-tab="applications">Applications</button>
+            <button class="plat-tab" type="button" role="tab" id="tab-packets" aria-selected="false" aria-controls="panel-packets" data-tab="packets">Packets</button>
+            <button class="plat-tab" type="button" role="tab" id="tab-fees" aria-selected="false" aria-controls="panel-fees" data-tab="fees">Fees</button>
+            <button class="plat-tab" type="button" role="tab" id="tab-reports" aria-selected="false" aria-controls="panel-reports" data-tab="reports">Reports</button>
+            <button class="plat-tab" type="button" role="tab" id="tab-messages" aria-selected="false" aria-controls="panel-messages" data-tab="messages">Messages</button>
+          </div>
+
+          <div class="plat-panels">
+            <div class="plat-panel is-active" role="tabpanel" id="panel-applications" aria-labelledby="tab-applications" data-panel="applications">
+              <h3>The queue, in one place. <span class="tone">Completed packets land on the desk in the order they finish.</span></h3>
+              <p>You open the file, not a chase through listings and inboxes.</p>
+              <div class="crop" aria-hidden="true">
+                <div class="crop-ui">
+                  <div class="crop-bar">
+                    <span class="tl tl-r"></span><span class="tl tl-y"></span><span class="tl tl-g"></span>
+                    <span class="crop-title">Applications</span>
+                  </div>
+                  <table class="app-table dense">
+                    <thead>
+                      <tr>
+                        <th>Applicant</th>
+                        <th>Unit</th>
+                        <th class="num">LeaseScore</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr class="is-selected">
+                        <td><span class="who"><span class="ava ava-sj">SJ</span> Sarah Johnson</span></td>
+                        <td>742 Evergreen</td>
+                        <td class="num score">785</td>
+                        <td><span class="status">Completed</span></td>
+                      </tr>
+                      <tr>
+                        <td><span class="who"><span class="ava ava-er">ER</span> Emily Rodriguez</span></td>
+                        <td>123 Main 4B</td>
+                        <td class="num score">820</td>
+                        <td><span class="status status-ok">Approved</span></td>
+                      </tr>
+                      <tr>
+                        <td><span class="who"><span class="ava ava-jw">JW</span> James Wilson</span></td>
+                        <td>742 Evergreen</td>
+                        <td class="num score">580</td>
+                        <td><span class="status status-no">Declined</span></td>
+                      </tr>
+                      <tr>
+                        <td><span class="who"><span class="ava ava-ap">AP</span> Aisha Patel</span></td>
+                        <td>123 Main 4B</td>
+                        <td class="num score">768</td>
+                        <td><span class="status">Completed</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <div class="plat-panel" role="tabpanel" id="panel-packets" aria-labelledby="tab-packets" data-panel="packets" hidden>
+              <h3>The file stays together. <span class="tone">Credit, criminal, eviction, and income seal into one packet with a LeaseScore.</span></h3>
+              <p>Approve or decline with the file still attached.</p>
+              <div class="crop" aria-hidden="true">
+                <div class="crop-ui packet-crop">
+                  <div class="packet-who">
+                    <span class="ava ava-sj ava-lg">SJ</span>
+                    <div>
+                      <p class="packet-name">Sarah Johnson</p>
+                      <p class="packet-meta">742 Evergreen Terrace · Standard pull</p>
+                    </div>
+                  </div>
+                  <div class="packet-score">
+                    <span class="packet-score-label">LeaseScore</span>
+                    <span class="packet-score-num">785</span>
+                  </div>
+                  <dl class="packet-rows">
+                    <div><dt>Credit</dt><dd>742 · three tradelines current</dd></div>
+                    <div><dt>Criminal</dt><dd>Clear · 7-year search</dd></div>
+                    <div><dt>Eviction</dt><dd>None on file</dd></div>
+                    <div><dt>Income</dt><dd class="num">$6,150 / mo · 2.6×</dd></div>
+                  </dl>
+                </div>
+              </div>
+            </div>
+
+            <div class="plat-panel" role="tabpanel" id="panel-fees" aria-labelledby="tab-fees" data-panel="fees" hidden>
+              <h3>Applicants cover screening. <span class="tone">Standard $39.99. Premium $59.99 with income.</span></h3>
+              <p>Landlords do not pay to use the desk.</p>
+              <div class="crop" aria-hidden="true">
+                <div class="crop-ui fees-crop">
+                  <div class="fee-row">
+                    <div>
+                      <p class="rate-name">Standard</p>
+                      <p class="fee-bits">Credit, criminal, eviction</p>
+                    </div>
+                    <p class="rate-price"><span class="num">$39.99</span></p>
+                  </div>
+                  <div class="fee-row">
+                    <div>
+                      <p class="rate-name">Premium</p>
+                      <p class="fee-bits">Standard plus income</p>
+                    </div>
+                    <p class="rate-price"><span class="num">$59.99</span></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="plat-panel" role="tabpanel" id="panel-reports" aria-labelledby="tab-reports" data-panel="reports" hidden>
+              <h3>Read what came back. <span class="tone">Each slice of the packet is a consumer report you can open from the row.</span></h3>
+              <p>Credit, criminal, eviction, income.</p>
+              <div class="crop" aria-hidden="true">
+                <div class="crop-ui">
+                  <div class="slice-ui report-list">
+                    <div class="slice-row"><span>Credit</span><span class="num">742 · Heartland Auto $8,420</span></div>
+                    <div class="slice-row"><span>Criminal</span><span>No records in 7-year search</span></div>
+                    <div class="slice-row"><span>Eviction</span><span>No filings on file</span></div>
+                    <div class="slice-row"><span>Income</span><span class="num">$6,150 / mo · 2.6×</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="plat-panel" role="tabpanel" id="panel-messages" aria-labelledby="tab-messages" data-panel="messages" hidden>
+              <h3>The thread sits on the file. <span class="tone">Notes to the applicant stay attached to the packet, not lost in a personal inbox.</span></h3>
+              <div class="crop" aria-hidden="true">
+                <div class="crop-ui msg-crop">
+                  <p class="msg-thread">Sarah Johnson · 742 Evergreen Terrace</p>
+                  <div class="msg">
+                    <span class="ava ava-sj">SJ</span>
+                    <p>Application submitted. Screening fee paid — Standard.</p>
+                  </div>
+                  <div class="msg msg-out">
+                    <p>Packet completed. LeaseScore 785 is on the file.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="block block-tint" id="queue" aria-labelledby="queue-title">
+      <div class="block-inner">
+        <p class="eyebrow">Applications</p>
+        <h2 id="queue-title" class="display">Applications in one queue. <span class="tone">Review files in the order they complete.</span></h2>
+        <div class="split split-reverse">
+          <div class="copy-col">
+            <p class="lede lede-left">One desk for every property — not a hunt through listings, inboxes, and portals.</p>
+            <ul class="quiet-list">
+              <li>Every completed packet lands in the same table.</li>
+              <li>LeaseScore is a number you can sort, not a color you have to decode.</li>
+              <li>Approve and decline stay on the row. The packet stays attached.</li>
+            </ul>
+          </div>
+          <div class="window window-mini" aria-label="Applications queue">
+            <div class="window-bar">
+              <span class="tl tl-r" aria-hidden="true"></span>
+              <span class="tl tl-y" aria-hidden="true"></span>
+              <span class="tl tl-g" aria-hidden="true"></span>
+            </div>
+            <div class="queue-ui">
+              <div class="desk-chrome">
+                <span class="desk-chrome-title">Applications</span>
+                <span class="desk-chrome-meta">Sorted by received</span>
+              </div>
+              <div class="table-scroll">
+                <table class="app-table dense">
+                  <thead>
+                    <tr>
+                      <th>Applicant</th>
+                      <th>Unit</th>
+                      <th class="num">LeaseScore</th>
+                      <th>Pull</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="is-selected">
+                      <td>
+                        <span class="who">
+                          <span class="ava ava-sj" aria-hidden="true">SJ</span>
+                          Sarah Johnson
+                        </span>
+                      </td>
+                      <td>742 Evergreen</td>
+                      <td class="num score">785</td>
+                      <td>Standard</td>
+                      <td><span class="status">Completed</span></td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <span class="who">
+                          <span class="ava ava-er" aria-hidden="true">ER</span>
+                          Emily Rodriguez
+                        </span>
+                      </td>
+                      <td>123 Main 4B</td>
+                      <td class="num score">820</td>
+                      <td>Premium</td>
+                      <td><span class="status status-ok">Approved</span></td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <span class="who">
+                          <span class="ava ava-jw" aria-hidden="true">JW</span>
+                          James Wilson
+                        </span>
+                      </td>
+                      <td>742 Evergreen</td>
+                      <td class="num score">580</td>
+                      <td>Standard</td>
+                      <td><span class="status status-no">Declined</span></td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <span class="who">
+                          <span class="ava ava-ap" aria-hidden="true">AP</span>
+                          Aisha Patel
+                        </span>
+                      </td>
+                      <td>123 Main 4B</td>
+                      <td class="num score">768</td>
+                      <td>Standard</td>
+                      <td><span class="status">Completed</span></td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <span class="who">
+                          <span class="ava ava-dk" aria-hidden="true">DK</span>
+                          David Kim
+                        </span>
+                      </td>
+                      <td>742 Evergreen</td>
+                      <td class="num score">645</td>
+                      <td>Premium</td>
+                      <td><span class="status">Completed</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="block" id="rates" aria-labelledby="rates-title">
+      <div class="block-inner">
+        <p class="eyebrow">Fees</p>
+        <h2 id="rates-title" class="display">Applicants pay the fee. <span class="tone">Landlords do not pay to use the desk. The renter covers screening when they apply.</span></h2>
+        <div class="rates">
+          <article class="rate">
+            <p class="rate-name">Standard</p>
+            <p class="rate-price"><span class="num">$39.99</span></p>
+            <p class="rate-copy">Credit, criminal, and eviction, sealed into the packet with a LeaseScore.</p>
+          </article>
+          <article class="rate">
+            <p class="rate-name">Premium</p>
+            <p class="rate-price"><span class="num">$59.99</span></p>
+            <p class="rate-copy">Standard plus income. Employer, stated pay, and rent multiple on the same file.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="block block-tint" id="packet" aria-labelledby="packet-title">
+      <div class="block-inner">
+        <p class="eyebrow">The file</p>
+        <h2 id="packet-title" class="display">Everything in the packet. <span class="tone">Four slices of the same sealed file. Read them on the desk, not across tabs.</span></h2>
+        <div class="bento">
+          <article class="slice">
+            <p class="slice-kicker">Credit</p>
+            <p class="slice-lead">Tradelines that belong on a consumer report.</p>
+            <div class="slice-ui" aria-hidden="true">
+              <div class="slice-row"><span>Heartland Auto</span><span class="num">$8,420</span></div>
+              <div class="slice-row"><span>Prairie Card</span><span class="num">$1,105</span></div>
+              <div class="slice-row"><span>First Oak Bank</span><span>Paid</span></div>
+            </div>
+          </article>
+          <article class="slice">
+            <p class="slice-kicker">Criminal</p>
+            <p class="slice-lead">A seven-year search, returned as clear or with records to read.</p>
+            <div class="slice-ui">
+              <p class="slice-result">No records in 7-year search</p>
+              <p class="slice-note">Johnson, Sarah · Springfield IL</p>
+            </div>
+          </article>
+          <article class="slice">
+            <p class="slice-kicker">Eviction</p>
+            <p class="slice-lead">Filings and judgments, or none on file.</p>
+            <div class="slice-ui">
+              <p class="slice-result">No filings on file</p>
+              <p class="slice-note">County courts · 7 years</p>
+            </div>
+          </article>
+          <article class="slice">
+            <p class="slice-kicker">Income</p>
+            <p class="slice-lead">Employer, stated pay, and how it sits against rent.</p>
+            <div class="slice-ui">
+              <div class="slice-row"><span>Employer</span><span>Springfield City Clerk</span></div>
+              <div class="slice-row"><span>Stated</span><span class="num">$6,150 / mo</span></div>
+              <div class="slice-row"><span>Rent multiple</span><span class="num">2.6×</span></div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="apply-strip" id="apply" aria-labelledby="apply-title">
+      <div class="apply-inner">
+        <div>
+          <p class="eyebrow">For renters</p>
+          <h2 id="apply-title">Apply for 742 Evergreen Terrace</h2>
+          <p>Springfield, IL · 3 bedroom · <span class="num">$2,400</span> / month. You pay the screening fee.</p>
+        </div>
+        <a class="btn btn-fill btn-lg" href="#apply">Begin ($39.99 / $59.99)</a>
+      </div>
+    </section>
+
+    <section class="close" aria-labelledby="close-title">
+      <div class="close-inner">
+        <h2 id="close-title" class="display display-center">Screening runs on LeaseFlow.</h2>
+        <div class="hero-ctas">
+          <a class="btn btn-ghost-dark btn-lg" href="#apply">Apply as renter</a>
+          <a class="btn btn-fill-dark btn-lg" href="#desk">Start for free</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" id="legal">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="brand" href="#top" aria-label="LeaseFlow home">
+          <svg class="brand-mark" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+            <rect width="24" height="24" rx="6.5" fill="currentColor"/>
+            <rect x="6.2" y="5.2" width="11.6" height="13.6" rx="2" fill="none" stroke="#fff" stroke-width="1.55"/>
+            <path d="M6.2 9.4h11.6" stroke="#fff" stroke-width="1.55"/>
+          </svg>
+          <span class="brand-word">leaseflow</span>
+        </a>
+      </div>
+      <div class="footer-cols">
+        <div>
+          <p class="footer-head">Product</p>
+          <a href="#desk">Applications</a>
+          <a href="#platform">Packet</a>
+          <a href="#rates">Pricing</a>
+          <a href="#desk">Desk</a>
+        </div>
+        <div>
+          <p class="footer-head">Resources</p>
+          <a href="#apply">Apply</a>
+          <a href="#packet">What’s in a file</a>
+          <a href="#legal">FCRA</a>
+        </div>
+        <div>
+          <p class="footer-head">Legal</p>
+          <a href="#legal">Privacy</a>
+          <a href="#legal">Terms</a>
+          <a href="#legal">Consumer reports</a>
+        </div>
+      </div>
+    </div>
+    <p class="footer-note">Screening reports are consumer reports under the FCRA. This page is a prototype. Names, scores, and tradelines are mock data.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState } from "react";
+import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,7 +22,9 @@ import {
   Clock,
   Download,
   FileText,
+  Gauge,
   Home,
+  Paperclip,
   PawPrint,
   Printer,
   Scale,
@@ -34,21 +36,35 @@ import {
 import {
   getApplicantById,
   getApplicationDetails,
+  getExperianPull,
   getPaymentsByApplicant,
   getPropertyById,
   getReportByApplicant,
   getScoreColor,
   getScoreLabel,
+  getScreeningFee,
   getStatusColor,
   getStatusLabel,
+  groupDocuments,
+  type Payment,
 } from "@/lib/data/mock-data";
 import { downloadPacket } from "@/lib/packet-document";
+import { getSubmission } from "@/lib/apply/storage";
+import {
+  confirmationIdFromApplicantId,
+  isLocalApplicantId,
+  submissionApplicant,
+  submissionDetails,
+  submissionExperian,
+  submissionReport,
+} from "@/lib/apply/to-packet";
+import type { ApplyState } from "@/lib/apply/types";
 
 function Field({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div>
-      <div className="text-sm text-gray-600">{label}</div>
-      <div className="font-medium text-gray-900 mt-0.5">{value}</div>
+      <div className="text-sm text-mute">{label}</div>
+      <div className="font-medium text-ink mt-0.5">{value}</div>
     </div>
   );
 }
@@ -72,18 +88,79 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
   const { id } = use(params);
   const [adverseActionOpen, setAdverseActionOpen] = useState(false);
 
-  const applicant = getApplicantById(id);
+  // Applications submitted from this browser live in localStorage, so they can
+  // only be resolved after mount.
+  const local = isLocalApplicantId(id);
+  const [submission, setSubmission] = useState<ApplyState | undefined>();
+  const [submissionChecked, setSubmissionChecked] = useState(!local);
+
+  useEffect(() => {
+    if (!local) return;
+    setSubmission(getSubmission(confirmationIdFromApplicantId(id)));
+    setSubmissionChecked(true);
+  }, [id, local]);
+
+  const applicant = local
+    ? submission
+      ? submissionApplicant(submission)
+      : undefined
+    : getApplicantById(id);
   const property = applicant ? getPropertyById(applicant.propertyId) : undefined;
-  const report = applicant ? getReportByApplicant(applicant.id) : undefined;
-  const details = applicant ? getApplicationDetails(applicant.id) : undefined;
-  const payments = applicant ? getPaymentsByApplicant(applicant.id) : [];
+  const report = local
+    ? submission
+      ? submissionReport(submission)
+      : undefined
+    : applicant
+      ? getReportByApplicant(applicant.id)
+      : undefined;
+  const details = local
+    ? submission
+      ? submissionDetails(submission)
+      : undefined
+    : applicant
+      ? getApplicationDetails(applicant.id)
+      : undefined;
+  const experian = local
+    ? submission
+      ? submissionExperian(submission)
+      : undefined
+    : applicant
+      ? getExperianPull(applicant.id)
+      : undefined;
+  const payments: Payment[] =
+    local && submission
+      ? [
+          {
+            id: `pay-${submission.confirmationId}`,
+            kind: "screening_fee",
+            description: `${submission.screeningPackage === "premium" ? "Premium" : "Standard"} screening fee`,
+            applicantId: applicant?.id,
+            propertyId: submission.listingId,
+            amount: getScreeningFee(submission.screeningPackage),
+            status: "paid",
+            method: "Demo card",
+            createdAt: submission.submittedAt ?? "",
+          },
+        ]
+      : applicant
+        ? getPaymentsByApplicant(applicant.id)
+        : [];
+
+  if (local && !submissionChecked) {
+    return <div className="py-12 text-mute">Loading the application…</div>;
+  }
 
   if (!applicant || !property) {
     return (
       <div className="text-center py-12">
-        <h2 className="text-2xl font-bold mb-2">Application Not Found</h2>
+        <h2 className="text-2xl font-bold mb-2">Application not found</h2>
+        <p className="text-mute mb-4">
+          {local
+            ? "Applications submitted in this prototype are stored in the browser that submitted them."
+            : "This application is no longer available."}
+        </p>
         <Link href="/dashboard/applications">
-          <Button>Back to Applications</Button>
+          <Button>Back to applications</Button>
         </Link>
       </div>
     );
@@ -98,7 +175,7 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
         <Link href="/dashboard/applications">
           <Button variant="ghost" size="sm" className="mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Applications
+            Back to applications
           </Button>
         </Link>
       </div>
@@ -106,25 +183,25 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
       {/* Print-only document header */}
       <div className="hidden print:block border-b-2 border-primary pb-3 mb-4">
         <div className="text-2xl font-bold">Application Packet — {fullName}</div>
-        <div className="text-sm text-gray-600">{property.address}</div>
+        <div className="text-sm text-mute">{property.address}</div>
       </div>
 
       {/* Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold text-gray-900">{fullName}</h1>
+            <h1 className="text-3xl font-bold text-ink">{fullName}</h1>
             <Badge className={getStatusColor(applicant.status)}>
               {getStatusLabel(applicant.status)}
             </Badge>
           </div>
-          <p className="text-gray-600 mt-1">{property.address}</p>
+          <p className="text-mute mt-1">{property.address}</p>
           <div className="flex flex-wrap items-center gap-3 mt-3">
-            <span className="text-sm text-gray-600">{applicant.email}</span>
-            <span className="text-gray-400">·</span>
-            <span className="text-sm text-gray-600">{applicant.phone}</span>
-            <span className="text-gray-400">·</span>
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-mute">{applicant.email}</span>
+            <span className="text-mute-3">·</span>
+            <span className="text-sm text-mute">{applicant.phone}</span>
+            <span className="text-mute-3">·</span>
+            <span className="text-sm text-mute">
               Applied {new Date(applicant.appliedAt).toLocaleDateString()}
             </span>
           </div>
@@ -137,14 +214,14 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
           </Button>
           <Button
             variant="outline"
-            onClick={() => downloadPacket({ applicant, property, details, report })}
+            onClick={() => downloadPacket({ applicant, property, details, report, experian })}
           >
             <Download className="w-4 h-4 mr-2" />
             Download
           </Button>
           {!decided && (
             <>
-              <Button className="bg-green-600 hover:bg-green-700">
+              <Button className="bg-ok hover:bg-[#0e8543]">
                 <CheckCircle className="w-4 h-4 mr-2" />
                 Approve
               </Button>
@@ -158,12 +235,12 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
       </div>
 
       {/* Demo Banner */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 print:hidden">
+      <div className="bg-mist border border-line rounded-lg p-4 print:hidden">
         <div className="flex items-start gap-3">
-          <AlertTriangle className="w-5 h-5 text-blue-600 mt-0.5" />
+          <AlertTriangle className="w-5 h-5 text-blue mt-0.5" />
           <div>
-            <div className="font-semibold text-blue-900">Demo Data</div>
-            <div className="text-sm text-blue-700">
+            <div className="font-semibold text-ink">Demo data</div>
+            <div className="text-sm text-slate">
               This packet contains mock data for demonstration purposes. No real credit bureau or
               background check services were used.
             </div>
@@ -177,27 +254,27 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
           <CardContent className="p-8">
             <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
               <div>
-                <div className="text-sm font-medium text-gray-600 mb-2">LeaseScore™</div>
+                <div className="text-sm font-medium text-mute mb-2">LeaseScore™</div>
                 <div className={`text-6xl font-bold ${getScoreColor(report.credit.leaseScore)}`}>
                   {report.credit.leaseScore}
                 </div>
-                <div className="text-lg text-gray-600 mt-2">
+                <div className="text-lg text-mute mt-2">
                   {getScoreLabel(report.credit.leaseScore)} Credit
                 </div>
               </div>
               <div className="md:text-right">
-                <div className="text-sm text-gray-600 mb-4">Score Range: 300-850</div>
+                <div className="text-sm text-mute mb-4">Score range 300–850</div>
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 md:justify-end">
-                    <div className="w-3 h-3 rounded-full bg-green-600"></div>
+                    <div className="w-3 h-3 rounded-full bg-ok"></div>
                     <span className="text-sm">750+ Excellent</span>
                   </div>
                   <div className="flex items-center gap-2 md:justify-end">
-                    <div className="w-3 h-3 rounded-full bg-yellow-600"></div>
+                    <div className="w-3 h-3 rounded-full bg-warn"></div>
                     <span className="text-sm">650-749 Good</span>
                   </div>
                   <div className="flex items-center gap-2 md:justify-end">
-                    <div className="w-3 h-3 rounded-full bg-red-600"></div>
+                    <div className="w-3 h-3 rounded-full bg-no"></div>
                     <span className="text-sm">&lt;650 Fair</span>
                   </div>
                 </div>
@@ -208,10 +285,10 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
       ) : (
         <Card className="border-dashed print-avoid-break">
           <CardContent className="p-8 flex items-start gap-4">
-            <Clock className="w-6 h-6 text-gray-400 mt-1" />
+            <Clock className="w-6 h-6 text-mute-3 mt-1" />
             <div>
               <div className="text-lg font-semibold">LeaseScore™ pending</div>
-              <p className="text-gray-600 text-sm mt-1">
+              <p className="text-mute text-sm mt-1">
                 {applicant.status === "invited"
                   ? "This applicant has been invited but has not started their application yet."
                   : "Screening runs once the applicant completes their application and pays the screening fee."}
@@ -221,9 +298,73 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
         </Card>
       )}
 
+      {/* Experian (demo) credit file */}
+      <div className="print-avoid-break">
+        <SectionHeading icon={Gauge}>Credit report</SectionHeading>
+        {experian ? (
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge variant="blue">{experian.provider}</Badge>
+                    <span className="text-sm text-mute">{experian.scoreModel}</span>
+                  </div>
+                  <div className="mt-4 text-5xl font-semibold tracking-[-1.4px] text-ink">
+                    {experian.score}
+                  </div>
+                  <p className="mt-2 text-sm text-mute">
+                    Pulled {new Date(experian.pulledAt).toLocaleString()} ·{" "}
+                    {experian.fileMatched ? "File matched" : "No file match"}
+                  </p>
+                </div>
+
+                <dl className="grid w-full max-w-sm grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                  {[
+                    ["On-time payments", `${experian.onTimePaymentRate}%`],
+                    ["Open accounts", String(experian.openAccounts)],
+                    ["Oldest account", `${experian.oldestAccountYears} years`],
+                    ["Recent inquiries", String(experian.recentInquiries)],
+                    ["Public records", String(experian.publicRecords)],
+                    ["Cost to applicant", "$0.00"],
+                  ].map(([label, value]) => (
+                    <div key={label} className="flex justify-between gap-3">
+                      <dt className="text-mute">{label}</dt>
+                      <dd className="font-medium text-ink">{value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+
+              {experian.factors.length > 0 && (
+                <ul className="mt-6 space-y-2 border-t border-line pt-4 text-sm">
+                  {experian.factors.map((factor) => (
+                    <li key={factor} className="flex items-start gap-2 text-ink-2">
+                      <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-mute-3" />
+                      {factor}
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              <p className="mt-4 text-xs text-mute">
+                Mock pull generated for this prototype. No consumer reporting agency was contacted
+                and no bureau credentials were collected.
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="border-dashed">
+            <CardContent className="p-6 text-sm text-mute">
+              No credit report is attached to this application yet.
+            </CardContent>
+          </Card>
+        )}
+      </div>
+
       {/* Application Summary */}
       <div className="print-avoid-break">
-        <SectionHeading icon={FileText}>Application Summary</SectionHeading>
+        <SectionHeading icon={FileText}>Application summary</SectionHeading>
         <Card>
           <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
             <Field label="Property" value={property.address} />
@@ -277,14 +418,18 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
         <>
           {/* Current Residence */}
           <div className="print-avoid-break">
-            <SectionHeading icon={Home}>Current Residence</SectionHeading>
+            <SectionHeading icon={Home}>Current residence</SectionHeading>
             <Card>
               <CardContent className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Field label="Address" value={details.currentAddress.address} />
                 <Field label="Resident since" value={details.currentAddress.since} />
                 <Field
                   label="Monthly rent"
-                  value={`$${details.currentAddress.monthlyRent.toLocaleString()}`}
+                  value={
+                    details.currentAddress.monthlyRent
+                      ? `$${details.currentAddress.monthlyRent.toLocaleString()}`
+                      : "Not provided"
+                  }
                 />
                 <Field
                   label="Landlord"
@@ -324,13 +469,13 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-600">Occupants</CardTitle>
+                  <CardTitle className="text-sm font-medium text-mute">Occupants</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2 text-sm">
                   {details.occupants.map((occupant) => (
                     <div key={occupant.name}>
                       <div className="font-medium">{occupant.name}</div>
-                      <div className="text-gray-600">
+                      <div className="text-mute">
                         {occupant.relationship} · {occupant.age}
                       </div>
                     </div>
@@ -339,19 +484,19 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
               </Card>
               <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                  <CardTitle className="text-sm font-medium text-mute flex items-center gap-2">
                     <PawPrint className="w-4 h-4" />
                     Pets
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2 text-sm">
                   {details.pets.length === 0 ? (
-                    <span className="text-gray-500">None</span>
+                    <span className="text-mute-2">None</span>
                   ) : (
                     details.pets.map((pet) => (
                       <div key={`${pet.type}-${pet.breed}`}>
                         <div className="font-medium">{pet.type}</div>
-                        <div className="text-gray-600">
+                        <div className="text-mute">
                           {pet.breed} · {pet.weight}
                         </div>
                       </div>
@@ -361,21 +506,21 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
               </Card>
               <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                  <CardTitle className="text-sm font-medium text-mute flex items-center gap-2">
                     <Car className="w-4 h-4" />
                     Vehicles
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2 text-sm">
                   {details.vehicles.length === 0 ? (
-                    <span className="text-gray-500">None</span>
+                    <span className="text-mute-2">None</span>
                   ) : (
                     details.vehicles.map((vehicle) => (
                       <div key={vehicle.plate}>
                         <div className="font-medium">
                           {vehicle.year} {vehicle.make} {vehicle.model}
                         </div>
-                        <div className="text-gray-600">{vehicle.plate}</div>
+                        <div className="text-mute">{vehicle.plate}</div>
                       </div>
                     ))
                   )}
@@ -384,60 +529,81 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
             </div>
           </div>
 
-          {/* Disclosures & Documents */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print-avoid-break">
+          {/* Disclosures */}
+          <div className="grid grid-cols-1 gap-4 print-avoid-break">
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">Disclosures</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm">
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Smoker</span>
+                  <span className="text-mute">Smoker</span>
                   <span className="font-medium">{details.disclosures.smoker ? "Yes" : "No"}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Prior eviction</span>
+                  <span className="text-mute">Prior eviction</span>
                   <span className="font-medium">
                     {details.disclosures.priorEviction ? "Yes" : "No"}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Bankruptcy</span>
+                  <span className="text-mute">Bankruptcy</span>
                   <span className="font-medium">
                     {details.disclosures.bankruptcy ? "Yes" : "No"}
                   </span>
                 </div>
                 {details.disclosures.notes && (
-                  <p className="text-gray-600 pt-2 border-t">{details.disclosures.notes}</p>
+                  <p className="text-mute pt-2 border-t">{details.disclosures.notes}</p>
                 )}
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Documents</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-sm">
-                {details.documents.length === 0 ? (
-                  <span className="text-gray-500">No documents uploaded</span>
-                ) : (
-                  details.documents.map((doc) => (
-                    <div key={doc.name} className="flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <FileText className="w-4 h-4 text-gray-400 shrink-0" />
-                        <span className="truncate">{doc.name}</span>
-                      </div>
-                      <span className="text-gray-500 shrink-0">{doc.kind}</span>
-                    </div>
-                  ))
-                )}
-              </CardContent>
-            </Card>
+          </div>
+
+          {/* Documents — photo ID, pay stubs, and bank statements */}
+          <div className="print-avoid-break">
+            <SectionHeading icon={Paperclip}>Documents</SectionHeading>
+            {details.documents.length === 0 ? (
+              <Card>
+                <CardContent className="p-6 text-sm text-mute">
+                  No documents were uploaded with this application.
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-4">
+                {groupDocuments(details.documents).map((group) => (
+                  <Card key={group.type}>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm font-medium text-mute">
+                        {group.label}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2 text-sm">
+                      {group.documents.map((doc) => (
+                        <div
+                          key={`${doc.name}-${doc.uploadedAt}`}
+                          className="flex items-center justify-between gap-3 rounded-btn border border-line px-3 py-2"
+                        >
+                          <div className="flex min-w-0 items-center gap-2">
+                            <FileText className="w-4 h-4 shrink-0 text-mute-3" />
+                            <span className="truncate font-medium text-ink">{doc.name}</span>
+                          </div>
+                          <span className="shrink-0 text-mute">
+                            {doc.sizeLabel ? `${doc.sizeLabel} · ` : ""}
+                            {new Date(doc.uploadedAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
           </div>
         </>
       ) : (
         <Card className="print-avoid-break">
-          <CardContent className="p-8 text-center text-gray-600">
+          <CardContent className="p-8 text-center text-mute">
             This applicant has been invited but has not submitted an application yet.
           </CardContent>
         </Card>
@@ -447,7 +613,7 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
         <>
           {/* Credit Summary */}
           <div className="print-avoid-break">
-            <SectionHeading icon={TrendingUp}>Credit Summary</SectionHeading>
+            <SectionHeading icon={TrendingUp}>Credit summary</SectionHeading>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               {[
                 { label: "Payment history", value: `${report.credit.paymentHistory}%` },
@@ -459,7 +625,7 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
                 <Card key={stat.label}>
                   <CardContent className="p-4">
                     <div className="text-2xl font-bold">{stat.value}</div>
-                    <div className="text-xs text-gray-600 mt-1">{stat.label}</div>
+                    <div className="text-xs text-mute mt-1">{stat.label}</div>
                   </CardContent>
                 </Card>
               ))}
@@ -468,7 +634,7 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
 
           {/* Background Check */}
           <div className="print-avoid-break">
-            <SectionHeading icon={Shield}>Background Check</SectionHeading>
+            <SectionHeading icon={Shield}>Background check</SectionHeading>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {[
                 { label: "Criminal", value: report.background.criminal },
@@ -479,13 +645,13 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
                 return (
                   <Card
                     key={check.label}
-                    className={clear ? "border-green-200 bg-green-50" : "border-red-200 bg-red-50"}
+                    className={clear ? "border-line bg-ok-bg" : "border-line bg-no-bg"}
                   >
                     <CardContent className="p-4 flex items-center gap-2">
                       {clear ? (
-                        <CheckCircle className="w-5 h-5 text-green-600" />
+                        <CheckCircle className="w-5 h-5 text-ok" />
                       ) : (
-                        <XCircle className="w-5 h-5 text-red-600" />
+                        <XCircle className="w-5 h-5 text-no" />
                       )}
                       <span className="font-medium">
                         {check.label}: {clear ? "Clear" : "Records found"}
@@ -497,11 +663,11 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
             </div>
 
             {report.background.details && (
-              <Card className="mt-4 border-red-200">
+              <Card className="mt-4 border-line">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base flex items-center gap-2">
-                    <AlertTriangle className="w-5 h-5 text-red-600" />
-                    Additional Details
+                    <AlertTriangle className="w-5 h-5 text-no" />
+                    Additional details
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -513,7 +679,7 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
 
           {/* Income Verification */}
           <div className="print-avoid-break">
-            <SectionHeading icon={Briefcase}>Income &amp; Employment (verified)</SectionHeading>
+            <SectionHeading icon={Briefcase}>Income and employment (verified)</SectionHeading>
             <Card>
               <CardContent className="p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -522,7 +688,7 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
                   <Field
                     label="Monthly income"
                     value={
-                      <span className="text-green-600">
+                      <span className="text-ok">
                         ${report.income.monthlyIncome.toLocaleString()}
                       </span>
                     }
@@ -531,20 +697,20 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
                     label="Verification status"
                     value={
                       report.income.verified ? (
-                        <span className="text-green-600">Verified</span>
+                        <span className="text-ok">Verified</span>
                       ) : (
-                        <span className="text-red-600">Not verified</span>
+                        <span className="text-no">Not verified</span>
                       )
                     }
                   />
                 </div>
 
-                <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-                  <div className="text-sm font-medium mb-1">Rent-to-Income Ratio</div>
+                <div className="mt-6 p-4 bg-mist rounded-lg">
+                  <div className="text-sm font-medium mb-1">Rent-to-income ratio</div>
                   <div className="text-3xl font-bold text-primary">
                     {Math.round((property.rent / report.income.monthlyIncome) * 100)}%
                   </div>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="text-sm text-mute mt-1">
                     {property.rent / report.income.monthlyIncome <= 0.3
                       ? "Within recommended 30% guideline"
                       : "Above recommended 30% guideline"}
@@ -554,26 +720,26 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
             </Card>
           </div>
 
-          {/* Residential History */}
-          <div className="print-avoid-break">
-            <SectionHeading icon={Home}>Residential History (verified)</SectionHeading>
+          {/* Residential History — verified addresses, when screening returned any */}
+          <div className={`print-avoid-break ${report.residentialHistory.length ? "" : "hidden"}`}>
+            <SectionHeading icon={Home}>Residential history (verified)</SectionHeading>
             <div className="space-y-3">
               {report.residentialHistory.map((residence) => (
                 <Card key={residence.address}>
                   <CardContent className="p-6 flex items-start justify-between gap-4">
                     <div>
                       <div className="font-semibold">{residence.address}</div>
-                      <div className="text-sm text-gray-600 mt-1">
+                      <div className="text-sm text-mute mt-1">
                         {residence.from} - {residence.to}
                       </div>
                     </div>
                     {residence.landlordVerified ? (
-                      <Badge className="bg-green-100 text-green-700">
+                      <Badge className="bg-ok-bg text-ok">
                         <CheckCircle className="w-3 h-3 mr-1" />
                         Verified
                       </Badge>
                     ) : (
-                      <Badge variant="secondary">Not Verified</Badge>
+                      <Badge variant="secondary">Not verified</Badge>
                     )}
                   </CardContent>
                 </Card>
@@ -586,7 +752,7 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
       {/* Consent */}
       {details && (
         <div className="print-avoid-break">
-          <SectionHeading icon={Scale}>Consent &amp; Authorization</SectionHeading>
+          <SectionHeading icon={Scale}>Consent and authorization</SectionHeading>
           <Card>
             <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
               <Field label="Electronic signature" value={details.consent.signature} />
@@ -600,7 +766,7 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
         </div>
       )}
 
-      <p className="text-xs text-gray-500 hidden print:block pt-4 border-t">
+      <p className="text-xs text-mute-2 hidden print:block pt-4 border-t">
         Generated by LeaseFlow (demo prototype). Screening data is fictional — no consumer
         reporting agency was used.
       </p>
@@ -611,14 +777,14 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Scale className="w-5 h-5" />
-              Adverse Action Notice Preview
+              Adverse action notice preview
             </DialogTitle>
             <DialogDescription>
               If you decline this application, the applicant will receive this notice per FCRA
               requirements.
             </DialogDescription>
           </DialogHeader>
-          <div className="border rounded-lg p-6 bg-gray-50 text-sm space-y-4">
+          <div className="border rounded-lg p-6 bg-mist text-sm space-y-4">
             <div>
               <strong>NOTICE OF ADVERSE ACTION</strong>
             </div>
@@ -641,7 +807,7 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
               within 60 days. You also have the right to dispute the accuracy or completeness of
               any information in your report.
             </div>
-            <div className="text-xs text-gray-600">
+            <div className="text-xs text-mute">
               This is a demo notice for prototype purposes only.
             </div>
           </div>
@@ -649,7 +815,7 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
             <Button variant="outline" onClick={() => setAdverseActionOpen(false)}>
               Cancel
             </Button>
-            <Button variant="destructive">Send Notice &amp; Decline</Button>
+            <Button variant="destructive">Send notice and decline</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

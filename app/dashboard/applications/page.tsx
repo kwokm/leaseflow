@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,8 +13,11 @@ import {
   getScoreColor,
   getStatusColor,
   getStatusLabel,
+  type Applicant,
   type ApplicationStatus,
 } from "@/lib/data/mock-data";
+import { loadSubmissions } from "@/lib/apply/storage";
+import { isLocalApplicantId, submissionApplicant } from "@/lib/apply/to-packet";
 
 const filters: { value: ApplicationStatus | "all"; label: string }[] = [
   { value: "all", label: "All" },
@@ -28,8 +31,20 @@ const filters: { value: ApplicationStatus | "all"; label: string }[] = [
 export default function ApplicationsPage() {
   const [status, setStatus] = useState<ApplicationStatus | "all">("all");
   const [query, setQuery] = useState("");
+  // Applications submitted from this browser sit alongside the seeded ones.
+  const [submitted, setSubmitted] = useState<Applicant[]>([]);
 
-  const applications = useMemo(() => getAllApplications(), []);
+  useEffect(() => {
+    setSubmitted(loadSubmissions().map(submissionApplicant));
+  }, []);
+
+  const applications = useMemo(
+    () =>
+      [...submitted, ...getAllApplications()].sort(
+        (a, b) => new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime()
+      ),
+    [submitted]
+  );
 
   const rows = applications.filter((application) => {
     if (status !== "all" && application.status !== status) return false;
@@ -51,8 +66,8 @@ export default function ApplicationsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Applications</h1>
-        <p className="text-gray-600 mt-1">
+        <h1 className="text-3xl font-bold text-ink">Applications</h1>
+        <p className="text-mute mt-1">
           Every application across your properties, newest first
         </p>
       </div>
@@ -81,7 +96,7 @@ export default function ApplicationsPage() {
         </div>
 
         <div className="relative w-full md:w-72">
-          <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-mute-3 absolute left-3 top-1/2 -translate-y-1/2" />
           <Input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
@@ -97,9 +112,9 @@ export default function ApplicationsPage() {
         <CardContent className="p-0">
           {rows.length === 0 ? (
             <div className="py-16 text-center">
-              <ClipboardList className="w-12 h-12 mx-auto text-gray-300 mb-4" />
+              <ClipboardList className="w-12 h-12 mx-auto text-mute-3 mb-4" />
               <h3 className="text-lg font-semibold mb-1">No applications match</h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-mute text-sm">
                 Try a different status filter or clear your search.
               </p>
             </div>
@@ -107,7 +122,7 @@ export default function ApplicationsPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b bg-gray-50 text-left text-xs uppercase tracking-wide text-gray-500">
+                  <tr className="border-b bg-mist text-left text-xs uppercase tracking-wide text-mute-2">
                     <th scope="col" className="px-6 py-3 font-medium">
                       Applicant
                     </th>
@@ -133,24 +148,29 @@ export default function ApplicationsPage() {
                     const property = getPropertyById(application.propertyId);
 
                     return (
-                      <tr key={application.id} className="hover:bg-gray-50 transition-colors">
+                      <tr key={application.id} className="hover:bg-mist transition-colors">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 bg-gray-200 rounded-full flex items-center justify-center shrink-0">
-                              <span className="text-xs font-semibold text-gray-600">
+                            <div className="w-9 h-9 bg-line rounded-full flex items-center justify-center shrink-0">
+                              <span className="text-xs font-semibold text-mute">
                                 {application.firstName[0]}
                                 {application.lastName[0]}
                               </span>
                             </div>
                             <div>
-                              <div className="font-medium text-gray-900">
-                                {application.firstName} {application.lastName}
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium text-ink">
+                                  {application.firstName} {application.lastName}
+                                </span>
+                                {isLocalApplicantId(application.id) && (
+                                  <Badge variant="blue">Submitted here</Badge>
+                                )}
                               </div>
-                              <div className="text-xs text-gray-500">{application.email}</div>
+                              <div className="text-xs text-mute-2">{application.email}</div>
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-gray-600">
+                        <td className="px-6 py-4 text-mute">
                           {property ? (
                             <Link
                               href={`/dashboard/listings/${property.id}`}
@@ -175,10 +195,10 @@ export default function ApplicationsPage() {
                               {application.leaseScore}
                             </span>
                           ) : (
-                            <span className="text-gray-400">Pending</span>
+                            <span className="text-mute-3">Pending</span>
                           )}
                         </td>
-                        <td className="px-6 py-4 text-gray-600">
+                        <td className="px-6 py-4 text-mute">
                           {new Date(application.appliedAt).toLocaleDateString()}
                         </td>
                         <td className="px-6 py-4 text-right">

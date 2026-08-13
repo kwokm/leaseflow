@@ -1,16 +1,18 @@
 import type {
   Applicant,
   ApplicationDetails,
+  ExperianPull,
   Property,
   ScreeningReport,
 } from "@/lib/data/mock-data";
-import { getScoreLabel, getStatusLabel } from "@/lib/data/mock-data";
+import { getScoreLabel, getStatusLabel, groupDocuments } from "@/lib/data/mock-data";
 
 export interface PacketInput {
   applicant: Applicant;
   property: Property;
   details?: ApplicationDetails;
   report?: ScreeningReport;
+  experian?: ExperianPull;
 }
 
 function escapeHtml(value: string): string {
@@ -48,7 +50,13 @@ function section(title: string, body: string): string {
  * Renders the application packet as a self-contained HTML document so it can be
  * saved, emailed, or printed to PDF without the app running.
  */
-export function buildPacketHtml({ applicant, property, details, report }: PacketInput): string {
+export function buildPacketHtml({
+  applicant,
+  property,
+  details,
+  report,
+  experian,
+}: PacketInput): string {
   const name = `${applicant.firstName} ${applicant.lastName}`;
 
   const summary = section(
@@ -186,14 +194,19 @@ export function buildPacketHtml({ applicant, property, details, report }: Packet
         section(
           "Documents",
           details.documents.length
-            ? `<ul>${details.documents
+            ? groupDocuments(details.documents)
                 .map(
-                  (doc) =>
-                    `<li>${escapeHtml(doc.name)} — ${escapeHtml(doc.kind)}, uploaded ${formatDate(
-                      doc.uploadedAt
-                    )}</li>`
+                  (group) =>
+                    `<h3>${escapeHtml(group.label)}</h3><ul>${group.documents
+                      .map(
+                        (doc) =>
+                          `<li>${escapeHtml(doc.name)}${
+                            doc.sizeLabel ? ` — ${escapeHtml(doc.sizeLabel)}` : ""
+                          }, uploaded ${formatDate(doc.uploadedAt)}</li>`
+                      )
+                      .join("")}</ul>`
                 )
-                .join("")}</ul>`
+                .join("")
             : `<p class="muted">No documents uploaded.</p>`
         ),
         section(
@@ -208,6 +221,35 @@ export function buildPacketHtml({ applicant, property, details, report }: Packet
     : section(
         "Applicant-Provided Information",
         `<p class="muted">This applicant has been invited but has not submitted an application.</p>`
+      );
+
+  const experianBlock = experian
+    ? section(
+        `Credit report — ${experian.provider}`,
+        `<div class="score"><div class="score-value">${experian.score}</div>
+         <div class="score-label">${escapeHtml(experian.scoreModel)} · pulled ${formatDate(
+           experian.pulledAt
+         )}</div></div>
+         <table>${rows([
+           ["File matched", experian.fileMatched ? "Yes" : "No"],
+           ["On-time payments", `${experian.onTimePaymentRate}%`],
+           ["Open accounts", String(experian.openAccounts)],
+           ["Oldest account", `${experian.oldestAccountYears} years`],
+           ["Recent inquiries", String(experian.recentInquiries)],
+           ["Public records", String(experian.publicRecords)],
+           ["Cost to applicant", "$0.00"],
+         ])}</table>
+         ${
+           experian.factors.length
+             ? `<ul>${experian.factors.map((f) => `<li>${escapeHtml(f)}</li>`).join("")}</ul>`
+             : ""
+         }
+         <p class="muted">Mock pull generated for this prototype. No consumer reporting agency was
+         contacted and no bureau credentials were collected.</p>`
+      )
+    : section(
+        "Credit report",
+        `<p class="muted">No credit report is attached to this application.</p>`
       );
 
   const residentialBlock = report?.residentialHistory.length
@@ -230,20 +272,21 @@ export function buildPacketHtml({ applicant, property, details, report }: Packet
 <meta charset="utf-8" />
 <title>Application Packet — ${escapeHtml(name)}</title>
 <style>
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; color: #111827; margin: 0; padding: 40px; }
-  header { border-bottom: 2px solid #2563eb; padding-bottom: 16px; margin-bottom: 24px; }
-  h1 { font-size: 24px; margin: 0 0 4px; }
-  h2 { font-size: 15px; text-transform: uppercase; letter-spacing: 0.06em; color: #2563eb; margin: 28px 0 8px; }
-  .sub { color: #6b7280; font-size: 14px; }
+  body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; color: #1C1D1F; margin: 0; padding: 40px; font-weight: 500; letter-spacing: -0.16px; }
+  header { border-bottom: 1px solid #C9D0D9; padding-bottom: 16px; margin-bottom: 24px; }
+  h1 { font-size: 24px; margin: 0 0 4px; font-weight: 600; letter-spacing: -0.5px; }
+  h2 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: #6D7988; margin: 28px 0 8px; }
+  h3 { font-size: 13px; margin: 14px 0 4px; color: #4E5967; font-weight: 600; }
+  .sub { color: #6D7988; font-size: 14px; }
   table { width: 100%; border-collapse: collapse; font-size: 14px; }
-  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
-  th { width: 34%; color: #6b7280; font-weight: 500; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid #E3E7EC; vertical-align: top; }
+  th { width: 34%; color: #6D7988; font-weight: 500; }
   ul { font-size: 14px; padding-left: 20px; }
-  .muted { color: #6b7280; font-size: 14px; }
+  .muted { color: #6D7988; font-size: 14px; }
   .score { margin: 8px 0 16px; }
-  .score-value { font-size: 44px; font-weight: 700; color: #2563eb; line-height: 1; }
-  .score-label { color: #6b7280; font-size: 14px; margin-top: 4px; }
-  footer { margin-top: 32px; padding-top: 12px; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 12px; }
+  .score-value { font-size: 44px; font-weight: 600; color: #1C1D1F; line-height: 1; letter-spacing: -1.4px; }
+  .score-label { color: #6D7988; font-size: 14px; margin-top: 4px; }
+  footer { margin-top: 32px; padding-top: 12px; border-top: 1px solid #E3E7EC; color: #6D7988; font-size: 12px; }
   section { break-inside: avoid; }
 </style>
 </head>
@@ -254,6 +297,7 @@ export function buildPacketHtml({ applicant, property, details, report }: Packet
 </header>
 ${summary}
 ${scoreBlock}
+${experianBlock}
 ${backgroundBlock}
 ${incomeBlock}
 ${residentialBlock}

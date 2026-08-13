@@ -65,6 +65,50 @@ export interface ScreeningReport {
   }[];
 }
 
+/**
+ * Result of the mock Experian connection in the apply flow. Everything here is
+ * fabricated locally — the prototype never contacts a consumer reporting agency
+ * and never collects bureau login details.
+ */
+export interface ExperianPull {
+  applicantId: string;
+  provider: "Experian (demo)";
+  status: "connected";
+  score: number;
+  scoreModel: string;
+  pulledAt: string;
+  fileMatched: boolean;
+  onTimePaymentRate: number;
+  openAccounts: number;
+  oldestAccountYears: number;
+  recentInquiries: number;
+  publicRecords: number;
+  factors: string[];
+}
+
+export type DocumentType =
+  | "photo_id_front"
+  | "photo_id_back"
+  | "paystub"
+  | "bank_statement"
+  | "other";
+
+export interface ApplicationDocument {
+  name: string;
+  kind: string;
+  docType: DocumentType;
+  uploadedAt: string;
+  sizeLabel?: string;
+}
+
+export const documentTypeLabels: Record<DocumentType, string> = {
+  photo_id_front: "Photo ID — front",
+  photo_id_back: "Photo ID — back",
+  paystub: "Pay stub",
+  bank_statement: "Bank statement",
+  other: "Other",
+};
+
 // Renter-submitted portion of an application, shown in the application packet
 export interface ApplicationDetails {
   applicantId: string;
@@ -96,7 +140,7 @@ export interface ApplicationDetails {
     bankruptcy: boolean;
     notes?: string;
   };
-  documents: { name: string; kind: string; uploadedAt: string }[];
+  documents: ApplicationDocument[];
   consent: { acceptedAt: string; signature: string; ipAddress: string };
 }
 
@@ -401,9 +445,48 @@ export const mockApplicationDetails: Record<string, ApplicationDetails> = {
     vehicles: [{ year: 2022, make: "Toyota", model: "RAV4", plate: "IL 8KP-2210" }],
     disclosures: { smoker: false, priorEviction: false, bankruptcy: false },
     documents: [
-      { name: "paystub-june-2026.pdf", kind: "Pay stub", uploadedAt: "2026-07-18T11:31:00Z" },
-      { name: "paystub-july-2026.pdf", kind: "Pay stub", uploadedAt: "2026-07-18T11:32:00Z" },
-      { name: "drivers-license.jpg", kind: "Photo ID", uploadedAt: "2026-07-18T11:34:00Z" },
+      {
+        name: "drivers-license-front.jpg",
+        kind: "Photo ID — front",
+        docType: "photo_id_front",
+        uploadedAt: "2026-07-18T11:34:00Z",
+        sizeLabel: "1.2 MB",
+      },
+      {
+        name: "drivers-license-back.jpg",
+        kind: "Photo ID — back",
+        docType: "photo_id_back",
+        uploadedAt: "2026-07-18T11:35:00Z",
+        sizeLabel: "1.1 MB",
+      },
+      {
+        name: "paystub-june-2026.pdf",
+        kind: "Pay stub",
+        docType: "paystub",
+        uploadedAt: "2026-07-18T11:31:00Z",
+        sizeLabel: "184 KB",
+      },
+      {
+        name: "paystub-july-2026.pdf",
+        kind: "Pay stub",
+        docType: "paystub",
+        uploadedAt: "2026-07-18T11:32:00Z",
+        sizeLabel: "179 KB",
+      },
+      {
+        name: "bank-statement-june-2026.pdf",
+        kind: "Bank statement",
+        docType: "bank_statement",
+        uploadedAt: "2026-07-18T11:37:00Z",
+        sizeLabel: "402 KB",
+      },
+      {
+        name: "bank-statement-july-2026.pdf",
+        kind: "Bank statement",
+        docType: "bank_statement",
+        uploadedAt: "2026-07-18T11:38:00Z",
+        sizeLabel: "396 KB",
+      },
     ],
     consent: {
       acceptedAt: "2026-07-18T11:44:00Z",
@@ -437,7 +520,20 @@ export const mockApplicationDetails: Record<string, ApplicationDetails> = {
     vehicles: [{ year: 2019, make: "Honda", model: "Civic", plate: "IL 4RT-9080" }],
     disclosures: { smoker: false, priorEviction: false, bankruptcy: false },
     documents: [
-      { name: "paystub-july-2026.pdf", kind: "Pay stub", uploadedAt: "2026-07-19T14:38:00Z" },
+      {
+        name: "state-id-front.jpg",
+        kind: "Photo ID — front",
+        docType: "photo_id_front",
+        uploadedAt: "2026-07-19T14:36:00Z",
+        sizeLabel: "980 KB",
+      },
+      {
+        name: "paystub-july-2026.pdf",
+        kind: "Pay stub",
+        docType: "paystub",
+        uploadedAt: "2026-07-19T14:38:00Z",
+        sizeLabel: "166 KB",
+      },
     ],
     consent: {
       acceptedAt: "2026-07-19T14:22:00Z",
@@ -474,9 +570,48 @@ export const mockApplicationDetails: Record<string, ApplicationDetails> = {
     vehicles: [{ year: 2021, make: "Subaru", model: "Outback", plate: "IL 7HN-4412" }],
     disclosures: { smoker: false, priorEviction: false, bankruptcy: false },
     documents: [
-      { name: "offer-letter.pdf", kind: "Employment letter", uploadedAt: "2026-07-22T09:52:00Z" },
-      { name: "paystub-june-2026.pdf", kind: "Pay stub", uploadedAt: "2026-07-22T09:54:00Z" },
-      { name: "state-id.jpg", kind: "Photo ID", uploadedAt: "2026-07-22T09:55:00Z" },
+      {
+        name: "state-id-front.jpg",
+        kind: "Photo ID — front",
+        docType: "photo_id_front",
+        uploadedAt: "2026-07-22T09:55:00Z",
+        sizeLabel: "1.4 MB",
+      },
+      {
+        name: "state-id-back.jpg",
+        kind: "Photo ID — back",
+        docType: "photo_id_back",
+        uploadedAt: "2026-07-22T09:56:00Z",
+        sizeLabel: "1.3 MB",
+      },
+      {
+        name: "paystub-june-2026.pdf",
+        kind: "Pay stub",
+        docType: "paystub",
+        uploadedAt: "2026-07-22T09:54:00Z",
+        sizeLabel: "201 KB",
+      },
+      {
+        name: "paystub-july-2026.pdf",
+        kind: "Pay stub",
+        docType: "paystub",
+        uploadedAt: "2026-07-22T09:54:00Z",
+        sizeLabel: "198 KB",
+      },
+      {
+        name: "bank-statement-july-2026.pdf",
+        kind: "Bank statement",
+        docType: "bank_statement",
+        uploadedAt: "2026-07-22T09:58:00Z",
+        sizeLabel: "377 KB",
+      },
+      {
+        name: "offer-letter.pdf",
+        kind: "Employment letter",
+        docType: "other",
+        uploadedAt: "2026-07-22T09:52:00Z",
+        sizeLabel: "88 KB",
+      },
     ],
     consent: {
       acceptedAt: "2026-07-22T10:12:00Z",
@@ -518,7 +653,34 @@ export const mockApplicationDetails: Record<string, ApplicationDetails> = {
       notes: "Eviction filed in 2023 was resolved by payment agreement; case dismissed.",
     },
     documents: [
-      { name: "paystub-july-2026.pdf", kind: "Pay stub", uploadedAt: "2026-07-23T17:02:00Z" },
+      {
+        name: "drivers-license-front.jpg",
+        kind: "Photo ID — front",
+        docType: "photo_id_front",
+        uploadedAt: "2026-07-23T17:00:00Z",
+        sizeLabel: "1.0 MB",
+      },
+      {
+        name: "drivers-license-back.jpg",
+        kind: "Photo ID — back",
+        docType: "photo_id_back",
+        uploadedAt: "2026-07-23T17:01:00Z",
+        sizeLabel: "1.0 MB",
+      },
+      {
+        name: "paystub-july-2026.pdf",
+        kind: "Pay stub",
+        docType: "paystub",
+        uploadedAt: "2026-07-23T17:02:00Z",
+        sizeLabel: "154 KB",
+      },
+      {
+        name: "bank-statement-july-2026.pdf",
+        kind: "Bank statement",
+        docType: "bank_statement",
+        uploadedAt: "2026-07-23T17:04:00Z",
+        sizeLabel: "312 KB",
+      },
     ],
     consent: {
       acceptedAt: "2026-07-23T17:18:00Z",
@@ -555,14 +717,123 @@ export const mockApplicationDetails: Record<string, ApplicationDetails> = {
     vehicles: [{ year: 2018, make: "Mazda", model: "CX-5", plate: "IL 2LM-7719" }],
     disclosures: { smoker: false, priorEviction: false, bankruptcy: false },
     documents: [
-      { name: "paystub-july-2026.pdf", kind: "Pay stub", uploadedAt: "2026-07-25T13:41:00Z" },
-      { name: "bank-statement.pdf", kind: "Bank statement", uploadedAt: "2026-07-25T13:44:00Z" },
+      {
+        name: "passport-photo-page.jpg",
+        kind: "Photo ID — front",
+        docType: "photo_id_front",
+        uploadedAt: "2026-07-25T13:39:00Z",
+        sizeLabel: "1.6 MB",
+      },
+      {
+        name: "paystub-june-2026.pdf",
+        kind: "Pay stub",
+        docType: "paystub",
+        uploadedAt: "2026-07-25T13:40:00Z",
+        sizeLabel: "172 KB",
+      },
+      {
+        name: "paystub-july-2026.pdf",
+        kind: "Pay stub",
+        docType: "paystub",
+        uploadedAt: "2026-07-25T13:41:00Z",
+        sizeLabel: "170 KB",
+      },
+      {
+        name: "bank-statement-july-2026.pdf",
+        kind: "Bank statement",
+        docType: "bank_statement",
+        uploadedAt: "2026-07-25T13:44:00Z",
+        sizeLabel: "344 KB",
+      },
     ],
     consent: {
       acceptedAt: "2026-07-25T13:58:00Z",
       signature: "Jessica Martinez",
       ipAddress: "203.0.113.12",
     },
+  },
+};
+
+/**
+ * Mock Experian connections, keyed by applicant id. Produced by the demo
+ * connect step in the apply flow — no live bureau is ever contacted.
+ */
+export const mockExperianPulls: Record<string, ExperianPull> = {
+  "app-1": {
+    applicantId: "app-1",
+    provider: "Experian (demo)",
+    status: "connected",
+    score: 785,
+    scoreModel: "VantageScore 3.0 (demo)",
+    pulledAt: "2026-07-18T11:41:00Z",
+    fileMatched: true,
+    onTimePaymentRate: 98,
+    openAccounts: 12,
+    oldestAccountYears: 11,
+    recentInquiries: 1,
+    publicRecords: 0,
+    factors: [
+      "Long, unbroken on-time payment history",
+      "Credit utilization under 25%",
+      "No public records on file",
+    ],
+  },
+  "app-3": {
+    applicantId: "app-3",
+    provider: "Experian (demo)",
+    status: "connected",
+    score: 820,
+    scoreModel: "VantageScore 3.0 (demo)",
+    pulledAt: "2026-07-22T10:08:00Z",
+    fileMatched: true,
+    onTimePaymentRate: 100,
+    openAccounts: 8,
+    oldestAccountYears: 14,
+    recentInquiries: 0,
+    publicRecords: 0,
+    factors: [
+      "No missed payments on record",
+      "Low revolving balances",
+      "No recent credit applications",
+    ],
+  },
+  "app-4": {
+    applicantId: "app-4",
+    provider: "Experian (demo)",
+    status: "connected",
+    score: 580,
+    scoreModel: "VantageScore 3.0 (demo)",
+    pulledAt: "2026-07-23T17:12:00Z",
+    fileMatched: true,
+    onTimePaymentRate: 72,
+    openAccounts: 15,
+    oldestAccountYears: 6,
+    recentInquiries: 5,
+    publicRecords: 1,
+    factors: [
+      "Several accounts reported past due",
+      "Revolving utilization above 80%",
+      "Five hard inquiries in the last 12 months",
+    ],
+  },
+  "app-6": {
+    applicantId: "app-6",
+    provider: "Experian (demo)",
+    status: "connected",
+    score: 695,
+    scoreModel: "VantageScore 3.0 (demo)",
+    pulledAt: "2026-07-25T13:52:00Z",
+    fileMatched: true,
+    onTimePaymentRate: 88,
+    openAccounts: 10,
+    oldestAccountYears: 7,
+    recentInquiries: 2,
+    publicRecords: 0,
+    factors: [
+      "One account reported 30 days late in 2024",
+      "Revolving utilization near 45%",
+      "Credit history still relatively short",
+    ],
   },
 };
 
@@ -738,15 +1009,15 @@ export function getReportByApplicant(applicantId: string): ScreeningReport | und
 export function getStatusColor(status: ApplicationStatus): string {
   switch (status) {
     case "invited":
-      return "text-gray-600 bg-gray-100";
+      return "text-mute bg-rail border-line";
     case "in_progress":
-      return "text-blue-600 bg-blue-100";
+      return "text-blue bg-blue-soft border-transparent";
     case "completed":
-      return "text-purple-600 bg-purple-100";
+      return "text-ink-2 bg-mist border-line-2";
     case "approved":
-      return "text-green-600 bg-green-100";
+      return "text-ok bg-ok-bg border-transparent";
     case "declined":
-      return "text-red-600 bg-red-100";
+      return "text-no bg-no-bg border-transparent";
   }
 }
 
@@ -769,9 +1040,34 @@ export function getAllApplications(): Applicant[] {
 }
 
 export function getScoreColor(score: number): string {
-  if (score >= 750) return "text-green-600";
-  if (score >= 650) return "text-yellow-600";
-  return "text-red-600";
+  if (score >= 750) return "text-ok";
+  if (score >= 650) return "text-ink";
+  return "text-no";
+}
+
+export function getExperianPull(applicantId: string): ExperianPull | undefined {
+  return mockExperianPulls[applicantId];
+}
+
+/** Groups an applicant's uploads by document type for the landlord packet. */
+export function groupDocuments(
+  documents: ApplicationDocument[]
+): { type: DocumentType; label: string; documents: ApplicationDocument[] }[] {
+  const order: DocumentType[] = [
+    "photo_id_front",
+    "photo_id_back",
+    "paystub",
+    "bank_statement",
+    "other",
+  ];
+
+  return order
+    .map((type) => ({
+      type,
+      label: documentTypeLabels[type],
+      documents: documents.filter((doc) => doc.docType === type),
+    }))
+    .filter((group) => group.documents.length > 0);
 }
 
 export function getScoreLabel(score: number): string {
@@ -787,13 +1083,13 @@ export function getPaymentsByApplicant(applicantId: string): Payment[] {
 export function getPaymentStatusColor(status: PaymentStatus): string {
   switch (status) {
     case "paid":
-      return "text-green-700 bg-green-100";
+      return "text-ok bg-ok-bg border-transparent";
     case "pending":
-      return "text-orange-700 bg-orange-100";
+      return "text-[#8a6400] bg-warn-bg border-transparent";
     case "refunded":
-      return "text-gray-700 bg-gray-100";
+      return "text-mute bg-rail border-line";
     case "failed":
-      return "text-red-700 bg-red-100";
+      return "text-no bg-no-bg border-transparent";
   }
 }
 
