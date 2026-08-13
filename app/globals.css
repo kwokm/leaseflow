@@ -135,6 +135,11 @@
     background: radial-gradient(70% 110% at 50% 0%, #ffffff 28%, rgba(255, 255, 255, 0) 68%);
   }
 
+  /* Apply / desk: same bloom, full viewport so every step sits on it. */
+  .hero-wash-shell {
+    height: 100%;
+  }
+
   .skip-link {
     position: absolute;
     left: 12px;

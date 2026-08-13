@@ -6,7 +6,7 @@ import { Check, Loader2, Lock, RotateCcw, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FieldError } from "@/components/apply/field";
 import { StepBody } from "@/components/apply/motion";
-import { Note, Panel, StepHeading, SummaryRow } from "@/components/apply/step-shell";
+import { Note, StepHeading, SummaryRow, WindowPanel } from "@/components/apply/step-shell";
 import type { StepProps } from "@/components/apply/step-shell";
 import { DURATION, EASE_OUT } from "@/lib/apply/motion";
 import { buildMockExperianPull, scoreBand } from "@/lib/apply/experian-mock";
@@ -35,7 +35,7 @@ function useCountUp(target: number | undefined) {
       return;
     }
 
-    const start = Math.max(0, target - 28);
+    const start = Math.max(0, target - 36);
     const duration = DURATION.reveal * 1000;
     const origin = performance.now();
     let frame = 0;
@@ -189,10 +189,10 @@ function ScoreReveal({ score }: { score: number }) {
 
   return (
     <motion.div
-      className="num mt-4 text-[56px] font-semibold leading-none tracking-[-1.6px] text-ink"
-      initial={reduced ? false : { opacity: 0, y: 8 }}
+      className="num mt-5 text-[64px] font-semibold leading-none tracking-[-2px] text-ink"
+      initial={reduced ? false : { opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: DURATION.reveal, ease: EASE_OUT, delay: 0.08 }}
+      transition={{ duration: DURATION.reveal, ease: EASE_OUT, delay: 0.2 }}
     >
       {displayed}
     </motion.div>
@@ -229,14 +229,15 @@ export function StepCredit({ state, patch, errors }: StepProps) {
 
     timers.current.forEach(clearTimeout);
     timers.current = [
-      setTimeout(() => setStage(1), 800),
-      setTimeout(() => setStage(2), 1600),
-      setTimeout(finish, 2400),
+      setTimeout(() => setStage(1), 1100),
+      setTimeout(() => setStage(2), 2200),
+      setTimeout(finish, 3400),
     ];
   };
 
   const band = experian.score ? scoreBand(experian.score) : undefined;
   const pullProgress = ((stage + 1) / PULL_STAGES.length) * 100;
+  const reduced = useReducedMotion();
 
   return (
     <StepBody>
@@ -247,25 +248,25 @@ export function StepCredit({ state, patch, errors }: StepProps) {
       </p>
 
       {experian.status === "connected" && experian.score ? (
-        <Panel>
+        <WindowPanel label="Experian (demo)">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <div className="flex items-center gap-2">
-                <span className="rounded-md bg-blue-soft px-2 py-0.5 text-[12px] font-medium text-blue">
-                  Experian (demo)
-                </span>
-                <span className="inline-flex items-center gap-1 text-[13px] font-medium text-ok">
-                  <ShieldCheck className="h-4 w-4" aria-hidden />
-                  Connected
-                </span>
-              </div>
+              <span className="inline-flex items-center gap-1 text-[13px] font-medium text-ok">
+                <ShieldCheck className="h-4 w-4" aria-hidden />
+                Connected
+              </span>
               <ScoreReveal score={experian.score} />
               <p className="mt-2 text-[15px] font-medium tracking-[-0.16px] text-mute">
                 {band?.label} · {experian.scoreModel}
               </p>
             </div>
 
-            <dl className="w-full max-w-xs shrink-0">
+            <motion.dl
+              className="w-full max-w-xs shrink-0"
+              initial={reduced ? false : { opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: DURATION.step, ease: EASE_OUT, delay: 0.36 }}
+            >
               <SummaryRow label="On-time payments" value={`${experian.onTimePaymentRate}%`} />
               <SummaryRow label="Open accounts" value={experian.openAccounts} />
               <SummaryRow label="Oldest account" value={`${experian.oldestAccountYears} years`} />
@@ -273,11 +274,16 @@ export function StepCredit({ state, patch, errors }: StepProps) {
               <SummaryRow label="Public records" value={experian.publicRecords} />
               <SummaryRow label="Pulled" value={formatDateTime(experian.pulledAt)} />
               <SummaryRow label="Cost to you" value="$0.00" />
-            </dl>
+            </motion.dl>
           </div>
 
           {experian.factors?.length ? (
-            <ul className="mt-5 space-y-2 border-t border-line pt-4">
+            <motion.ul
+              className="mt-5 space-y-2 border-t border-line pt-4"
+              initial={reduced ? false : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: DURATION.ui, ease: EASE_OUT, delay: 0.48 }}
+            >
               {experian.factors.map((factor) => (
                 <li
                   key={factor}
@@ -287,7 +293,7 @@ export function StepCredit({ state, patch, errors }: StepProps) {
                   {factor}
                 </li>
               ))}
-            </ul>
+            </motion.ul>
           ) : null}
 
           <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-line pt-4">
@@ -304,9 +310,9 @@ export function StepCredit({ state, patch, errors }: StepProps) {
               Mock data — generated locally for this demo.
             </p>
           </div>
-        </Panel>
+        </WindowPanel>
       ) : experian.status === "pulling" ? (
-        <Panel>
+        <WindowPanel label="Experian (demo)">
           <div className="flex items-center gap-3">
             <Loader2 className="h-5 w-5 animate-spin text-mute" aria-hidden />
             <p
@@ -317,18 +323,18 @@ export function StepCredit({ state, patch, errors }: StepProps) {
               Pulling your report — {PULL_STAGES[stage]}…
             </p>
           </div>
-          <div className="relative mt-4 h-1 overflow-hidden rounded-full bg-line">
+          <div className="relative mt-5 h-1 overflow-hidden rounded-full bg-line">
             <div
               className="h-full bg-ink transition-transform duration-240 ease-premium"
               style={{ transform: `translateX(-${100 - pullProgress}%)` }}
             />
           </div>
-          <ol className="mt-4 space-y-2">
+          <ol className="mt-5 space-y-3">
             {PULL_STAGES.map((label, index) => (
               <li
                 key={label}
                 className={cn(
-                  "flex items-center gap-2 text-[14px] font-medium tracking-[-0.14px] transition-colors duration-200 ease-premium",
+                  "flex min-h-[44px] items-center gap-2.5 text-[14px] font-medium tracking-[-0.14px] transition-colors duration-200 ease-premium",
                   index < stage ? "text-ink-2" : index === stage ? "text-ink" : "text-mute-2"
                 )}
               >
@@ -349,9 +355,9 @@ export function StepCredit({ state, patch, errors }: StepProps) {
               </li>
             ))}
           </ol>
-        </Panel>
+        </WindowPanel>
       ) : (
-        <Panel>
+        <WindowPanel label="Experian (demo)">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
               <p className="text-[17px] font-semibold tracking-[-0.3px] text-ink">
@@ -371,7 +377,7 @@ export function StepCredit({ state, patch, errors }: StepProps) {
             </Button>
           </div>
           <FieldError id="experian-error" message={errors.experian} />
-        </Panel>
+        </WindowPanel>
       )}
 
       <Note tone="warn">

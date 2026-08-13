@@ -16,7 +16,7 @@ export function StepPhotoId({ state, patch, errors }: StepProps) {
         stay on your device in this prototype.
       </p>
 
-      <Panel>
+      <Panel className="shadow-window">
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <FileSlot
             id="id-front"

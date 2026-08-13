@@ -193,7 +193,7 @@ export function FileSlot({ id, label, hint, error, file, onChange }: FileSlotPro
           }}
           aria-describedby={errorId}
           className={cn(
-            "flex min-h-[112px] w-full flex-col items-center justify-center gap-2 rounded-btn border border-dashed bg-mist px-4 py-5 text-center",
+            "flex min-h-[128px] w-full flex-col items-center justify-center gap-2 rounded-btn border border-dashed bg-mist px-4 py-5 text-center",
             "transition-[background-color,border-color] duration-200 ease-premium",
             error ? "border-no" : "border-line-2",
             "hover:border-mute-3 hover:bg-rail",

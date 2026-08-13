@@ -19,7 +19,7 @@ export function PageWash({
       )}
       aria-hidden
     >
-      <div className={cn("hero-wash", quiet && "opacity-70")} />
+      <div className={cn("hero-wash", !quiet && "hero-wash-shell", quiet && "opacity-70")} />
     </div>
   );
 }

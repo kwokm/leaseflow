@@ -10,7 +10,7 @@ export const DURATION = {
   ui: 0.2,
   step: 0.24,
   exit: 0.18,
-  reveal: 0.48,
+  reveal: 0.64,
 } as const;
 
 export const STAGGER = 0.036;
