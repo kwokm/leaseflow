@@ -163,7 +163,7 @@ leaseflow/
 
 ## Design
 
-Visual lock lives in the landing screenshot and `app/globals.css` (lilac bloom, Inter, screenshot card). **Motion** follows [`design/animations-rules.md`](./design/animations-rules.md) — see also [`design/NOTES.md`](./design/NOTES.md). Do not restyle LeaseFlow into another product’s look.
+Visual lock lives in the landing screenshot and `app/globals.css` (lilac bloom, Inter, screenshot card). **Motion** follows [`design/animations-rules.md`](./design/animations-rules.md) — see also [`design/NOTES.md`](./design/NOTES.md). Landing gray secondaries use reversible split-text. Do not restyle LeaseFlow into another product’s look.
 
 ## Design Principles
 

@@ -4,7 +4,9 @@ import { ApplicationTable } from "@/components/desk/application-table";
 import { DeskSidebar } from "@/components/desk/desk-sidebar";
 import { DeskPill, DeskToolbar, PacketWindow } from "@/components/desk/packet-window";
 import { Float } from "@/components/motion/float";
+import { InView } from "@/components/motion/in-view";
 import { Reveal, RevealItem, RevealStagger } from "@/components/motion/reveal";
+import { SectionHeadline } from "@/components/motion/section-headline";
 import { Button } from "@/components/ui/button";
 import { deskHeroApplicants } from "@/lib/desk/display";
 import { getPropertyById } from "@/lib/data/mock-data";
@@ -12,27 +14,6 @@ import { getPropertyById } from "@/lib/data/mock-data";
 const DEMO_LISTING_ID = "prop-1";
 const APPLY_HREF = `/apply/${DEMO_LISTING_ID}`;
 const DESK_HREF = "/dashboard";
-
-function Headline({
-  lead,
-  tone,
-  className = "",
-  id,
-}: {
-  lead: string;
-  tone: string;
-  className?: string;
-  id?: string;
-}) {
-  return (
-    <h2
-      id={id}
-      className={`text-[30px] font-medium leading-[1.08] tracking-[-0.6px] text-ink sm:text-[40px] sm:leading-[44px] sm:tracking-[-0.4px] ${className}`}
-    >
-      {lead} <span className="tone">{tone}</span>
-    </h2>
-  );
-}
 
 const STEPS = [
   {
@@ -84,7 +65,7 @@ export default function Home() {
               <Link
                 key={item.label}
                 href={item.href}
-                className="text-[14px] font-medium tracking-[-0.2px] text-mute transition-colors duration-240 ease-premium hover:text-ink"
+                className="text-[14px] font-medium tracking-[-0.2px] text-mute transition-colors duration-200 ease-out hover:text-ink"
               >
                 {item.label}
               </Link>
@@ -140,29 +121,29 @@ export default function Home() {
         </section>
 
         <section id="platform" className="bg-white pb-16 sm:pb-28" aria-labelledby="platform-title">
-          <Reveal className="mx-auto max-w-shell px-5 sm:px-8">
-            <p className="mb-[18px] text-[13px] font-medium tracking-[-0.13px] text-mute">
+          <InView className="mx-auto max-w-shell px-5 sm:px-8">
+            <p className="reveal-block reveal-shift-sm mb-[18px] text-[13px] font-medium tracking-[-0.13px] text-mute">
               Platform
             </p>
-            <Headline
+            <SectionHeadline
               id="platform-title"
               lead="The desk that finishes the file."
               tone="Applicants pay. The packet lands scored. You approve or decline."
               className="max-w-[28ch]"
             />
-          </Reveal>
+          </InView>
         </section>
 
         <section className="pb-16 sm:pb-24" aria-labelledby="how-title">
           <div className="mx-auto max-w-shell px-5 sm:px-8">
-            <Reveal>
-              <Headline
+            <InView>
+              <SectionHeadline
                 id="how-title"
                 lead="Four steps, start to decision."
                 tone="Most applications complete in about ten minutes."
                 className="max-w-3xl"
               />
-            </Reveal>
+            </InView>
 
             <RevealStagger
               as="ol"
@@ -185,15 +166,17 @@ export default function Home() {
 
         <section id="rates" className="pb-16 sm:pb-28" aria-labelledby="rates-title">
           <div className="mx-auto max-w-shell px-5 sm:px-8">
-            <Reveal>
-              <p className="mb-3.5 text-[13px] font-medium tracking-[-0.13px] text-mute">Fees</p>
-              <Headline
+            <InView>
+              <p className="reveal-block reveal-shift-sm mb-3.5 text-[13px] font-medium tracking-[-0.13px] text-mute">
+                Fees
+              </p>
+              <SectionHeadline
                 id="rates-title"
                 lead="Applicants pay the fee."
                 tone="Landlords do not pay to use the desk. The renter covers screening when they apply."
                 className="max-w-[22ch]"
               />
-            </Reveal>
+            </InView>
 
             <RevealStagger className="mt-14 grid grid-cols-1 overflow-hidden rounded-lg border border-line bg-paper shadow-window sm:grid-cols-2">
               <RevealItem as="article" className="p-7">
@@ -222,10 +205,10 @@ export default function Home() {
         </section>
 
         <section id="apply" className="pb-20" aria-labelledby="apply-title">
-          <Reveal className="mx-auto max-w-shell px-5 sm:px-8">
+          <InView className="mx-auto max-w-shell px-5 sm:px-8">
             <PacketWindow title={`Apply • ${property.address.split(",")[0]}`}>
               <div className="flex flex-col gap-5 px-6 py-7 md:flex-row md:items-center md:justify-between">
-                <div>
+                <div className="reveal-block reveal-shift-lg">
                   <p className="text-[13px] font-medium tracking-[-0.13px] text-mute">For renters</p>
                   <h2
                     id="apply-title"
@@ -239,17 +222,22 @@ export default function Home() {
                     pay the screening fee.
                   </p>
                 </div>
-                <Button asChild size="cta" className="shrink-0">
-                  <Link href={APPLY_HREF}>Apply as renter</Link>
-                </Button>
+                <div className="reveal-cta shrink-0">
+                  <Button asChild size="cta">
+                    <Link href={APPLY_HREF}>Apply as renter</Link>
+                  </Button>
+                </div>
               </div>
             </PacketWindow>
-          </Reveal>
+          </InView>
         </section>
       </main>
 
       <footer id="legal" className="relative z-10 pb-10 pt-6 text-mute">
-        <Reveal className="mx-auto flex max-w-shell flex-col gap-6 px-5 sm:px-8 md:flex-row md:items-center md:justify-between">
+        <Reveal
+          shift="sm"
+          className="mx-auto flex max-w-shell flex-col gap-6 px-5 sm:px-8 md:flex-row md:items-center md:justify-between"
+        >
           <div className="flex items-center gap-2.5 text-ink">
             <BrandMark size={20} />
             <BrandWord />

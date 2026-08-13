@@ -1,44 +1,25 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
 import type { ReactNode } from "react";
-import { durationReveal, easeReveal, staggerItem } from "@/lib/motion/tokens";
+import { InView } from "@/components/motion/in-view";
+import { cn } from "@/lib/utils";
+
+type Shift = "sm" | "md" | "lg" | "xl";
 
 export function Reveal({
   children,
   className,
-  delay = 0,
+  shift = "xl",
 }: {
   children: ReactNode;
   className?: string;
   delay?: number;
+  shift?: Shift;
 }) {
-  const reduce = useReducedMotion();
-
-  if (reduce) {
-    return (
-      <motion.div
-        className={className}
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true, amount: 0.2 }}
-        transition={{ duration: 0.1 }}
-      >
-        {children}
-      </motion.div>
-    );
-  }
-
   return (
-    <motion.div
-      className={className}
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.18 }}
-      transition={{ duration: durationReveal, ease: easeReveal, delay }}
-    >
+    <InView className={cn("reveal-block", `reveal-shift-${shift}`, className)}>
       {children}
-    </motion.div>
+    </InView>
   );
 }
 
@@ -51,26 +32,10 @@ export function RevealStagger({
   className?: string;
   as?: "div" | "ol";
 }) {
-  const reduce = useReducedMotion();
-  const Comp = as === "ol" ? motion.ol : motion.div;
-
   return (
-    <Comp
-      className={className}
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once: true, amount: 0.16 }}
-      variants={{
-        hidden: {},
-        show: {
-          transition: {
-            staggerChildren: reduce ? 0 : staggerItem,
-          },
-        },
-      }}
-    >
+    <InView as={as} className={cn("reveal-stagger", className)}>
       {children}
-    </Comp>
+    </InView>
   );
 }
 
@@ -83,29 +48,6 @@ export function RevealItem({
   className?: string;
   as?: "div" | "li" | "article";
 }) {
-  const reduce = useReducedMotion();
-  const Comp = as === "li" ? motion.li : as === "article" ? motion.article : motion.div;
-
-  return (
-    <Comp
-      className={className}
-      variants={
-        reduce
-          ? {
-              hidden: { opacity: 0 },
-              show: { opacity: 1, transition: { duration: 0.1 } },
-            }
-          : {
-              hidden: { opacity: 0, y: 30 },
-              show: {
-                opacity: 1,
-                y: 0,
-                transition: { duration: durationReveal, ease: easeReveal },
-              },
-            }
-      }
-    >
-      {children}
-    </Comp>
-  );
+  const Tag = as;
+  return <Tag className={cn("reveal-item", className)}>{children}</Tag>;
 }

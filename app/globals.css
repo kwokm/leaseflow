@@ -41,7 +41,25 @@
     --pad: clamp(20px, 5.5vw, 56px);
     --ease-reveal: cubic-bezier(0.16, 1, 0.3, 1);
     --ease-spatial: cubic-bezier(0.32, 0.72, 0, 1);
-    --dur-interact: 240ms;
+    --dur-interact: 200ms;
+    --dur-instant: 150ms;
+    --dur-fast: 200ms;
+    --dur-exit: 300ms;
+    --dur-medium: 350ms;
+    --dur-panel: 450ms;
+    --dur-enter: 500ms;
+    --dur-slow: 700ms;
+    --ease-default: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-out: cubic-bezier(0, 0, 0.2, 1);
+    --ease-soft: cubic-bezier(0.25, 0.1, 0.25, 1);
+    --ease-power3: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-power2: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --shift-sm: 10px;
+    --shift-md: 15px;
+    --shift-lg: 40px;
+    --shift-xl: 60px;
+    --stagger-tight: 80ms;
+    --stagger-loose: 150ms;
   }
 }
 
@@ -97,6 +115,117 @@
   /* Two-tone headline: lead stays ink, the continuation drops to mute. */
   .tone {
     color: var(--mute);
+  }
+
+  /* Pattern A / A2 — opacity + transform only. Start hidden before paint. */
+  .reveal-block,
+  .reveal-item,
+  .reveal-lead,
+  .reveal-cta {
+    opacity: 0;
+    transition:
+      transform var(--dur-slow) var(--ease-power3),
+      opacity var(--dur-slow) var(--ease-power3);
+  }
+
+  .reveal-block,
+  .reveal-item {
+    transform: translateY(var(--shift-xl));
+  }
+
+  .reveal-shift-sm {
+    transform: translateY(var(--shift-sm));
+  }
+
+  .reveal-shift-md {
+    transform: translateY(var(--shift-md));
+  }
+
+  .reveal-shift-lg,
+  .reveal-lead {
+    transform: translateY(var(--shift-lg));
+  }
+
+  .reveal-shift-xl {
+    transform: translateY(var(--shift-xl));
+  }
+
+  .reveal-lead {
+    display: inline-block;
+  }
+
+  .reveal-cta {
+    transform: translateY(var(--shift-md));
+    transition-delay: 0.4s;
+  }
+
+  .reveal-delay {
+    opacity: 0;
+  }
+
+  .reveal-stagger > .reveal-item:nth-child(8n + 1) {
+    --i: 0;
+  }
+  .reveal-stagger > .reveal-item:nth-child(8n + 2) {
+    --i: 1;
+  }
+  .reveal-stagger > .reveal-item:nth-child(8n + 3) {
+    --i: 2;
+  }
+  .reveal-stagger > .reveal-item:nth-child(8n + 4) {
+    --i: 3;
+  }
+  .reveal-stagger > .reveal-item:nth-child(8n + 5) {
+    --i: 4;
+  }
+  .reveal-stagger > .reveal-item:nth-child(8n + 6) {
+    --i: 5;
+  }
+  .reveal-stagger > .reveal-item:nth-child(8n + 7) {
+    --i: 6;
+  }
+  .reveal-stagger > .reveal-item:nth-child(8n + 8) {
+    --i: 7;
+  }
+
+  .reveal-item {
+    transition-delay: calc((var(--i, 0) * var(--stagger-loose)));
+  }
+
+  .is-visible.reveal-block,
+  .is-visible.reveal-item,
+  .is-visible.reveal-cta,
+  .is-visible .reveal-block,
+  .is-visible .reveal-item,
+  .is-visible .reveal-lead,
+  .is-visible .reveal-cta {
+    opacity: 1;
+    transform: none;
+  }
+
+  .line-mask {
+    display: inline-block;
+    overflow: hidden;
+    margin-bottom: -0.15em;
+    vertical-align: bottom;
+  }
+
+  .line-mask > span,
+  [data-word] {
+    display: inline-block;
+    transform: translateY(100%);
+    opacity: 0;
+    text-shadow: 0 0 1em transparent;
+    transition:
+      transform 600ms var(--ease-power3),
+      opacity 600ms var(--ease-power3);
+    transition-delay: calc(280ms + var(--w, 0) * var(--stagger-tight));
+  }
+
+  .is-visible .line-mask > span,
+  .is-visible [data-word] {
+    transform: none;
+    opacity: 1;
   }
 
   .num {
@@ -257,8 +386,8 @@
     color: var(--mute);
     text-decoration: none;
     transition:
-      background-color var(--dur-interact) var(--ease-reveal),
-      color var(--dur-interact) var(--ease-reveal);
+      background-color var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out);
   }
 
   .rail-item svg {
@@ -348,7 +477,7 @@
   }
 
   .app-table tbody tr {
-    transition: background-color var(--dur-interact) var(--ease-reveal);
+    transition: background-color var(--dur-fast) var(--ease-out);
   }
 
   .app-table tbody tr:hover {
@@ -462,9 +591,9 @@
     font-weight: 500;
     letter-spacing: -0.14px;
     transition:
-      background-color var(--dur-interact) var(--ease-reveal),
-      border-color var(--dur-interact) var(--ease-reveal),
-      color var(--dur-interact) var(--ease-reveal);
+      background-color var(--dur-fast) var(--ease-out),
+      border-color var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out);
   }
 
   .desk-pill.is-on {
@@ -540,6 +669,16 @@
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  .reveal-block,
+  .reveal-item,
+  .reveal-lead,
+  .reveal-cta,
+  .line-mask > span,
+  [data-word] {
+    opacity: 1 !important;
+    transform: none !important;
   }
 
   *,
