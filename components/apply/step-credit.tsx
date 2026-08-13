@@ -1,11 +1,14 @@
 "use client";
 
 import * as React from "react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { Check, Loader2, Lock, RotateCcw, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FieldError } from "@/components/apply/field";
+import { StepBody } from "@/components/apply/motion";
 import { Note, Panel, StepHeading, SummaryRow } from "@/components/apply/step-shell";
 import type { StepProps } from "@/components/apply/step-shell";
+import { DURATION, EASE_OUT } from "@/lib/apply/motion";
 import { buildMockExperianPull, scoreBand } from "@/lib/apply/experian-mock";
 import { formatDateTime } from "@/lib/apply/format";
 import { cn } from "@/lib/utils";
@@ -19,6 +22,36 @@ const PULL_STAGES = [
 function prefersReducedMotion(): boolean {
   if (typeof window === "undefined" || !window.matchMedia) return false;
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function useCountUp(target: number | undefined) {
+  const reduced = useReducedMotion();
+  const [value, setValue] = React.useState(target ?? 0);
+
+  React.useEffect(() => {
+    if (target == null) return;
+    if (reduced) {
+      setValue(target);
+      return;
+    }
+
+    const start = Math.max(0, target - 28);
+    const duration = DURATION.reveal * 1000;
+    const origin = performance.now();
+    let frame = 0;
+
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - origin) / duration);
+      const eased = 1 - (1 - t) ** 3;
+      setValue(Math.round(start + (target - start) * eased));
+      if (t < 1) frame = requestAnimationFrame(tick);
+    };
+
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [target, reduced]);
+
+  return value;
 }
 
 /**
@@ -35,6 +68,7 @@ function DemoAuthorizationDialog({
 }) {
   const dialogRef = React.useRef<HTMLDivElement>(null);
   const confirmRef = React.useRef<HTMLButtonElement>(null);
+  const reduced = useReducedMotion();
 
   React.useEffect(() => {
     confirmRef.current?.focus();
@@ -68,13 +102,23 @@ function DemoAuthorizationDialog({
   }, [onCancel]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 p-0 sm:items-center sm:p-6">
-      <div
+    <motion.div
+      className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 p-0 sm:items-center sm:p-6"
+      initial={reduced ? false : { opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: DURATION.ui, ease: EASE_OUT }}
+    >
+      <motion.div
         ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="experian-demo-title"
         className="w-full max-w-lg overflow-hidden rounded-t-lg border border-line bg-paper shadow-window sm:rounded-lg"
+        initial={reduced ? false : { opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 8 }}
+        transition={{ duration: DURATION.step, ease: EASE_OUT }}
       >
         {/* Browser-style chrome, labelled as a demo throughout */}
         <div className="flex items-center gap-2 border-b border-line bg-mist px-3 py-2.5">
@@ -134,8 +178,24 @@ function DemoAuthorizationDialog({
             </Button>
           </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+function ScoreReveal({ score }: { score: number }) {
+  const displayed = useCountUp(score);
+  const reduced = useReducedMotion();
+
+  return (
+    <motion.div
+      className="num mt-4 text-[56px] font-semibold leading-none tracking-[-1.6px] text-ink"
+      initial={reduced ? false : { opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: DURATION.reveal, ease: EASE_OUT, delay: 0.08 }}
+    >
+      {displayed}
+    </motion.div>
   );
 }
 
@@ -176,9 +236,10 @@ export function StepCredit({ state, patch, errors }: StepProps) {
   };
 
   const band = experian.score ? scoreBand(experian.score) : undefined;
+  const pullProgress = ((stage + 1) / PULL_STAGES.length) * 100;
 
   return (
-    <div className="space-y-5">
+    <StepBody>
       <StepHeading lead="Credit report." tone="Included at no extra cost." />
       <p className="max-w-xl text-[15px] font-medium leading-[21px] tracking-[-0.16px] text-mute">
         Connect your report once and it travels with this application. The landlord sees your score
@@ -198,9 +259,7 @@ export function StepCredit({ state, patch, errors }: StepProps) {
                   Connected
                 </span>
               </div>
-              <div className="num mt-4 text-[56px] font-semibold leading-none tracking-[-1.6px] text-ink">
-                {experian.score}
-              </div>
+              <ScoreReveal score={experian.score} />
               <p className="mt-2 text-[15px] font-medium tracking-[-0.16px] text-mute">
                 {band?.label} · {experian.scoreModel}
               </p>
@@ -258,19 +317,25 @@ export function StepCredit({ state, patch, errors }: StepProps) {
               Pulling your report — {PULL_STAGES[stage]}…
             </p>
           </div>
+          <div className="relative mt-4 h-1 overflow-hidden rounded-full bg-line">
+            <div
+              className="h-full bg-ink transition-transform duration-240 ease-premium"
+              style={{ transform: `translateX(-${100 - pullProgress}%)` }}
+            />
+          </div>
           <ol className="mt-4 space-y-2">
             {PULL_STAGES.map((label, index) => (
               <li
                 key={label}
                 className={cn(
-                  "flex items-center gap-2 text-[14px] font-medium tracking-[-0.14px]",
+                  "flex items-center gap-2 text-[14px] font-medium tracking-[-0.14px] transition-colors duration-200 ease-premium",
                   index < stage ? "text-ink-2" : index === stage ? "text-ink" : "text-mute-2"
                 )}
               >
                 <span
                   aria-hidden
                   className={cn(
-                    "flex h-5 w-5 items-center justify-center rounded-full border",
+                    "flex h-5 w-5 items-center justify-center rounded-full border transition-[background-color,border-color,color] duration-200 ease-premium",
                     index < stage
                       ? "border-ok bg-ok text-paper"
                       : index === stage
@@ -314,12 +379,14 @@ export function StepCredit({ state, patch, errors }: StepProps) {
         does not contact Experian or any other consumer reporting agency.
       </Note>
 
-      {experian.status === "authorizing" && (
-        <DemoAuthorizationDialog
-          onAuthorize={runPull}
-          onCancel={() => patch({ experian: { status: "idle" } })}
-        />
-      )}
-    </div>
+      <AnimatePresence>
+        {experian.status === "authorizing" && (
+          <DemoAuthorizationDialog
+            onAuthorize={runPull}
+            onCancel={() => patch({ experian: { status: "idle" } })}
+          />
+        )}
+      </AnimatePresence>
+    </StepBody>
   );
 }

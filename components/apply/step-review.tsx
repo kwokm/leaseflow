@@ -3,6 +3,7 @@
 import { CreditCard, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox, Field, MaskedField } from "@/components/apply/field";
+import { StepBody } from "@/components/apply/motion";
 import { Note, StepHeading, SummaryRow } from "@/components/apply/step-shell";
 import type { StepProps } from "@/components/apply/step-shell";
 import {
@@ -29,7 +30,7 @@ function ReviewBlock({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-lg border border-line bg-paper p-5">
+    <section className="rounded-lg border border-line bg-paper p-5 transition-[border-color,box-shadow] duration-200 ease-premium">
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-[17px] font-semibold tracking-[-0.3px] text-ink">{title}</h2>
         <Button type="button" variant="ghost" size="sm" onClick={() => goTo(step)}>
@@ -55,7 +56,7 @@ export function StepReview({ state, patch, errors, property, goTo }: StepProps) 
     .join(", ");
 
   return (
-    <div className="space-y-5">
+    <StepBody>
       <StepHeading lead="Review and pay." tone="Last look before it goes out." />
 
       <ReviewBlock title="You" step={2} goTo={goTo}>
@@ -291,6 +292,6 @@ export function StepReview({ state, patch, errors, property, goTo }: StepProps) 
         Card details are never saved, not even in this prototype&apos;s local draft. Submitting
         records a mock payment only.
       </Note>
-    </div>
+    </StepBody>
   );
 }

@@ -13,8 +13,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           "flex h-11 w-full rounded-btn border border-line-2 bg-paper px-3 text-[15px] font-medium tracking-[-0.16px] text-ink",
           "placeholder:font-medium placeholder:text-mute-2",
           "file:mr-3 file:h-7 file:rounded-md file:border file:border-line-2 file:bg-mist file:px-2 file:text-[13px] file:font-medium file:text-ink-2",
+          "transition-[border-color,background-color] duration-160 ease-premium hover:border-mute-3",
           "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink",
-          "disabled:cursor-not-allowed disabled:bg-mist disabled:text-mute",
+          "disabled:cursor-not-allowed disabled:bg-mist disabled:text-mute disabled:hover:border-line-2",
           "aria-[invalid=true]:border-no",
           className
         )}

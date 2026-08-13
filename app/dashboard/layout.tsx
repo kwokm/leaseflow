@@ -1,19 +1,20 @@
 import Link from "next/link";
+import { BrandMark, BrandWord } from "@/components/brand";
+import { PageWash } from "@/components/page-wash";
 import { Button } from "@/components/ui/button";
 import { DashboardNav } from "@/components/dashboard-nav";
-import { Shield, HelpCircle } from "lucide-react";
+import { HelpCircle } from "lucide-react";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-mist print:bg-white">
+    <div className="relative min-h-screen print:bg-white">
+      <PageWash quiet />
       {/* Header */}
-      <header className="border-b bg-white sticky top-0 z-50 print:hidden">
+      <header className="relative z-50 border-b border-line bg-paper/80 backdrop-blur-md sticky top-0 print:hidden">
         <div className="flex items-center justify-between px-6 py-4">
-          <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <Shield className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-xl font-bold text-ink">LeaseFlow</span>
+          <Link href="/dashboard" className="flex items-center gap-2.5 text-ink">
+            <BrandMark />
+            <BrandWord />
           </Link>
 
           <div className="flex items-center gap-4">
@@ -34,9 +35,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </header>
 
-      <div className="flex">
+      <div className="relative z-10 flex">
         {/* Sidebar */}
-        <aside className="w-64 bg-white border-r min-h-[calc(100vh-73px)] p-4 print:hidden">
+        <aside className="w-64 border-r border-line bg-paper/70 min-h-[calc(100vh-73px)] p-4 print:hidden">
           <DashboardNav />
 
           <div className="mt-8 p-4 bg-mist rounded-lg">

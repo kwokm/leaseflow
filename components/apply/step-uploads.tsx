@@ -2,13 +2,14 @@
 
 import { Field } from "@/components/apply/field";
 import { FileSlot, FileStack } from "@/components/apply/file-upload";
+import { StepBody } from "@/components/apply/motion";
 import { FieldGrid, Note, Panel, StepHeading } from "@/components/apply/step-shell";
 import type { StepProps } from "@/components/apply/step-shell";
 import type { BankInfo, IncomeInfo } from "@/lib/apply/types";
 
 export function StepPhotoId({ state, patch, errors }: StepProps) {
   return (
-    <div className="space-y-5">
+    <StepBody>
       <StepHeading lead="Photo ID." tone="Front and back, please." />
       <p className="max-w-xl text-[15px] font-medium leading-[21px] tracking-[-0.16px] text-mute">
         A driver&apos;s licence, state ID, or passport works. Images and PDFs are both fine. Files
@@ -37,8 +38,8 @@ export function StepPhotoId({ state, patch, errors }: StepProps) {
       <Note>
         Make sure all four corners are visible and the text is readable. Blurry IDs are the most
         common reason an application gets sent back.
-      </Note>
-    </div>
+    </Note>
+    </StepBody>
   );
 }
 
@@ -47,7 +48,7 @@ export function StepIncome({ state, patch, errors }: StepProps) {
   const set = (partial: Partial<IncomeInfo>) => patch({ income: { ...income, ...partial } });
 
   return (
-    <div className="space-y-5">
+    <StepBody>
       <StepHeading lead="Income." tone="Plus your two most recent pay stubs." />
 
       <Panel title="Where your income comes from">
@@ -113,7 +114,7 @@ export function StepIncome({ state, patch, errors }: StepProps) {
           onChange={(files) => patch({ paystubs: files })}
         />
       </Panel>
-    </div>
+    </StepBody>
   );
 }
 
@@ -122,7 +123,7 @@ export function StepBank({ state, patch, errors }: StepProps) {
   const set = (partial: Partial<BankInfo>) => patch({ bank: { ...bank, ...partial } });
 
   return (
-    <div className="space-y-5">
+    <StepBody>
       <StepHeading lead="Bank statements." tone="One to three, most recent first." />
       <p className="max-w-xl text-[15px] font-medium leading-[21px] tracking-[-0.16px] text-mute">
         Statements corroborate the income you just entered. You can black out transaction lines — we
@@ -164,6 +165,6 @@ export function StepBank({ state, patch, errors }: StepProps) {
       </Panel>
 
       <Note>Never share full account or routing numbers in a rental application.</Note>
-    </div>
+    </StepBody>
   );
 }

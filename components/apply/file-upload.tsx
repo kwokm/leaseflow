@@ -2,8 +2,10 @@
 
 import * as React from "react";
 import { FileText, ImageIcon, Plus, Trash2, Upload } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { FieldError } from "@/components/apply/field";
+import { DURATION, EASE_OUT } from "@/lib/apply/motion";
 import { formatFileSize } from "@/lib/apply/format";
 import type { LocalFile } from "@/lib/apply/types";
 import { cn } from "@/lib/utils";
@@ -57,9 +59,19 @@ function FilePreview({ file }: { file: LocalFile }) {
   );
 }
 
-function FileRow({ file, onRemove }: { file: LocalFile; onRemove: () => void }) {
-  return (
-    <div className="flex items-center gap-3 rounded-btn border border-line bg-paper p-2.5">
+function FileRow({
+  file,
+  onRemove,
+  onReplace,
+}: {
+  file: LocalFile;
+  onRemove: () => void;
+  onReplace?: () => void;
+}) {
+  const reduced = useReducedMotion();
+
+  const row = (
+    <div className="flex items-center gap-3 rounded-btn border border-line bg-paper p-2.5 transition-[border-color,box-shadow] duration-200 ease-premium">
       <FilePreview file={file} />
       <div className="min-w-0 flex-1">
         <p className="truncate text-[14px] font-medium tracking-[-0.14px] text-ink">{file.name}</p>
@@ -68,6 +80,17 @@ function FileRow({ file, onRemove }: { file: LocalFile; onRemove: () => void }) 
           {file.url ? "" : " · preview cleared on reload"}
         </p>
       </div>
+      {onReplace && (
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={onReplace}
+          className="hidden text-mute hover:text-ink sm:inline-flex"
+        >
+          Replace
+        </Button>
+      )}
       <Button
         type="button"
         variant="ghost"
@@ -80,6 +103,44 @@ function FileRow({ file, onRemove }: { file: LocalFile; onRemove: () => void }) 
       </Button>
     </div>
   );
+
+  if (reduced) return row;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: DURATION.ui, ease: EASE_OUT }}
+    >
+      {row}
+    </motion.div>
+  );
+}
+
+function useDropzone() {
+  const [over, setOver] = React.useState(false);
+
+  const onDragEnter = (event: React.DragEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setOver(true);
+  };
+
+  const onDragOver = (event: React.DragEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setOver(true);
+  };
+
+  const onDragLeave = (event: React.DragEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!event.currentTarget.contains(event.relatedTarget as Node)) {
+      setOver(false);
+    }
+  };
+
+  return { over, setOver, onDragEnter, onDragOver, onDragLeave };
 }
 
 interface FileSlotProps {
@@ -95,6 +156,7 @@ interface FileSlotProps {
 export function FileSlot({ id, label, hint, error, file, onChange }: FileSlotProps) {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const errorId = error ? `${id}-error` : undefined;
+  const drop = useDropzone();
 
   const handleFiles = (files: FileList | null) => {
     const picked = files?.[0];
@@ -110,6 +172,7 @@ export function FileSlot({ id, label, hint, error, file, onChange }: FileSlotPro
       {file ? (
         <FileRow
           file={file}
+          onReplace={() => inputRef.current?.click()}
           onRemove={() => {
             releaseLocalFile(file);
             onChange(null);
@@ -120,15 +183,26 @@ export function FileSlot({ id, label, hint, error, file, onChange }: FileSlotPro
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
+          onDragEnter={drop.onDragEnter}
+          onDragOver={drop.onDragOver}
+          onDragLeave={drop.onDragLeave}
+          onDrop={(event) => {
+            event.preventDefault();
+            drop.setOver(false);
+            handleFiles(event.dataTransfer.files);
+          }}
           aria-describedby={errorId}
           className={cn(
-            "flex min-h-[112px] w-full flex-col items-center justify-center gap-2 rounded-btn border border-dashed bg-mist px-4 py-5 text-center transition-colors hover:bg-rail",
-            error ? "border-no" : "border-line-2"
+            "flex min-h-[112px] w-full flex-col items-center justify-center gap-2 rounded-btn border border-dashed bg-mist px-4 py-5 text-center",
+            "transition-[background-color,border-color] duration-200 ease-premium",
+            error ? "border-no" : "border-line-2",
+            "hover:border-mute-3 hover:bg-rail",
+            drop.over && "border-ink bg-wash"
           )}
         >
           <Upload className="h-5 w-5 text-mute" />
           <span className="text-[14px] font-medium tracking-[-0.14px] text-ink-2">
-            Add {label.toLowerCase()}
+            {drop.over ? "Drop to add" : `Add ${label.toLowerCase()}`}
           </span>
           <span className="text-[13px] font-medium text-mute">JPG, PNG, or PDF</span>
         </button>
@@ -164,6 +238,7 @@ export function FileStack({ id, label, hint, error, files, max, onChange }: File
   const inputRef = React.useRef<HTMLInputElement>(null);
   const errorId = error ? `${id}-error` : undefined;
   const full = files.length >= max;
+  const drop = useDropzone();
 
   const handleFiles = (list: FileList | null) => {
     if (!list?.length) return;
@@ -198,14 +273,25 @@ export function FileStack({ id, label, hint, error, files, max, onChange }: File
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
+            onDragEnter={drop.onDragEnter}
+            onDragOver={drop.onDragOver}
+            onDragLeave={drop.onDragLeave}
+            onDrop={(event) => {
+              event.preventDefault();
+              drop.setOver(false);
+              handleFiles(event.dataTransfer.files);
+            }}
             aria-describedby={errorId}
             className={cn(
-              "flex min-h-[56px] w-full items-center justify-center gap-2 rounded-btn border border-dashed bg-mist px-4 text-[14px] font-medium tracking-[-0.14px] text-ink-2 transition-colors hover:bg-rail",
-              error ? "border-no" : "border-line-2"
+              "flex min-h-[56px] w-full items-center justify-center gap-2 rounded-btn border border-dashed bg-mist px-4 text-[14px] font-medium tracking-[-0.14px] text-ink-2",
+              "transition-[background-color,border-color] duration-200 ease-premium",
+              error ? "border-no" : "border-line-2",
+              "hover:border-mute-3 hover:bg-rail",
+              drop.over && "border-ink bg-wash"
             )}
           >
             <Plus className="h-4 w-4 text-mute" />
-            Add file
+            {drop.over ? "Drop to add" : "Add file"}
             <span className="text-mute">· JPG, PNG, or PDF</span>
           </button>
         )}

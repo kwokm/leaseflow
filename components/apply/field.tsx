@@ -157,7 +157,7 @@ export function Checkbox({
           aria-describedby={errorId}
           aria-invalid={error ? true : undefined}
           onChange={(event) => onChange(event.target.checked)}
-          className="mt-0.5 h-5 w-5 shrink-0 cursor-pointer rounded-[6px] border border-line-2 accent-fill focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+          className="mt-0.5 h-5 w-5 shrink-0 cursor-pointer rounded-[6px] border border-line-2 accent-fill transition-[border-color] duration-160 ease-premium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
         />
         <span>{children}</span>
       </label>

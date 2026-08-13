@@ -36,7 +36,12 @@ export function Panel({
   className?: string;
 }) {
   return (
-    <section className={cn("rounded-lg border border-line bg-paper p-5", className)}>
+    <section
+      className={cn(
+        "rounded-lg border border-line bg-paper p-5 transition-[border-color,box-shadow] duration-200 ease-premium",
+        className
+      )}
+    >
       {title && (
         <h2 className="text-[17px] font-semibold leading-tight tracking-[-0.3px] text-ink">
           {title}

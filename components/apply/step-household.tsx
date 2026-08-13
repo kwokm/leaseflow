@@ -3,6 +3,7 @@
 import { Plus, Scale, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox, Field, FieldError } from "@/components/apply/field";
+import { StepBody } from "@/components/apply/motion";
 import { Note, Panel, StepHeading } from "@/components/apply/step-shell";
 import type { StepProps } from "@/components/apply/step-shell";
 import type { HouseholdInfo, OccupantEntry, PetEntry } from "@/lib/apply/types";
@@ -30,7 +31,7 @@ export function StepHousehold({ state, patch, errors }: StepProps) {
     });
 
   return (
-    <div className="space-y-5">
+    <StepBody>
       <StepHeading lead="Household." tone="Optional, but it speeds up review." />
 
       <Panel title="Pets" description="List anything that will live at the property.">
@@ -203,7 +204,7 @@ export function StepHousehold({ state, patch, errors }: StepProps) {
               value={household.notes}
               onChange={(event) => set({ notes: event.target.value })}
               placeholder="Optional — context for the landlord"
-              className="w-full rounded-btn border border-line-2 bg-paper p-3 text-[15px] font-medium tracking-[-0.16px] text-ink placeholder:text-mute-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+              className="w-full rounded-btn border border-line-2 bg-paper p-3 text-[15px] font-medium tracking-[-0.16px] text-ink placeholder:text-mute-2 transition-[border-color,background-color] duration-160 ease-premium hover:border-mute-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
             />
             <FieldError id="household-notes-error" message={errors.notes} />
           </div>
@@ -222,6 +223,6 @@ export function StepHousehold({ state, patch, errors }: StepProps) {
       </Panel>
 
       <Note>You can skip everything on this step and still submit your application.</Note>
-    </div>
+    </StepBody>
   );
 }

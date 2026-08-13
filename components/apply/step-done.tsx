@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { CheckCircle2, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { StepBody } from "@/components/apply/motion";
 import { Note, Panel, StepHeading, SummaryRow } from "@/components/apply/step-shell";
 import type { StepProps } from "@/components/apply/step-shell";
 import { formatDateTime, formatMoney, maskCardNumber } from "@/lib/apply/format";
@@ -15,7 +16,7 @@ export function StepDone({ state, property }: StepProps) {
   const packetHref = `/dashboard/applications/${localApplicantId(state.confirmationId ?? "")}`;
 
   return (
-    <div className="space-y-5">
+    <StepBody>
       <div className="flex items-start gap-3">
         <CheckCircle2 className="mt-1 h-7 w-7 shrink-0 text-ok" aria-hidden />
         <StepHeading lead="Application submitted." tone="Here is your receipt." />
@@ -97,6 +98,6 @@ export function StepDone({ state, property }: StepProps) {
       <Note>
         This prototype keeps your application in this browser only. Clearing site data removes it.
       </Note>
-    </div>
+    </StepBody>
   );
 }

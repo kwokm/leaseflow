@@ -55,7 +55,7 @@
 
   body {
     min-width: 320px;
-    background: var(--paper);
+    background: var(--wash);
     color: var(--ink);
     /* Body 16/22/500, letter-spacing -0.16px */
     font-size: 16px;
@@ -127,6 +127,56 @@
     position: absolute;
     inset: 0;
     background: radial-gradient(70% 110% at 50% 0%, #ffffff 28%, rgba(255, 255, 255, 0) 68%);
+  }
+
+  /*
+   * Full-page wash for apply / renter chrome. Same bloom as the hero, with a
+   * stronger white veil so forms stay readable. Quiet variant keeps more paper.
+   */
+  .page-wash {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+    background: radial-gradient(
+      90% 80% at 50% 100%,
+      var(--wash) 0%,
+      var(--wash-mid) 45%,
+      var(--wash-deep) 100%
+    );
+  }
+
+  .page-wash::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.55) 0 1px,
+      transparent 1px 12px
+    );
+  }
+
+  .page-wash::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      78% 88% at 50% 0%,
+      #ffffff 20%,
+      rgba(255, 255, 255, 0.76) 50%,
+      rgba(255, 255, 255, 0.34) 100%
+    );
+  }
+
+  .page-wash-quiet::after {
+    background: radial-gradient(
+      85% 92% at 50% 0%,
+      #ffffff 30%,
+      rgba(255, 255, 255, 0.88) 58%,
+      rgba(255, 255, 255, 0.52) 100%
+    );
   }
 
   .skip-link {

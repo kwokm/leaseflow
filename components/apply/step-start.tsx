@@ -1,6 +1,7 @@
 "use client";
 
 import { BedDouble, Bath, CalendarDays, Check } from "lucide-react";
+import { StepBody } from "@/components/apply/motion";
 import { Note, Panel, StepHeading } from "@/components/apply/step-shell";
 import type { StepProps } from "@/components/apply/step-shell";
 import { formatDateOnly, formatDollars } from "@/lib/apply/format";
@@ -42,7 +43,7 @@ const PACKAGES: {
 
 export function StepStart({ state, patch, property }: StepProps) {
   return (
-    <div className="space-y-5">
+    <StepBody>
       <StepHeading lead="Start your application for" tone={property.address.split(",")[0]} />
       <p className="max-w-xl text-[15px] font-medium leading-[21px] tracking-[-0.16px] text-mute">
         It takes about ten minutes. Your progress saves in this browser, so you can stop and pick it
@@ -91,9 +92,12 @@ export function StepStart({ state, patch, property }: StepProps) {
                 key={pkg.id}
                 className={cn(
                   // The radio itself is visually hidden, so the card carries the focus ring.
-                  "relative flex cursor-pointer flex-col rounded-lg border bg-paper p-5 transition-colors",
+                  "relative flex cursor-pointer flex-col rounded-lg border bg-paper p-5",
+                  "transition-[border-color,box-shadow,background-color] duration-200 ease-premium",
                   "focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-ink",
-                  selected ? "border-ink shadow-mini" : "border-line hover:border-line-2"
+                  selected
+                    ? "border-ink shadow-mini"
+                    : "border-line hover:border-line-2 hover:shadow-mini"
                 )}
               >
                 <input
@@ -168,6 +172,6 @@ export function StepStart({ state, patch, property }: StepProps) {
           ))}
         </ul>
       </Panel>
-    </div>
+    </StepBody>
   );
 }

@@ -2,7 +2,10 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { motion, useReducedMotion } from "motion/react";
 import { ArrowLeft, ArrowRight, Check, Lock } from "lucide-react";
+import { BrandMark, BrandWord } from "@/components/brand";
+import { PageWash } from "@/components/page-wash";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { StepStart } from "@/components/apply/step-start";
@@ -12,7 +15,9 @@ import { StepCredit } from "@/components/apply/step-credit";
 import { StepHousehold } from "@/components/apply/step-household";
 import { StepReview } from "@/components/apply/step-review";
 import { StepDone } from "@/components/apply/step-done";
+import { StepTransition } from "@/components/apply/motion";
 import type { StepProps } from "@/components/apply/step-shell";
+import { DURATION, EASE_OUT } from "@/lib/apply/motion";
 import { clearDraft, loadDraft, saveDraft, saveSubmission } from "@/lib/apply/storage";
 import { APPLY_STEPS, TOTAL_STEPS, createInitialState, type ApplyState } from "@/lib/apply/types";
 import { validateStep, type StepErrors } from "@/lib/apply/validate";
@@ -46,7 +51,9 @@ export function ApplyWizard({ property }: { property: Property }) {
   );
   const [errors, setErrors] = React.useState<StepErrors>({});
   const [hydrated, setHydrated] = React.useState(false);
+  const [direction, setDirection] = React.useState(1);
   const headingRef = React.useRef<HTMLDivElement>(null);
+  const reduced = useReducedMotion();
 
   // Draft lives in localStorage; load it once the component is on the client.
   React.useEffect(() => {
@@ -68,6 +75,7 @@ export function ApplyWizard({ property }: { property: Property }) {
 
   const moveTo = React.useCallback((next: number) => {
     setErrors({});
+    setDirection(next >= step ? 1 : -1);
     setState((current) => ({
       ...current,
       step: next,
@@ -76,7 +84,7 @@ export function ApplyWizard({ property }: { property: Property }) {
     if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, behavior: "auto" });
     }
-  }, []);
+  }, [step]);
 
   // Move focus to the step region so keyboard and screen-reader users land in
   // the new content rather than back at the top of the document.
@@ -96,6 +104,7 @@ export function ApplyWizard({ property }: { property: Property }) {
       furthestStep: 9,
     };
 
+    setDirection(1);
     setState(submitted);
     saveSubmission(submitted);
     clearDraft(property.id);
@@ -125,24 +134,21 @@ export function ApplyWizard({ property }: { property: Property }) {
   const errorCount = Object.keys(errors).length;
 
   return (
-    <div className="min-h-screen bg-paper">
+    <div className="relative min-h-screen print:bg-white">
+      <PageWash />
+
       <a href="#apply-step" className="skip-link">
         Skip to the current step
       </a>
 
-      <header className="sticky top-0 z-40 border-b border-line bg-paper/95 backdrop-blur print:hidden">
-        <div className="mx-auto flex h-16 max-w-shell items-center gap-4 px-5 sm:px-8">
+      <header className="sticky top-0 z-40 border-b border-line bg-paper/80 backdrop-blur-md print:hidden">
+        <div className="relative z-10 mx-auto flex h-16 max-w-shell items-center gap-4 px-5 sm:px-8">
           <Link
             href="/"
-            className="flex shrink-0 items-center gap-2 rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+            className="flex shrink-0 items-center gap-2.5 text-ink rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
           >
-            <span
-              aria-hidden
-              className="flex h-6 w-6 items-center justify-center rounded-[7px] bg-fill text-[13px] font-semibold text-fill-text"
-            >
-              L
-            </span>
-            <span className="text-[16px] font-semibold tracking-[-0.64px] text-ink">LeaseFlow</span>
+            <BrandMark />
+            <BrandWord />
           </Link>
 
           <p className="ml-auto hidden items-center gap-1.5 text-[13px] font-medium text-mute sm:flex">
@@ -151,7 +157,7 @@ export function ApplyWizard({ property }: { property: Property }) {
           </p>
         </div>
 
-        <div className="border-t border-line">
+        <div className="relative z-10 border-t border-line">
           <div className="mx-auto max-w-shell px-5 py-3 sm:px-8">
             <div className="flex items-baseline justify-between gap-4">
               <p className="text-[13px] font-medium tracking-[-0.13px] text-ink-2">
@@ -171,7 +177,7 @@ export function ApplyWizard({ property }: { property: Property }) {
         </div>
       </header>
 
-      <div className="mx-auto grid max-w-shell gap-8 px-5 py-8 sm:px-8 lg:grid-cols-[212px_minmax(0,1fr)] lg:py-12">
+      <div className="relative z-10 mx-auto grid max-w-shell gap-8 px-5 py-8 sm:px-8 lg:grid-cols-[212px_minmax(0,1fr)] lg:py-12">
         {/* Step rail — desktop only; the progress bar covers small screens. */}
         <nav aria-label="Application steps" className="hidden lg:block print:hidden">
           <ol className="sticky top-36 space-y-0.5">
@@ -188,16 +194,27 @@ export function ApplyWizard({ property }: { property: Property }) {
                     aria-current={current ? "step" : undefined}
                     onClick={() => goTo(entry.id)}
                     className={cn(
-                      "flex min-h-[44px] w-full items-center gap-2.5 rounded-md px-2.5 text-left text-[13px] font-medium tracking-[-0.13px] transition-colors",
-                      current ? "bg-rail text-ink" : "text-mute",
-                      reachable && !current && "hover:bg-mist hover:text-ink",
+                      "relative flex min-h-[44px] w-full items-center gap-2.5 rounded-md px-2.5 text-left text-[13px] font-medium tracking-[-0.13px] transition-[color,background-color] duration-200 ease-premium",
+                      current ? "text-ink" : "text-mute",
+                      reachable && !current && "hover:text-ink",
                       !reachable && "cursor-default opacity-60"
                     )}
                   >
+                    {current && !reduced && (
+                      <motion.span
+                        layoutId="apply-step-pill"
+                        className="absolute inset-0 rounded-md bg-paper shadow-mini"
+                        transition={{ duration: DURATION.step, ease: EASE_OUT }}
+                        aria-hidden
+                      />
+                    )}
+                    {current && reduced && (
+                      <span className="absolute inset-0 rounded-md bg-paper shadow-mini" aria-hidden />
+                    )}
                     <span
                       aria-hidden
                       className={cn(
-                        "num flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[11px]",
+                        "relative num flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[11px] transition-[background-color,border-color,color] duration-200 ease-premium",
                         done && "border-ink bg-ink text-paper",
                         current && !done && "border-ink text-ink",
                         !done && !current && "border-line-2 text-mute-2"
@@ -205,7 +222,7 @@ export function ApplyWizard({ property }: { property: Property }) {
                     >
                       {done ? <Check className="h-3 w-3" strokeWidth={3} /> : entry.id}
                     </span>
-                    {entry.name}
+                    <span className="relative">{entry.name}</span>
                   </button>
                 </li>
               );
@@ -226,13 +243,15 @@ export function ApplyWizard({ property }: { property: Property }) {
               </div>
             )}
 
-            <StepComponent
-              state={state}
-              patch={patch}
-              errors={errors}
-              property={property}
-              goTo={goTo}
-            />
+            <StepTransition step={step} direction={direction}>
+              <StepComponent
+                state={state}
+                patch={patch}
+                errors={errors}
+                property={property}
+                goTo={goTo}
+              />
+            </StepTransition>
           </div>
 
           {step < 9 && (
@@ -255,10 +274,10 @@ export function ApplyWizard({ property }: { property: Property }) {
         </main>
       </div>
 
-      <footer className="border-t border-line print:hidden">
+      <footer className="relative z-10 border-t border-line print:hidden">
         <div className="mx-auto flex max-w-shell flex-wrap items-center justify-between gap-3 px-5 py-6 text-[13px] font-medium text-mute sm:px-8">
           <p>Demo prototype · mock data only, no consumer reporting agency is used.</p>
-          <Link href="/" className="text-ink-2 hover:text-ink">
+          <Link href="/" className="text-ink-2 transition-colors duration-160 ease-premium hover:text-ink">
             Back to LeaseFlow
           </Link>
         </div>

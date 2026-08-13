@@ -1,30 +1,12 @@
 import Link from "next/link";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { BrandMark, BrandWord } from "@/components/brand";
 import { Button } from "@/components/ui/button";
 import { getPropertyById } from "@/lib/data/mock-data";
 
 // Every renter-facing CTA points at the demo listing's application.
 const DEMO_LISTING_ID = "prop-1";
 const APPLY_HREF = `/apply/${DEMO_LISTING_ID}`;
-
-function BrandMark({ size = 22 }: { size?: number }) {
-  return (
-    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden className="shrink-0">
-      <rect width="24" height="24" rx="6.5" fill="currentColor" />
-      <rect
-        x="6.2"
-        y="5.2"
-        width="11.6"
-        height="13.6"
-        rx="2"
-        fill="none"
-        stroke="#fff"
-        strokeWidth="1.55"
-      />
-      <path d="M6.2 9.4h11.6" stroke="#fff" strokeWidth="1.55" />
-    </svg>
-  );
-}
 
 function Headline({
   lead,
@@ -152,32 +134,6 @@ const SLICES = [
   },
 ];
 
-const PACKAGES = [
-  {
-    name: "Standard",
-    price: "$39.99",
-    blurb: "Everything most landlords ask for.",
-    features: [
-      "Credit report and score",
-      "National criminal search",
-      "Eviction records",
-      "Identity check",
-    ],
-  },
-  {
-    name: "Premium",
-    price: "$59.99",
-    blurb: "Adds income and employment verification.",
-    features: [
-      "Everything in Standard",
-      "Income verified against pay stubs",
-      "Bank statement review",
-      "Landlord reference outreach",
-    ],
-    featured: true,
-  },
-];
-
 export default function Home() {
   const property = getPropertyById(DEMO_LISTING_ID)!;
 
@@ -202,7 +158,7 @@ export default function Home() {
               className="flex shrink-0 items-center gap-2.5 text-ink"
             >
               <BrandMark />
-              <span className="text-[16px] font-semibold tracking-[-0.64px]">leaseflow</span>
+              <BrandWord />
             </Link>
 
             <nav aria-label="Primary" className="hidden flex-1 items-center gap-7 md:flex">
@@ -215,7 +171,7 @@ export default function Home() {
                 <Link
                   key={item.label}
                   href={item.href}
-                  className="text-[14px] font-medium tracking-[-0.2px] text-ink-2 hover:text-ink"
+                  className="text-[14px] font-medium tracking-[-0.2px] text-ink-2 transition-colors duration-160 ease-premium hover:text-ink"
                 >
                   {item.label}
                 </Link>
@@ -242,7 +198,7 @@ export default function Home() {
           <div className="relative z-10 mx-auto mb-12 max-w-[860px] px-5 text-center sm:px-8">
             <Link
               href="#desk"
-              className="mb-5 inline-flex h-[30px] items-center rounded-full border border-line-2 bg-paper px-3 text-[13px] font-medium tracking-[-0.18px] text-ink hover:border-mute-3"
+              className="mb-5 inline-flex h-[30px] items-center rounded-full border border-line-2 bg-paper px-3 text-[13px] font-medium tracking-[-0.18px] text-ink transition-[border-color] duration-160 ease-premium hover:border-mute-3"
             >
               How landlords review a packet →
             </Link>
@@ -424,7 +380,7 @@ export default function Home() {
         </section>
 
         {/* Packet slices */}
-        <section id="packet" className="py-16 sm:py-24" aria-labelledby="packet-title">
+        <section id="packet" className="border-t border-line bg-mist py-16 sm:py-24" aria-labelledby="packet-title">
           <div className="mx-auto max-w-shell px-5 sm:px-8">
             <Headline
               id="packet-title"
@@ -456,63 +412,40 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Pricing */}
+        {/* Fees — ported from design/attio-inspired #rates */}
         <section
           id="rates"
-          className="border-t border-line bg-mist py-16 sm:py-24"
+          className="py-16 sm:py-28"
           aria-labelledby="rates-title"
         >
           <div className="mx-auto max-w-shell px-5 sm:px-8">
+            <p className="mb-3.5 text-[13px] font-medium tracking-[-0.13px] text-mute">Fees</p>
             <Headline
               id="rates-title"
               lead="Applicants pay the fee."
-              tone="Landlords never pay to use the desk. The renter covers screening when they apply."
-              className="max-w-3xl"
+              tone="Landlords do not pay to use the desk. The renter covers screening when they apply."
+              className="max-w-[22ch]"
             />
 
-            <div className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-2">
-              {PACKAGES.map((pkg) => (
-                <article
-                  key={pkg.name}
-                  className={`rounded-lg border bg-paper p-6 ${
-                    pkg.featured ? "border-ink" : "border-line"
-                  }`}
-                >
-                  <div className="flex items-baseline justify-between gap-3">
-                    <h3 className="text-[24px] font-medium leading-[27.6px] tracking-[-0.24px] text-ink">
-                      {pkg.name}
-                    </h3>
-                    {pkg.featured && (
-                      <span className="rounded-md bg-blue-soft px-2 py-0.5 text-[12px] font-medium text-blue">
-                        Most chosen
-                      </span>
-                    )}
-                  </div>
-                  <p className="mt-1 text-[14px] font-medium text-mute">{pkg.blurb}</p>
-                  <p className="num mt-5 text-[40px] font-semibold leading-none tracking-[-1.2px] text-ink">
-                    {pkg.price}
-                  </p>
-                  <p className="mt-1.5 text-[13px] font-medium text-mute">
-                    One-time, paid by the applicant
-                  </p>
-
-                  <ul className="mt-5 space-y-2 border-t border-line pt-5">
-                    {pkg.features.map((feature) => (
-                      <li
-                        key={feature}
-                        className="flex items-start gap-2 text-[14px] font-medium tracking-[-0.14px] text-ink-2"
-                      >
-                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-ok" aria-hidden />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-
-                  <Button asChild size="cta" variant={pkg.featured ? "default" : "outline"} className="mt-6 w-full">
-                    <Link href={APPLY_HREF}>Apply with {pkg.name}</Link>
-                  </Button>
-                </article>
-              ))}
+            <div className="mt-10 grid grid-cols-1 border-t border-line sm:grid-cols-2">
+              <article className="pt-7 sm:pr-12">
+                <p className="text-[14px] font-medium text-mute">Standard</p>
+                <p className="num mt-2 text-[40px] font-medium leading-[44px] tracking-[-0.4px] text-ink">
+                  $39.99
+                </p>
+                <p className="mt-3 max-w-[32ch] text-[15px] font-medium leading-[1.5] text-mute">
+                  Credit, criminal, and eviction, sealed into the packet with a LeaseScore.
+                </p>
+              </article>
+              <article className="border-t border-line pt-7 sm:border-l sm:border-t-0 sm:pl-12">
+                <p className="text-[14px] font-medium text-mute">Premium</p>
+                <p className="num mt-2 text-[40px] font-medium leading-[44px] tracking-[-0.4px] text-ink">
+                  $59.99
+                </p>
+                <p className="mt-3 max-w-[32ch] text-[15px] font-medium leading-[1.5] text-mute">
+                  Standard plus income. Employer, stated pay, and rent multiple on the same file.
+                </p>
+              </article>
             </div>
           </div>
         </section>
@@ -521,7 +454,7 @@ export default function Home() {
         <section className="border-t border-line py-14" aria-labelledby="apply-title">
           <div className="mx-auto flex max-w-shell flex-col gap-5 px-5 sm:px-8 md:flex-row md:items-center md:justify-between">
             <div>
-              <p className="text-[12px] font-medium uppercase tracking-[0.06em] text-mute-2">
+              <p className="text-[13px] font-medium tracking-[-0.13px] text-mute">
                 For renters
               </p>
               <h2
@@ -567,7 +500,7 @@ export default function Home() {
         <div className="mx-auto grid max-w-shell gap-10 px-5 sm:px-8 md:grid-cols-[1fr_2fr]">
           <div className="flex items-center gap-2.5 text-white">
             <BrandMark size={20} />
-            <span className="text-[16px] font-semibold tracking-[-0.64px]">leaseflow</span>
+            <BrandWord />
           </div>
 
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
@@ -585,7 +518,7 @@ export default function Home() {
                     <li key={label}>
                       <Link
                         href="#legal"
-                        className="text-[13px] font-medium text-[#9aa3af] hover:text-white"
+                        className="text-[13px] font-medium text-[#9aa3af] transition-colors duration-160 ease-premium hover:text-white"
                       >
                         {label}
                       </Link>
