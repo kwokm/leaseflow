@@ -29,11 +29,43 @@ function Headline({
   );
 }
 
-const DESK_ROWS = [
-  { time: "9:12 AM", name: "Sarah Johnson", meta: "742 Evergreen Terrace · Premium", score: "785" },
-  { time: "8:40 AM", name: "Jessica Martinez", meta: "742 Evergreen Terrace · Premium", score: "695" },
-  { time: "Yesterday", name: "Emily Rodriguez", meta: "123 Main Street 4B · Standard", score: "820" },
+const REVIEWS = [
+  {
+    time: "10:00 – 10:20",
+    initials: "SJ",
+    ava: "bg-[#e8e4f4] text-[#3d3558]",
+    name: "Sarah Johnson packet",
+    meta: "742 Evergreen Terrace · LeaseScore 785",
+    status: "Completed",
+    statusTone: "",
+    open: true,
+    bits: ["Credit 742", "Criminal clear", "Eviction none", "Income 2.6×"],
+  },
+  {
+    time: "11:30 – 11:50",
+    initials: "ER",
+    ava: "bg-[#ece8f2] text-[#3f3a4d]",
+    name: "Emily Rodriguez",
+    meta: "123 Main Street 4B · LeaseScore 820",
+    status: "Approved",
+    statusTone: "bg-ok-bg text-ok",
+    open: false,
+    bits: [],
+  },
+  {
+    time: "2:00 – 2:20",
+    initials: "JW",
+    ava: "bg-[#e8e8ec] text-[#3f3f46]",
+    name: "James Wilson",
+    meta: "742 Evergreen Terrace · LeaseScore 580",
+    status: "Declined",
+    statusTone: "bg-no-bg text-no",
+    open: false,
+    bits: [],
+  },
 ];
+
+const RAIL = ["Home", "Applications", "Payments", "Messages", "Properties"];
 
 const LOGO_CELLS = [
   "742 Evergreen",
@@ -146,7 +178,7 @@ export default function Home() {
       <div className="sticky top-0 z-50">
         <div className="flex h-9 items-center justify-center bg-dark px-11 text-center">
           <p className="text-[13px] font-medium leading-tight tracking-[-0.18px] text-white">
-            Applicant-paid packets. Landlords use the desk free.
+            Applicant-paid packets. Landlords use the desk free →
           </p>
         </div>
 
@@ -164,9 +196,9 @@ export default function Home() {
             <nav aria-label="Primary" className="hidden flex-1 items-center gap-7 md:flex">
               {[
                 { href: "#platform", label: "Platform" },
-                { href: "#packet", label: "The packet" },
+                { href: "#apply", label: "Resources" },
+                { href: "#desk", label: "Customers" },
                 { href: "#rates", label: "Pricing" },
-                { href: APPLY_HREF, label: "For renters" },
               ].map((item) => (
                 <Link
                   key={item.label}
@@ -192,10 +224,10 @@ export default function Home() {
 
       <main id="main">
         {/* Hero */}
-        <section className="relative overflow-hidden bg-paper pt-16 sm:pt-24" aria-labelledby="hero-title">
-          <div className="hero-wash pointer-events-none absolute inset-x-0 bottom-0 h-[62%]" aria-hidden />
+        <section className="relative overflow-hidden bg-paper pt-[88px]" aria-labelledby="hero-title">
+          <div className="hero-wash" aria-hidden />
 
-          <div className="relative z-10 mx-auto mb-12 max-w-[860px] px-5 text-center sm:px-8">
+          <div className="relative z-10 mx-auto mb-[52px] max-w-[860px] px-5 text-center sm:px-8">
             <Link
               href="#desk"
               className="mb-5 inline-flex h-[30px] items-center rounded-full border border-line-2 bg-paper px-3 text-[13px] font-medium tracking-[-0.18px] text-ink transition-[border-color] duration-160 ease-premium hover:border-mute-3"
@@ -210,9 +242,9 @@ export default function Home() {
               Welcome to the packet.
             </h1>
 
-            <p className="mx-auto mt-5 max-w-[34rem] text-[16px] font-medium leading-[20.8px] tracking-[-0.17px] text-mute">
-              LeaseFlow collects the application, the documents, and the credit report, then hands
-              you one sealed packet you can approve or decline.
+            <p className="mx-auto mt-[18px] max-w-[34rem] text-[16px] font-medium leading-[20.8px] tracking-[-0.17px] text-mute">
+              LeaseFlow is the screening service that collects applications, runs credit and
+              background, and hands you a LeaseScore you can approve or decline.
             </p>
 
             <div className="mt-7 flex flex-wrap justify-center gap-2.5">
@@ -225,7 +257,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Desk window */}
           <div className="relative z-10 mx-auto max-w-shell px-5 pb-20 sm:px-8" id="desk">
             <div className="overflow-hidden rounded-lg border border-line bg-paper shadow-window">
               <div className="flex h-10 items-center gap-[7px] border-b border-line bg-[#fafafa] px-3.5">
@@ -234,39 +265,40 @@ export default function Home() {
                 <span className="h-3 w-3 rounded-full bg-[#12A150]" aria-hidden />
               </div>
 
-              <div className="grid min-h-[420px] grid-cols-1 bg-paper sm:grid-cols-[196px_minmax(0,1fr)]">
+              <div className="grid min-h-[480px] grid-cols-1 bg-paper sm:grid-cols-[196px_minmax(0,1fr)]">
                 <aside className="hidden flex-col gap-0.5 border-r border-line bg-rail p-2 pt-2.5 sm:flex">
-                  <div className="mb-2 flex h-[34px] items-center rounded-md px-2.5 text-[13px] font-semibold tracking-[-0.26px] text-ink">
+                  <div className="mb-2 flex h-[34px] items-center justify-between rounded-md px-2.5 text-[13px] font-semibold tracking-[-0.26px] text-ink">
                     Evergreen desk
+                    <span className="text-mute-2" aria-hidden>
+                      ▾
+                    </span>
                   </div>
-                  {["Home", "Applications", "Payments", "Messages", "Properties"].map(
-                    (item, index) => (
-                      <span
-                        key={item}
-                        className={`flex h-[34px] items-center rounded-md px-2.5 text-[13px] font-medium ${
-                          index === 0 ? "bg-paper text-ink shadow-mini" : "text-mute"
-                        }`}
-                      >
-                        {item}
-                      </span>
-                    )
-                  )}
+                  {RAIL.map((item, index) => (
+                    <span
+                      key={item}
+                      className={`flex h-[34px] items-center rounded-md px-2.5 text-[13px] font-medium ${
+                        index === 0 ? "bg-paper text-ink shadow-[0_1px_2px_rgba(17,17,20,0.06)]" : "text-mute"
+                      }`}
+                    >
+                      {item}
+                    </span>
+                  ))}
                 </aside>
 
                 <div className="flex min-w-0 flex-col">
-                  <div className="flex h-11 items-center justify-between border-b border-line px-5 text-[13px] font-medium text-ink-2">
-                    <span>Applications</span>
-                    <span className="text-mute-2">6 total · 2 need review</span>
+                  <div className="flex h-11 items-center justify-between border-b border-line px-[22px] text-[13px] font-medium text-ink-2">
+                    <span>Home</span>
+                    <span className="text-mute-2">Help</span>
                   </div>
 
-                  <div className="min-w-0 p-6">
-                    <p className="text-[28px] font-semibold leading-[1.1] tracking-[-1.1px] text-ink">
+                  <div className="min-w-0 px-7 py-7">
+                    <p className="text-[32px] font-semibold leading-[1.1] tracking-[-0.04em] text-ink">
                       Good morning.
                     </p>
 
-                    <div className="mt-4 flex h-[52px] items-center gap-2.5 rounded-[14px] border border-line bg-[#f7f7f9] pl-4 pr-2">
+                    <div className="mt-[18px] flex h-[52px] items-center gap-2.5 rounded-[14px] border border-line bg-[#f7f7f9] pl-[18px] pr-2">
                       <span className="flex-1 truncate text-[15px] font-medium tracking-[-0.24px] text-mute-2">
-                        Ask about a packet — “who is ready to approve?”
+                        Ask about an applicant…
                       </span>
                       <span
                         aria-hidden
@@ -276,16 +308,26 @@ export default function Home() {
                       </span>
                     </div>
 
-                    <p className="mt-6 text-[12px] font-medium text-mute-2">Completed packets</p>
-                    <ul className="mt-2.5 space-y-2">
-                      {DESK_ROWS.map((row) => (
-                        <li key={row.name} className="grid grid-cols-[76px_minmax(0,1fr)] gap-3">
+                    <p className="mt-7 text-[12px] font-medium text-mute-2">Upcoming reviews</p>
+                    <ol className="mt-2.5 space-y-2">
+                      {REVIEWS.map((row) => (
+                        <li key={row.name} className="grid grid-cols-[92px_minmax(0,1fr)] gap-3">
                           <span className="num pt-3.5 text-[12px] font-medium text-mute-2">
                             {row.time}
                           </span>
-                          <div className="rounded-lg border border-line bg-paper px-3.5 py-2.5">
-                            <div className="flex items-center justify-between gap-3">
-                              <div className="min-w-0">
+                          <article
+                            className={`rounded-lg border border-line bg-paper px-3.5 py-2.5 ${
+                              row.open ? "shadow-[0_1px_2px_rgba(17,17,20,0.04)]" : ""
+                            }`}
+                          >
+                            <div className="flex items-center gap-2.5">
+                              <span
+                                aria-hidden
+                                className={`flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full text-[9.5px] font-bold tracking-[-0.02em] ${row.ava}`}
+                              >
+                                {row.initials}
+                              </span>
+                              <div className="min-w-0 flex-1">
                                 <p className="truncate text-[13.5px] font-semibold tracking-[-0.27px] text-ink">
                                   {row.name}
                                 </p>
@@ -293,14 +335,25 @@ export default function Home() {
                                   {row.meta}
                                 </p>
                               </div>
-                              <span className="num shrink-0 rounded-md bg-mist px-2 py-1 text-[12px] font-semibold text-ink">
-                                {row.score}
+                              <span
+                                className={`inline-flex h-[22px] shrink-0 items-center rounded-full px-2 text-[12px] font-medium ${
+                                  row.statusTone || "bg-[#f3f3f5] text-ink-2"
+                                }`}
+                              >
+                                {row.status}
                               </span>
                             </div>
-                          </div>
+                            {row.open && row.bits.length > 0 && (
+                              <div className="mt-2.5 ml-9 flex flex-wrap gap-x-3.5 gap-y-2 border-t border-line pt-2.5 text-[12px] font-medium text-mute">
+                                {row.bits.map((bit) => (
+                                  <span key={bit}>{bit}</span>
+                                ))}
+                              </div>
+                            )}
+                          </article>
                         </li>
                       ))}
-                    </ul>
+                    </ol>
                   </div>
                 </div>
               </div>
@@ -309,7 +362,7 @@ export default function Home() {
         </section>
 
         {/* Hairline cell band */}
-        <section aria-label="Listings and packet slices" className="border-y border-line">
+        <section aria-label="Listings and packet slices" className="border-y border-line bg-mist">
           <div className="mx-auto max-w-shell px-5 sm:px-8">
             <ul className="grid grid-cols-3 sm:grid-cols-5">
               {LOGO_CELLS.map((cell, index) => (
@@ -329,13 +382,16 @@ export default function Home() {
         </section>
 
         {/* Platform */}
-        <section id="platform" className="py-16 sm:py-24" aria-labelledby="platform-title">
+        <section id="platform" className="bg-mist py-16 sm:py-28" aria-labelledby="platform-title">
           <div className="mx-auto max-w-shell px-5 sm:px-8">
+            <p className="mb-[18px] inline-flex h-6 items-center rounded-full bg-blue-soft px-2.5 text-[13px] font-medium tracking-[-0.16px] text-blue">
+              Platform
+            </p>
             <Headline
               id="platform-title"
               lead="The desk that never loses a file."
               tone="Applicants pay. The packet lands scored. You approve or decline."
-              className="max-w-3xl"
+              className="max-w-[28ch]"
             />
 
             <div className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -382,11 +438,12 @@ export default function Home() {
         {/* Packet slices */}
         <section id="packet" className="border-t border-line bg-mist py-16 sm:py-24" aria-labelledby="packet-title">
           <div className="mx-auto max-w-shell px-5 sm:px-8">
+            <p className="mb-3.5 text-[13px] font-medium tracking-[-0.13px] text-mute">The file</p>
             <Headline
               id="packet-title"
               lead="Everything in the packet."
-              tone="Four slices of the same sealed file, read on the desk instead of across tabs."
-              className="max-w-3xl"
+              tone="Four slices of the same sealed file. Read them on the desk, not across tabs."
+              className="max-w-[22ch]"
             />
 
             <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -427,22 +484,22 @@ export default function Home() {
               className="max-w-[22ch]"
             />
 
-            <div className="mt-10 grid grid-cols-1 border-t border-line sm:grid-cols-2">
-              <article className="pt-7 sm:pr-12">
-                <p className="text-[14px] font-medium text-mute">Standard</p>
-                <p className="num mt-2 text-[40px] font-medium leading-[44px] tracking-[-0.4px] text-ink">
+            <div className="mt-14 grid grid-cols-1 border-t border-line sm:grid-cols-2">
+              <article className="pt-7">
+                <p className="mb-2 text-[14px] font-medium text-mute">Standard</p>
+                <p className="num mb-3 text-[40px] font-medium leading-[44px] tracking-[-0.4px] text-ink">
                   $39.99
                 </p>
-                <p className="mt-3 max-w-[32ch] text-[15px] font-medium leading-[1.5] text-mute">
+                <p className="max-w-[32ch] text-[15px] font-medium leading-[1.5] text-mute">
                   Credit, criminal, and eviction, sealed into the packet with a LeaseScore.
                 </p>
               </article>
-              <article className="border-t border-line pt-7 sm:border-l sm:border-t-0 sm:pl-12">
-                <p className="text-[14px] font-medium text-mute">Premium</p>
-                <p className="num mt-2 text-[40px] font-medium leading-[44px] tracking-[-0.4px] text-ink">
+              <article className="border-t border-line pt-7 sm:ml-12 sm:border-l sm:border-t-0 sm:pl-12">
+                <p className="mb-2 text-[14px] font-medium text-mute">Premium</p>
+                <p className="num mb-3 text-[40px] font-medium leading-[44px] tracking-[-0.4px] text-ink">
                   $59.99
                 </p>
-                <p className="mt-3 max-w-[32ch] text-[15px] font-medium leading-[1.5] text-mute">
+                <p className="max-w-[32ch] text-[15px] font-medium leading-[1.5] text-mute">
                   Standard plus income. Employer, stated pay, and rent multiple on the same file.
                 </p>
               </article>
@@ -451,7 +508,7 @@ export default function Home() {
         </section>
 
         {/* Renter strip */}
-        <section className="border-t border-line py-14" aria-labelledby="apply-title">
+        <section id="apply" className="border-t border-line py-14" aria-labelledby="apply-title">
           <div className="mx-auto flex max-w-shell flex-col gap-5 px-5 sm:px-8 md:flex-row md:items-center md:justify-between">
             <div>
               <p className="text-[13px] font-medium tracking-[-0.13px] text-mute">

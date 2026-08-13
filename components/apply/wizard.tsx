@@ -134,14 +134,14 @@ export function ApplyWizard({ property }: { property: Property }) {
   const errorCount = Object.keys(errors).length;
 
   return (
-    <div className="relative min-h-screen print:bg-white">
+    <div className="relative min-h-screen bg-paper print:bg-white">
       <PageWash />
 
       <a href="#apply-step" className="skip-link">
         Skip to the current step
       </a>
 
-      <header className="sticky top-0 z-40 border-b border-line bg-paper/40 backdrop-blur-md print:hidden">
+      <header className="sticky top-0 z-40 border-b border-line bg-paper/95 backdrop-blur print:hidden">
         <div className="relative z-10 mx-auto flex h-16 max-w-shell items-center gap-4 px-5 sm:px-8">
           <Link
             href="/"

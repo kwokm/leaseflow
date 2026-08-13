@@ -55,7 +55,7 @@
 
   body {
     min-width: 320px;
-    background: var(--wash);
+    background: var(--paper);
     color: var(--ink);
     /* Body 16/22/500, letter-spacing -0.16px */
     font-size: 16px;
@@ -101,8 +101,14 @@
     font-feature-settings: "tnum" 1;
   }
 
-  /* The hero wash from the reference: radial bloom, hairline rules, white fade. */
+  /* Ported 1:1 from design/attio-inspired/styles.css — do not invent a second bloom. */
   .hero-wash {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 62%;
+    pointer-events: none;
     background: radial-gradient(
       90% 80% at 50% 100%,
       var(--wash) 0%,
@@ -127,57 +133,6 @@
     position: absolute;
     inset: 0;
     background: radial-gradient(70% 110% at 50% 0%, #ffffff 28%, rgba(255, 255, 255, 0) 68%);
-  }
-
-  /*
-   * Apply / renter chrome. The field is --wash so the page is never gray.
-   * The bloom is the same layer as the landing hero: bottom 74%, radial
-   * 90% 80% at 50% 100%, pinstripes, white fade only at the top of the bloom.
-   */
-  .page-wash {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    overflow: hidden;
-    background: var(--wash);
-  }
-
-  .page-wash-bloom {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 88%;
-    background: radial-gradient(
-      90% 80% at 50% 100%,
-      var(--wash) 0%,
-      var(--wash-mid) 45%,
-      var(--wash-deep) 100%
-    );
-  }
-
-  .page-wash-bloom::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-image: repeating-linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0.78) 0 1px,
-      transparent 1px 12px
-    );
-  }
-
-  .page-wash-bloom::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(70% 90% at 50% 0%, #ffffff 10%, rgba(255, 255, 255, 0) 52%);
-  }
-
-  .page-wash-quiet .page-wash-bloom {
-    height: 58%;
-    opacity: 0.72;
   }
 
   .skip-link {

@@ -10,7 +10,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <div className="relative min-h-screen print:bg-white">
       <PageWash quiet />
       {/* Header */}
-      <header className="relative z-50 border-b border-line bg-paper/80 backdrop-blur-md sticky top-0 print:hidden">
+      <header className="relative z-50 border-b border-line bg-paper/95 backdrop-blur sticky top-0 print:hidden">
         <div className="flex items-center justify-between px-6 py-4">
           <Link href="/dashboard" className="flex items-center gap-2.5 text-ink">
             <BrandMark />

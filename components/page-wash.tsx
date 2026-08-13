@@ -1,9 +1,8 @@
 import { cn } from "@/lib/utils";
 
 /**
- * Lavender page wash ported from design/attio-inspired/styles.css.
- * Same bloom as the landing hero: radial at the bottom, pinstripes, white fade
- * only at the top of the bloom. The field above stays --wash, never gray.
+ * The locked hero wash, reused. White paper field + the same 62% bottom bloom
+ * as design/attio-inspired `.hero-wash`. No second palette.
  */
 export function PageWash({
   quiet = false,
@@ -14,10 +13,13 @@ export function PageWash({
 }) {
   return (
     <div
-      className={cn("page-wash print:hidden", quiet && "page-wash-quiet", className)}
+      className={cn(
+        "pointer-events-none fixed inset-0 z-0 overflow-hidden bg-paper print:hidden",
+        className
+      )}
       aria-hidden
     >
-      <div className="page-wash-bloom" />
+      <div className={cn("hero-wash", quiet && "opacity-70")} />
     </div>
   );
 }
