@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { Check, Loader2, Lock, RotateCcw, ShieldCheck } from "lucide-react";
+import { Check, Loader2, RotateCcw, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FieldError } from "@/components/apply/field";
 import { StepBody } from "@/components/apply/motion";
@@ -120,20 +120,9 @@ function DemoAuthorizationDialog({
         exit={{ opacity: 0, y: 8 }}
         transition={{ duration: DURATION.step, ease: EASE_OUT }}
       >
-        {/* Browser-style chrome, labelled as a demo throughout */}
-        <div className="flex items-center gap-2 border-b border-line bg-mist px-3 py-2.5">
-          <span className="flex gap-1.5" aria-hidden>
-            <span className="h-2.5 w-2.5 rounded-full bg-[#E15C6B]" />
-            <span className="h-2.5 w-2.5 rounded-full bg-[#F5B400]" />
-            <span className="h-2.5 w-2.5 rounded-full bg-[#12A150]" />
-          </span>
-          <span className="ml-1 flex min-w-0 flex-1 items-center gap-1.5 rounded-md border border-line bg-paper px-2 py-1 text-[12px] font-medium text-mute">
-            <Lock className="h-3 w-3 shrink-0" aria-hidden />
-            <span className="truncate">experian-demo.leaseflow.local</span>
-          </span>
-          <span className="shrink-0 rounded-md bg-blue-soft px-2 py-1 text-[12px] font-medium text-blue">
-            Experian (demo)
-          </span>
+        <div className="card-head">
+          <span className="card-head-title">Experian (demo)</span>
+          <span className="card-head-meta">Does not affect your score</span>
         </div>
 
         <div className="p-5">

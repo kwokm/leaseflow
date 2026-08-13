@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-/** Locked product window from design/attio-inspired `.window` / `.window-bar`. */
+/** Screenshot card: title left, meta right, hairline under. No traffic lights. */
 export function PacketWindow({
   title,
   meta,
@@ -14,12 +14,9 @@ export function PacketWindow({
 }) {
   return (
     <section className={cn("window", className)}>
-      <div className="window-bar">
-        <span className="tl tl-r" aria-hidden />
-        <span className="tl tl-y" aria-hidden />
-        <span className="tl tl-g" aria-hidden />
-        <span className="desk-chrome-title ml-1 min-w-0 flex-1 truncate">{title}</span>
-        {meta ? <span className="desk-chrome-meta shrink-0">{meta}</span> : null}
+      <div className="card-head">
+        <span className="card-head-title">{title}</span>
+        {meta ? <span className="card-head-meta">{meta}</span> : null}
       </div>
       {children}
     </section>

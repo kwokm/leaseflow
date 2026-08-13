@@ -125,10 +125,10 @@ export default function Home() {
                 <DeskSidebar staticActive="Applications" />
                 <div className="min-w-0">
                   <DeskToolbar meta="3 in queue">
-                    <DeskPill>All properties</DeskPill>
-                    <DeskPill active>Received</DeskPill>
+                    <DeskPill active>All properties</DeskPill>
+                    <DeskPill>Received</DeskPill>
                   </DeskToolbar>
-                  <ApplicationTable rows={heroRows} packetLinks />
+                  <ApplicationTable rows={heroRows} packetLinks selectedId="app-1" />
                 </div>
               </div>
             </PacketWindow>

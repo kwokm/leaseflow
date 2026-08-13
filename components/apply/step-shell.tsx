@@ -24,16 +24,11 @@ export function StepHeading({ lead, tone }: { lead: string; tone: string }) {
   );
 }
 
-/** macOS-style bar — same traffic lights as the locked landing window. */
+/** Nested card head — title only, no traffic lights. */
 export function WindowChrome({ label }: { label?: string }) {
   return (
-    <div className="flex h-10 items-center gap-[7px] border-b border-line bg-[#fafafa] px-3.5">
-      <span className="h-3 w-3 rounded-full bg-[#E15C6B]" aria-hidden />
-      <span className="h-3 w-3 rounded-full bg-[#F5B400]" aria-hidden />
-      <span className="h-3 w-3 rounded-full bg-[#12A150]" aria-hidden />
-      {label && (
-        <span className="ml-1 truncate text-[12px] font-medium text-mute">{label}</span>
-      )}
+    <div className="card-head">
+      {label ? <span className="card-head-title">{label}</span> : null}
     </div>
   );
 }

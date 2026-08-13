@@ -2,14 +2,12 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { motion, useReducedMotion } from "motion/react";
-import { ArrowLeft, ArrowRight, Check, Lock } from "lucide-react";
+import { ArrowLeft, ArrowRight, Lock } from "lucide-react";
 import { BrandMark, BrandWord } from "@/components/brand";
 import { PacketWindow } from "@/components/desk/packet-window";
 import { PageWash } from "@/components/page-wash";
 import { Button } from "@/components/ui/button";
 import { shortAddress } from "@/lib/desk/display";
-import { Progress } from "@/components/ui/progress";
 import { StepStart } from "@/components/apply/step-start";
 import { StepYou } from "@/components/apply/step-you";
 import { StepBank, StepIncome, StepPhotoId } from "@/components/apply/step-uploads";
@@ -19,7 +17,6 @@ import { StepReview } from "@/components/apply/step-review";
 import { StepDone } from "@/components/apply/step-done";
 import { StepTransition } from "@/components/apply/motion";
 import type { StepProps } from "@/components/apply/step-shell";
-import { DURATION, EASE_OUT } from "@/lib/apply/motion";
 import { clearDraft, loadDraft, saveDraft, saveSubmission } from "@/lib/apply/storage";
 import { APPLY_STEPS, TOTAL_STEPS, createDemoState, type ApplyState } from "@/lib/apply/types";
 import type { StepErrors } from "@/lib/apply/validate";
@@ -55,7 +52,6 @@ export function ApplyWizard({ property }: { property: Property }) {
   const [hydrated, setHydrated] = React.useState(false);
   const [direction, setDirection] = React.useState(1);
   const headingRef = React.useRef<HTMLDivElement>(null);
-  const reduced = useReducedMotion();
 
   // Draft lives in localStorage; load it once the component is on the client.
   React.useEffect(() => {
@@ -72,7 +68,6 @@ export function ApplyWizard({ property }: { property: Property }) {
   }, []);
 
   const step = state.step;
-  const definition = APPLY_STEPS[step - 1];
   const StepComponent = STEP_COMPONENTS[step];
 
   const moveTo = React.useCallback((next: number) => {
@@ -129,7 +124,6 @@ export function ApplyWizard({ property }: { property: Property }) {
     moveTo(target);
   };
 
-  const progress = Math.round((step / TOTAL_STEPS) * 100);
   const errorCount = Object.keys(errors).length;
 
   return (
@@ -155,78 +149,30 @@ export function ApplyWizard({ property }: { property: Property }) {
             Saved in this browser
           </p>
         </div>
-
-        <div className="relative z-10 border-t border-line">
-          <div className="mx-auto max-w-shell px-5 py-3 sm:px-8">
-            <div className="flex items-baseline justify-between gap-4">
-              <p className="text-[13px] font-medium tracking-[-0.13px] text-ink-2">
-                <span className="num">
-                  Step {step} of {TOTAL_STEPS}
-                </span>
-                <span className="tone"> · {definition.name}</span>
-              </p>
-              <p className="num text-[13px] font-medium text-mute">{progress}%</p>
-            </div>
-            <Progress
-              value={progress}
-              className="mt-2"
-              aria-label={`Application progress: step ${step} of ${TOTAL_STEPS}`}
-            />
-          </div>
-        </div>
       </header>
 
       <div className="relative z-10 mx-auto max-w-shell px-5 py-8 sm:px-8 lg:py-12">
         <PacketWindow
           title={`Application packet • ${shortAddress(property.address)}`}
-          meta={`Desk • step ${step} of ${TOTAL_STEPS}`}
+          meta="Desk • 3 files"
         >
           <div className="desk apply-desk">
         <nav aria-label="Application steps" className="desk-rail print:hidden">
-          <ol className="space-y-0.5">
-            {APPLY_STEPS.map((entry) => {
-              const done = entry.id < step;
-              const current = entry.id === step;
+          {APPLY_STEPS.map((entry) => {
+            const current = entry.id === step;
 
-              return (
-                <li key={entry.id}>
-                  <button
-                    type="button"
-                    aria-current={current ? "step" : undefined}
-                    onClick={() => goTo(entry.id)}
-                    className={cn(
-                      "relative flex min-h-[44px] w-full items-center gap-2.5 rounded-md px-2.5 text-left text-[13px] font-medium tracking-[-0.13px] transition-[color,background-color] duration-200 ease-premium",
-                      current ? "text-ink" : "text-mute hover:text-ink"
-                    )}
-                  >
-                    {current && !reduced && (
-                      <motion.span
-                        layoutId="apply-step-pill"
-                        className="absolute inset-0 rounded-md bg-paper shadow-mini"
-                        transition={{ duration: DURATION.step, ease: EASE_OUT }}
-                        aria-hidden
-                      />
-                    )}
-                    {current && reduced && (
-                      <span className="absolute inset-0 rounded-md bg-paper shadow-mini" aria-hidden />
-                    )}
-                    <span
-                      aria-hidden
-                      className={cn(
-                        "relative num flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[11px] transition-[background-color,border-color,color] duration-200 ease-premium",
-                        done && "border-ink bg-ink text-paper",
-                        current && !done && "border-ink text-ink",
-                        !done && !current && "border-line-2 text-mute-2"
-                      )}
-                    >
-                      {done ? <Check className="h-3 w-3" strokeWidth={3} /> : entry.id}
-                    </span>
-                    <span className="relative">{entry.name}</span>
-                  </button>
-                </li>
-              );
-            })}
-          </ol>
+            return (
+              <button
+                key={entry.id}
+                type="button"
+                aria-current={current ? "step" : undefined}
+                onClick={() => goTo(entry.id)}
+                className={cn("rail-item", current && "is-active")}
+              >
+                {entry.name}
+              </button>
+            );
+          })}
         </nav>
 
         <main id="apply-step" className="min-w-0 px-5 py-6 sm:px-8 sm:py-8">

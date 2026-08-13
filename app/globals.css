@@ -197,31 +197,33 @@
     overflow: hidden;
   }
 
-  .window-bar {
+  .card-head {
     display: flex;
     align-items: center;
-    gap: 7px;
-    height: 40px;
-    padding: 0 14px;
-    background: #fafafa;
+    justify-content: space-between;
+    gap: 16px;
+    min-height: 48px;
+    padding: 0 22px;
+    background: #fff;
     border-bottom: 1px solid var(--line);
   }
 
-  .tl {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    flex-shrink: 0;
+  .card-head-title {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-2);
+    letter-spacing: -0.02em;
   }
 
-  .tl-r {
-    background: #e15c6b;
-  }
-  .tl-y {
-    background: #f5b400;
-  }
-  .tl-g {
-    background: #12a150;
+  .card-head-meta {
+    flex-shrink: 0;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--mute-2);
   }
 
   .desk {
@@ -232,9 +234,9 @@
   }
 
   .desk-rail {
-    background: var(--rail);
+    background: #fff;
     border-right: 1px solid var(--line);
-    padding: 10px 8px 16px;
+    padding: 16px 12px 20px;
     display: flex;
     flex-direction: column;
     gap: 2px;
@@ -264,9 +266,9 @@
   }
 
   .rail-item.is-active {
-    background: #fff;
+    background: #f3f3f5;
     color: var(--ink);
-    box-shadow: 0 1px 2px rgba(17, 17, 20, 0.06);
+    box-shadow: none;
   }
 
   .desk-chrome {
@@ -274,10 +276,10 @@
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    height: 44px;
-    padding: 0 16px;
+    min-height: 48px;
+    padding: 10px 22px;
     border-bottom: 1px solid var(--line);
-    background: #fbfbfc;
+    background: #fff;
   }
 
   .desk-chrome-title {
@@ -344,11 +346,11 @@
   }
 
   .app-table tr.is-selected {
-    background: #f4f7ff;
+    background: #f4f0f8;
   }
 
   .app-table tr.is-selected:hover {
-    background: #eef3ff;
+    background: #f0ecf8;
   }
 
   .app-table .num,

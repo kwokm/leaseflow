@@ -2,10 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { Applicant, ApplicationStatus } from "@/lib/data/mock-data";
-import { getAllApplications, getPropertyById, mockProperties } from "@/lib/data/mock-data";
+import { getAllApplications } from "@/lib/data/mock-data";
 import { loadSubmissions } from "@/lib/apply/storage";
 import { submissionApplicant } from "@/lib/apply/to-packet";
-import { shortAddress, sortDeskFirst } from "@/lib/desk/display";
+import { sortDeskFirst } from "@/lib/desk/display";
 import { ApplicationTable } from "@/components/desk/application-table";
 import { DeskPill, DeskToolbar } from "@/components/desk/packet-window";
 
@@ -14,7 +14,7 @@ type StatusFilter = "all" | "received" | ApplicationStatus;
 
 export function ApplicationDesk({
   propertyId,
-  extras = true,
+  extras = false,
   chrome = true,
 }: {
   propertyId?: string;
@@ -48,33 +48,18 @@ export function ApplicationDesk({
     <>
       {chrome ? (
       <DeskToolbar meta={`${scoped.length} in queue`}>
-        {!propertyId && (
-          <>
-            <DeskPill active={propertyFilter === "all"} onClick={() => setPropertyFilter("all")}>
-              All properties
-            </DeskPill>
-            {mockProperties.map((property) => (
-              <DeskPill
-                key={property.id}
-                active={propertyFilter === property.id}
-                onClick={() => setPropertyFilter(property.id)}
-              >
-                {shortAddress(property.address)}
-              </DeskPill>
-            ))}
-          </>
-        )}
-        {propertyId && (
-          <DeskPill active>
-            {shortAddress(getPropertyById(propertyId)?.address ?? "Listing")}
-          </DeskPill>
-        )}
-        <DeskPill active={statusFilter === "all"} onClick={() => setStatusFilter("all")}>
-          All
+        <DeskPill
+          active={propertyFilter === "all" && !propertyId}
+          onClick={() => {
+            setPropertyFilter("all");
+            setStatusFilter("all");
+          }}
+        >
+          All properties
         </DeskPill>
         <DeskPill
           active={statusFilter === "received"}
-          onClick={() => setStatusFilter("received")}
+          onClick={() => setStatusFilter(statusFilter === "received" ? "all" : "received")}
         >
           Received
         </DeskPill>
@@ -84,6 +69,7 @@ export function ApplicationDesk({
         rows={scoped}
         showExtras={extras}
         packetLinks
+        selectedId={scoped[0]?.id}
       />
     </>
   );
