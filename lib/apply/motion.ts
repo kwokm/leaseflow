@@ -1,39 +1,52 @@
 /**
- * Apply-flow motion tokens. Quiet and expensive — no springs, no bounce.
- * Aligns with design/animations-rules.md.
+ * Apply-flow motion tokens. Claude Steep set — opacity and transform only.
+ * Aligns with design/animations-rules-claude.md.
  */
-import { durationInteraction, easeReveal, easeSpatial } from "@/lib/motion/tokens";
+import {
+  durationEnter,
+  durationExit,
+  durationFast,
+  durationInstant,
+  durationSlow,
+  easeDefault,
+  easeOut,
+  easePower3,
+  shiftLg,
+  shiftXl,
+  staggerCap,
+  staggerLoose,
+} from "@/lib/motion/tokens";
 
-export const EASE_OUT = easeReveal;
-export const EASE_IN_OUT = easeSpatial;
+export const EASE_OUT = easeOut;
+export const EASE_DEFAULT = easeDefault;
+export const EASE_POWER3 = easePower3;
 
 export const DURATION = {
-  micro: 0.16,
-  ui: durationInteraction,
-  step: 0.55,
-  exit: 0.28,
-  reveal: 0.7,
+  instant: durationInstant,
+  ui: durationFast,
+  step: durationSlow,
+  exit: durationExit,
+  enter: durationEnter,
+  reveal: durationSlow,
 } as const;
 
-export const STAGGER = 0.12;
+export const STAGGER = staggerLoose;
+export const STAGGER_CAP = staggerCap;
 
 export const stepSlide = {
   enter: {
     opacity: 0,
-    scale: 0.9,
-    y: 20,
+    y: shiftXl,
   },
   center: {
     opacity: 1,
-    scale: 1,
     y: 0,
-    transition: { duration: DURATION.step, ease: easeSpatial },
+    transition: { duration: DURATION.step, ease: easePower3 },
   },
   leave: {
     opacity: 0,
-    scale: 0.96,
-    y: 8,
-    transition: { duration: DURATION.exit, ease: easeSpatial },
+    y: shiftLg,
+    transition: { duration: DURATION.exit, ease: easeDefault },
   },
 };
 
@@ -42,25 +55,28 @@ export const staggerContainer = {
   show: {
     transition: {
       staggerChildren: STAGGER,
-      delayChildren: 0.04,
     },
   },
 };
 
 export const staggerItem = {
-  hidden: { opacity: 0, y: 30 },
-  show: {
+  hidden: { opacity: 0, y: shiftLg },
+  show: (index = 0) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: DURATION.step, ease: EASE_OUT },
-  },
+    transition: {
+      duration: DURATION.step,
+      ease: easePower3,
+      delay: (index % STAGGER_CAP) * STAGGER,
+    },
+  }),
 };
 
 export const appear = {
-  hidden: { opacity: 0, y: 6 },
+  hidden: { opacity: 0, y: 10 },
   show: {
     opacity: 1,
     y: 0,
-    transition: { duration: DURATION.ui, ease: EASE_OUT },
+    transition: { duration: DURATION.ui, ease: easeOut },
   },
 };

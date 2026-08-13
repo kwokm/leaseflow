@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { RevealRoot } from "@/components/motion/reveal-root";
 import "./globals.css";
 
 // Variable Inter so the optical-size axis (14–32) is available to headings.
@@ -22,7 +23,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={inter.variable}>
-      <body className="font-sans antialiased">{children}</body>
+      <body className="font-sans antialiased">
+        <RevealRoot />
+        {children}
+      </body>
     </html>
   );
 }

@@ -8,7 +8,7 @@ import { FieldError } from "@/components/apply/field";
 import { StepBody } from "@/components/apply/motion";
 import { Note, StepHeading, SummaryRow, WindowPanel } from "@/components/apply/step-shell";
 import type { StepProps } from "@/components/apply/step-shell";
-import { DURATION, EASE_OUT } from "@/lib/apply/motion";
+import { DURATION, EASE_DEFAULT, EASE_OUT, EASE_POWER3 } from "@/lib/apply/motion";
 import { buildMockExperianPull, scoreBand } from "@/lib/apply/experian-mock";
 import { formatDateTime } from "@/lib/apply/format";
 import { cn } from "@/lib/utils";
@@ -106,8 +106,8 @@ function DemoAuthorizationDialog({
       className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 p-0 sm:items-center sm:p-6"
       initial={reduced ? false : { opacity: 0 }}
       animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: DURATION.ui, ease: EASE_OUT }}
+      exit={{ opacity: 0, transition: { duration: DURATION.exit, ease: EASE_DEFAULT } }}
+      transition={{ duration: reduced ? 0.01 : DURATION.enter, ease: EASE_OUT }}
     >
       <motion.div
         ref={dialogRef}
@@ -115,10 +115,17 @@ function DemoAuthorizationDialog({
         aria-modal="true"
         aria-labelledby="experian-demo-title"
         className="w-full max-w-lg overflow-hidden rounded-t-lg border border-line bg-paper shadow-window sm:rounded-lg"
-        initial={reduced ? false : { opacity: 0, y: 12 }}
+        initial={reduced ? false : { opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: 8 }}
-        transition={{ duration: DURATION.step, ease: EASE_OUT }}
+        exit={{
+          opacity: 0,
+          y: 15,
+          transition: { duration: DURATION.exit, ease: EASE_DEFAULT },
+        }}
+        transition={{
+          duration: reduced ? 0.01 : DURATION.enter,
+          ease: EASE_POWER3,
+        }}
       >
         <div className="card-head">
           <span className="card-head-title">Experian (demo)</span>
@@ -179,9 +186,9 @@ function ScoreReveal({ score }: { score: number }) {
   return (
     <motion.div
       className="num mt-5 text-[64px] font-semibold leading-none tracking-[-2px] text-ink"
-      initial={reduced ? false : { opacity: 0, y: 10 }}
+      initial={reduced ? false : { opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: DURATION.reveal, ease: EASE_OUT, delay: 0.2 }}
+      transition={{ duration: DURATION.reveal, ease: EASE_POWER3, delay: 0.15 }}
     >
       {displayed}
     </motion.div>
@@ -252,9 +259,9 @@ export function StepCredit({ state, patch, errors }: StepProps) {
 
             <motion.dl
               className="w-full max-w-xs shrink-0"
-              initial={reduced ? false : { opacity: 0, y: 6 }}
+              initial={reduced ? false : { opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: DURATION.step, ease: EASE_OUT, delay: 0.36 }}
+              transition={{ duration: DURATION.step, ease: EASE_POWER3, delay: 0.15 }}
             >
               <SummaryRow label="On-time payments" value={`${experian.onTimePaymentRate}%`} />
               <SummaryRow label="Open accounts" value={experian.openAccounts} />
@@ -271,7 +278,7 @@ export function StepCredit({ state, patch, errors }: StepProps) {
               className="mt-5 space-y-2 border-t border-line pt-4"
               initial={reduced ? false : { opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: DURATION.ui, ease: EASE_OUT, delay: 0.48 }}
+              transition={{ duration: DURATION.enter, ease: EASE_OUT, delay: 0.3 }}
             >
               {experian.factors.map((factor) => (
                 <li
@@ -314,7 +321,7 @@ export function StepCredit({ state, patch, errors }: StepProps) {
           </div>
           <div className="relative mt-5 h-1 overflow-hidden rounded-full bg-line">
             <div
-              className="h-full bg-ink transition-transform duration-240 ease-premium"
+              className="h-full bg-ink transition-transform duration-200 ease-out"
               style={{ transform: `translateX(-${100 - pullProgress}%)` }}
             />
           </div>
@@ -323,14 +330,14 @@ export function StepCredit({ state, patch, errors }: StepProps) {
               <li
                 key={label}
                 className={cn(
-                  "flex min-h-[44px] items-center gap-2.5 text-[14px] font-medium tracking-[-0.14px] transition-colors duration-200 ease-premium",
+                  "flex min-h-[44px] items-center gap-2.5 text-[14px] font-medium tracking-[-0.14px] transition-opacity duration-200 ease-out",
                   index < stage ? "text-ink-2" : index === stage ? "text-ink" : "text-mute-2"
                 )}
               >
                 <span
                   aria-hidden
                   className={cn(
-                    "flex h-5 w-5 items-center justify-center rounded-full border transition-[background-color,border-color,color] duration-200 ease-premium",
+                    "flex h-5 w-5 items-center justify-center rounded-full border",
                     index < stage
                       ? "border-ok bg-ok text-paper"
                       : index === stage

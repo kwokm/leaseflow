@@ -6,7 +6,7 @@ import {
   appear,
   DURATION,
   EASE_OUT,
-  staggerContainer,
+  STAGGER_CAP,
   staggerItem,
   stepSlide,
 } from "@/lib/apply/motion";
@@ -27,7 +27,7 @@ export function StepTransition({
         key={step}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.1 }}
+        transition={{ duration: 0.01 }}
       >
         {children}
       </motion.div>
@@ -49,7 +49,7 @@ export function StepTransition({
   );
 }
 
-/** Staggers direct children on step enter. The wrapper itself does not fade. */
+/** Staggers direct children on step enter. Cap 8 so late fields do not wait. */
 export function StepBody({ children }: { children: React.ReactNode }) {
   const reduced = useReducedMotion();
 
@@ -58,18 +58,19 @@ export function StepBody({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <motion.div
-      className="space-y-5"
-      variants={staggerContainer}
-      initial="hidden"
-      animate="show"
-    >
+    <div className="space-y-5">
       {React.Children.map(children, (child, index) => (
-        <motion.div key={index} variants={staggerItem}>
+        <motion.div
+          key={index}
+          initial="hidden"
+          animate="show"
+          custom={index % STAGGER_CAP}
+          variants={staggerItem}
+        >
           {child}
         </motion.div>
       ))}
-    </motion.div>
+    </div>
   );
 }
 

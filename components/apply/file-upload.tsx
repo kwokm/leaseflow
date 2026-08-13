@@ -71,7 +71,7 @@ function FileRow({
   const reduced = useReducedMotion();
 
   const row = (
-    <div className="flex items-center gap-3 rounded-btn border border-line bg-paper p-2.5 transition-[border-color,box-shadow] duration-200 ease-premium">
+    <div className="flex items-center gap-3 rounded-btn border border-line bg-paper p-2.5">
       <FilePreview file={file} />
       <div className="min-w-0 flex-1">
         <p className="truncate text-[14px] font-medium tracking-[-0.14px] text-ink">{file.name}</p>
@@ -108,7 +108,7 @@ function FileRow({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 6 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: DURATION.ui, ease: EASE_OUT }}
     >
@@ -193,14 +193,13 @@ export function FileSlot({ id, label, hint, error, file, onChange }: FileSlotPro
           }}
           aria-describedby={errorId}
           className={cn(
-            "flex min-h-[128px] w-full flex-col items-center justify-center gap-2 rounded-btn border border-dashed bg-mist px-4 py-5 text-center",
-            "transition-[background-color,border-color] duration-200 ease-premium",
+            "group flex min-h-[128px] w-full flex-col items-center justify-center gap-2 rounded-btn border border-dashed bg-mist px-4 py-5 text-center",
+            "transition-opacity duration-200 ease-out hover:opacity-90",
             error ? "border-no" : "border-line-2",
-            "hover:border-mute-3 hover:bg-rail",
             drop.over && "border-ink bg-wash"
           )}
         >
-          <Upload className="h-5 w-5 text-mute" />
+          <Upload className="h-5 w-5 text-mute transition-transform duration-200 ease-out group-hover:scale-110" />
           <span className="text-[14px] font-medium tracking-[-0.14px] text-ink-2">
             {drop.over ? "Drop to add" : `Add ${label.toLowerCase()}`}
           </span>
@@ -283,14 +282,13 @@ export function FileStack({ id, label, hint, error, files, max, onChange }: File
             }}
             aria-describedby={errorId}
             className={cn(
-              "flex min-h-[56px] w-full items-center justify-center gap-2 rounded-btn border border-dashed bg-mist px-4 text-[14px] font-medium tracking-[-0.14px] text-ink-2",
-              "transition-[background-color,border-color] duration-200 ease-premium",
+              "group flex min-h-[56px] w-full items-center justify-center gap-2 rounded-btn border border-dashed bg-mist px-4 text-[14px] font-medium tracking-[-0.14px] text-ink-2",
+              "transition-opacity duration-200 ease-out hover:opacity-90",
               error ? "border-no" : "border-line-2",
-              "hover:border-mute-3 hover:bg-rail",
               drop.over && "border-ink bg-wash"
             )}
           >
-            <Plus className="h-4 w-4 text-mute" />
+            <Plus className="h-4 w-4 text-mute transition-transform duration-200 ease-out group-hover:scale-110" />
             {drop.over ? "Drop to add" : "Add file"}
             <span className="text-mute">· JPG, PNG, or PDF</span>
           </button>

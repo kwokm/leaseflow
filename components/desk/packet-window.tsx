@@ -13,13 +13,15 @@ export function PacketWindow({
   className?: string;
 }) {
   return (
-    <section className={cn("window", className)}>
-      <div className="card-head">
-        <span className="card-head-title">{title}</span>
-        {meta ? <span className="card-head-meta">{meta}</span> : null}
-      </div>
-      {children}
-    </section>
+    <div className={cn("window-elevate", className)}>
+      <section className="window">
+        <div className="card-head">
+          <span className="card-head-title">{title}</span>
+          {meta ? <span className="card-head-meta">{meta}</span> : null}
+        </div>
+        {children}
+      </section>
+    </div>
   );
 }
 

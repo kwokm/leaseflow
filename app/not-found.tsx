@@ -13,8 +13,8 @@ export default function NotFound() {
 
       <header className="relative z-50 bg-white">
         <div className="mx-auto flex h-16 max-w-header items-center gap-4 px-5 sm:px-8">
-          <Link href="/" className="flex items-center gap-2.5 text-ink">
-            <BrandMark />
+          <Link href="/" className="group flex items-center gap-2.5 text-ink">
+            <BrandMark className="transition-transform duration-200 ease-out group-hover:scale-110" />
             <BrandWord />
           </Link>
         </div>

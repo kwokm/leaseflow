@@ -1,9 +1,6 @@
-"use client";
-
-import { motion, useReducedMotion } from "motion/react";
 import type { ReactNode } from "react";
-import { durationFloat } from "@/lib/motion/tokens";
 
+/** Passthrough — Pattern C hero float is stripped on this branch. */
 export function Float({
   children,
   className,
@@ -11,24 +8,5 @@ export function Float({
   children: ReactNode;
   className?: string;
 }) {
-  const reduce = useReducedMotion();
-
-  if (reduce) {
-    return <div className={className}>{children}</div>;
-  }
-
-  return (
-    <motion.div
-      className={className}
-      animate={{ y: [-10, 10] }}
-      transition={{
-        duration: durationFloat,
-        repeat: Infinity,
-        repeatType: "alternate",
-        ease: "easeInOut",
-      }}
-    >
-      {children}
-    </motion.div>
-  );
+  return <div className={className}>{children}</div>;
 }

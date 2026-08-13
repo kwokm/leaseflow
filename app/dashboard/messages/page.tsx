@@ -31,7 +31,7 @@ export default function MessagesPage() {
         <span className="desk-pill is-on">Inbox</span>
       </DeskToolbar>
       <div className="grid min-h-[480px] grid-cols-1 lg:grid-cols-[280px_minmax(0,1fr)]">
-        <div className="border-b border-line lg:border-b-0 lg:border-r">
+        <div className="group/threads border-b border-line lg:border-b-0 lg:border-r">
           {threads.map((item) => {
             const person = getApplicantById(item.applicantId);
             const last = item.messages[item.messages.length - 1];
@@ -44,8 +44,8 @@ export default function MessagesPage() {
                 onClick={() => setSelectedId(item.id)}
                 aria-current={active ? "true" : undefined}
                 className={cn(
-                  "flex w-full items-start gap-2.5 border-b border-line px-4 py-3 text-left transition-colors duration-240 ease-premium",
-                  active ? "bg-[#f4f0f8]" : "hover:bg-mist"
+                  "flex w-full items-start gap-2.5 border-b border-line px-4 py-3 text-left transition-opacity duration-200 ease-out",
+                  active ? "bg-[#f4f0f8]" : "group-hover/threads:opacity-90 hover:!opacity-100"
                 )}
               >
                 {person ? (

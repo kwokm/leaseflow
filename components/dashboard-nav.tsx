@@ -41,13 +41,13 @@ export function DashboardNav() {
             href={item.href}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors duration-240 ease-premium",
+              "group flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-opacity duration-200 ease-out",
               active
                 ? "bg-primary/10 text-primary"
-                : "text-ink-2 hover:bg-accent hover:text-accent-foreground"
+                : "text-ink-2 hover:opacity-90"
             )}
           >
-            <item.icon className="w-4 h-4" />
+            <item.icon className="h-4 w-4 transition-transform duration-200 ease-out group-hover:scale-110" />
             <span className="flex-1">{item.label}</span>
             {item.label === "Messages" && unread > 0 && (
               <span className="rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">
@@ -70,13 +70,13 @@ export function DashboardNav() {
               href={item.href}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors duration-240 ease-premium",
+                "group flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-opacity duration-200 ease-out",
                 active
                   ? "bg-primary/10 text-primary font-medium"
-                  : "text-mute hover:bg-accent hover:text-accent-foreground"
+                  : "text-mute hover:opacity-90"
               )}
             >
-              <item.icon className="w-4 h-4" />
+              <item.icon className="h-4 w-4 transition-transform duration-200 ease-out group-hover:scale-110" />
               {item.label}
             </Link>
           );

@@ -142,9 +142,9 @@ export function ApplyWizard({ property }: { property: Property }) {
         <div className="relative z-10 mx-auto flex h-16 max-w-shell items-center gap-4 px-5 sm:px-8">
           <Link
             href="/"
-            className="flex shrink-0 items-center gap-2.5 text-ink rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+            className="group flex shrink-0 items-center gap-2.5 text-ink rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
           >
-            <BrandMark />
+            <BrandMark className="transition-transform duration-200 ease-out group-hover:scale-110" />
             <BrandWord />
           </Link>
 
@@ -207,8 +207,8 @@ export function ApplyWizard({ property }: { property: Property }) {
           <div className="sticky bottom-4 z-20 mt-8 print:hidden">
             <div className="flex flex-col-reverse gap-3 rounded-lg border border-line bg-paper/80 px-4 py-3 shadow-mini backdrop-blur-md sm:flex-row sm:items-center sm:justify-between">
               {step > 1 ? (
-                <Button type="button" variant="outline" size="touch" onClick={() => moveTo(step - 1)}>
-                  <ArrowLeft className="h-4 w-4" aria-hidden />
+                <Button type="button" variant="outline" size="touch" className="group" onClick={() => moveTo(step - 1)}>
+                  <ArrowLeft className="h-4 w-4 transition-transform duration-200 ease-out group-hover:-translate-x-1" aria-hidden />
                   Back
                 </Button>
               ) : (
@@ -216,9 +216,9 @@ export function ApplyWizard({ property }: { property: Property }) {
               )}
 
               {step < 9 ? (
-                <Button type="button" size="touch" onClick={goNext} className="sm:min-w-[168px]">
+                <Button type="button" size="touch" onClick={goNext} className="group sm:min-w-[168px]">
                   {step === 8 ? "Pay and submit" : "Continue"}
-                  <ArrowRight className="h-4 w-4" aria-hidden />
+                  <ArrowRight className="h-4 w-4 transition-transform duration-200 ease-out group-hover:translate-x-1" aria-hidden />
                 </Button>
               ) : (
                 <Button asChild size="touch" className="sm:min-w-[168px]">
@@ -236,7 +236,7 @@ export function ApplyWizard({ property }: { property: Property }) {
       <footer className="relative z-10 print:hidden">
         <Reveal className="mx-auto flex max-w-shell flex-wrap items-center justify-between gap-3 px-5 py-6 text-[13px] font-medium text-mute sm:px-8">
           <p>Demo prototype · mock data only, no consumer reporting agency is used.</p>
-          <Link href="/" className="text-ink-2 transition-colors duration-240 ease-premium hover:text-ink">
+          <Link href="/" className="text-ink-2 transition-opacity duration-200 ease-out hover:opacity-90">
             Back to LeaseFlow
           </Link>
         </Reveal>

@@ -15,8 +15,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       <header className="relative z-50 bg-white print:hidden">
         <div className="mx-auto flex h-16 max-w-header items-center gap-4 px-5 sm:px-8">
-          <Link href="/" className="flex items-center gap-2.5 text-ink">
-            <BrandMark />
+          <Link href="/" className="group flex items-center gap-2.5 text-ink">
+            <BrandMark className="transition-transform duration-200 ease-out group-hover:scale-110" />
             <BrandWord />
           </Link>
           <div className="ml-auto flex items-center gap-2">

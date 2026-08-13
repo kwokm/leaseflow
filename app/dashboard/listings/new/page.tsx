@@ -32,8 +32,8 @@ export default function NewListingPage() {
     <div className="space-y-6 p-5 sm:p-6">
       <Reveal>
         <Link href="/dashboard/listings">
-          <Button variant="ghost" size="sm" className="mb-4">
-            <ArrowLeft className="w-4 h-4 mr-2" />
+          <Button variant="ghost" size="sm" className="group mb-4">
+            <ArrowLeft className="mr-2 h-4 w-4 transition-transform duration-200 ease-out group-hover:-translate-x-1" />
             Back to properties
           </Button>
         </Link>
@@ -128,10 +128,10 @@ export default function NewListingPage() {
               <button
                 type="button"
                 onClick={() => setFormData({ ...formData, screeningPackage: "standard" })}
-                className={`p-4 border-2 rounded-lg text-left transition-all duration-240 ease-premium ${
+                className={`p-4 border-2 rounded-lg text-left transition-opacity duration-200 ease-out ${
                   formData.screeningPackage === "standard"
                     ? "border-primary bg-primary/5"
-                    : "border-line hover:border-line-2"
+                    : "border-line hover:opacity-90"
                 }`}
               >
                 <div className="font-semibold text-lg mb-1">Standard</div>
@@ -147,15 +147,15 @@ export default function NewListingPage() {
               <button
                 type="button"
                 onClick={() => setFormData({ ...formData, screeningPackage: "premium" })}
-                className={`p-4 border-2 rounded-lg text-left transition-all duration-240 ease-premium ${
+                className={`group p-4 border-2 rounded-lg text-left transition-opacity duration-200 ease-out ${
                   formData.screeningPackage === "premium"
                     ? "border-primary bg-primary/5"
-                    : "border-line hover:border-line-2"
+                    : "border-line hover:opacity-90"
                 }`}
               >
                 <div className="flex items-center gap-2 mb-1">
                   <div className="font-semibold text-lg">Premium</div>
-                  <Sparkles className="w-4 h-4 text-primary" />
+                  <Sparkles className="h-4 w-4 text-primary transition-transform duration-200 ease-out group-hover:scale-110" />
                 </div>
                 <div className="text-sm text-mute mb-3">$59.99 per applicant</div>
                 <ul className="text-sm space-y-1 text-mute">

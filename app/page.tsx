@@ -3,7 +3,7 @@ import { BrandMark, BrandWord } from "@/components/brand";
 import { ApplicationTable } from "@/components/desk/application-table";
 import { DeskSidebar } from "@/components/desk/desk-sidebar";
 import { DeskPill, DeskToolbar, PacketWindow } from "@/components/desk/packet-window";
-import { Float } from "@/components/motion/float";
+import { HeroCopy } from "@/components/motion/hero-copy";
 import { Reveal, RevealItem, RevealStagger } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/button";
 import { deskHeroApplicants } from "@/lib/desk/display";
@@ -68,9 +68,9 @@ export default function Home() {
           <Link
             href="/"
             aria-label="LeaseFlow home"
-            className="flex shrink-0 items-center gap-2.5 text-ink"
+            className="group flex shrink-0 items-center gap-2.5 text-ink"
           >
-            <BrandMark />
+            <BrandMark className="transition-transform duration-200 ease-out group-hover:scale-110" />
             <BrandWord />
           </Link>
 
@@ -84,7 +84,7 @@ export default function Home() {
               <Link
                 key={item.label}
                 href={item.href}
-                className="text-[14px] font-medium tracking-[-0.2px] text-mute transition-colors duration-240 ease-premium hover:text-ink"
+                className="text-[14px] font-medium tracking-[-0.2px] text-mute transition-opacity duration-200 ease-out hover:opacity-90"
               >
                 {item.label}
               </Link>
@@ -105,37 +105,21 @@ export default function Home() {
       <main id="main">
         <section className="hero" id="top" aria-labelledby="hero-title">
           <div className="hero-wash" aria-hidden />
-          <div className="hero-copy">
-            <h1 id="hero-title">Welcome to the packet.</h1>
-            <p className="hero-sub">
-              LeaseFlow is the screening service that collects applications, runs credit and
-              background, and hands you a LeaseScore you can approve or decline.
-            </p>
-            <div className="hero-ctas">
-              <Button asChild size="cta">
-                <Link href={DESK_HREF}>Open the desk</Link>
-              </Button>
-              <Button asChild variant="outline" size="cta">
-                <Link href={APPLY_HREF}>Apply as renter</Link>
-              </Button>
-            </div>
-          </div>
+          <HeroCopy deskHref={DESK_HREF} applyHref={APPLY_HREF} />
 
           <div className="stage-wrap" id="desk">
-            <Float>
-              <PacketWindow title="Application packet • 742 Evergreen Terrace" meta="Desk • 3 files">
-                <div className="desk">
-                  <DeskSidebar staticActive="Applications" />
-                  <div className="min-w-0">
-                    <DeskToolbar meta="3 in queue">
-                      <DeskPill active>All properties</DeskPill>
-                      <DeskPill>Received</DeskPill>
-                    </DeskToolbar>
-                    <ApplicationTable rows={heroRows} packetLinks selectedId="app-1" />
-                  </div>
+            <PacketWindow title="Application packet • 742 Evergreen Terrace" meta="Desk • 3 files">
+              <div className="desk">
+                <DeskSidebar staticActive="Applications" />
+                <div className="min-w-0">
+                  <DeskToolbar meta="3 in queue">
+                    <DeskPill active>All properties</DeskPill>
+                    <DeskPill>Received</DeskPill>
+                  </DeskToolbar>
+                  <ApplicationTable rows={heroRows} packetLinks selectedId="app-1" />
                 </div>
-              </PacketWindow>
-            </Float>
+              </div>
+            </PacketWindow>
           </div>
         </section>
 

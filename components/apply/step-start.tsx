@@ -94,7 +94,7 @@ export function StepStart({ state, patch, property }: StepProps) {
                   className={cn(
                     // The radio itself is visually hidden, so the column carries the focus ring.
                     "relative flex cursor-pointer flex-col p-6",
-                    "transition-[background-color,box-shadow] duration-200 ease-premium",
+                    "transition-opacity duration-200 ease-out hover:opacity-90",
                     "focus-within:z-10 focus-within:outline focus-within:outline-2 focus-within:outline-offset-[-2px] focus-within:outline-ink",
                     index > 0 && "border-t border-line md:border-l md:border-t-0",
                     selected ? "bg-wash/40" : "bg-paper hover:bg-mist"
@@ -118,7 +118,7 @@ export function StepStart({ state, patch, property }: StepProps) {
                     <span
                       aria-hidden
                       className={cn(
-                        "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-[background-color,border-color,color] duration-200 ease-premium",
+                        "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border",
                         selected ? "border-ink bg-ink text-paper" : "border-line-2 bg-paper"
                       )}
                     >

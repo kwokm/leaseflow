@@ -30,7 +30,7 @@ function ReviewBlock({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-lg border border-line bg-paper p-5 shadow-window transition-[border-color,box-shadow] duration-200 ease-premium">
+    <section className="rounded-lg border border-line bg-paper p-5 shadow-window">
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-[17px] font-semibold tracking-[-0.3px] text-ink">{title}</h2>
         <Button type="button" variant="ghost" size="sm" onClick={() => goTo(step)}>

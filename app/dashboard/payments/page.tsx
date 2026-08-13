@@ -56,7 +56,7 @@ export default function PaymentsPage() {
                     {applicant ? (
                       <Link
                         href={`/dashboard/applications/${applicant.id}`}
-                        className="text-ink transition-colors duration-240 ease-premium hover:underline"
+                        className="text-ink transition-opacity duration-200 ease-out hover:opacity-90"
                       >
                         {applicant.firstName} {applicant.lastName}
                       </Link>
