@@ -102,20 +102,28 @@
   }
 
   /*
-   * Full-page lavender wash from the locked landing screenshot:
-   * lighter at the top center, deeper toward the edges and bottom,
-   * with fine vertical pinstripes across the whole field.
+   * Locked 1:1 from design/attio-inspired/styles.css.
+   * White page. Bloom is 62% from the BOTTOM. Do not invert.
    */
+  .hero {
+    position: relative;
+    padding: 88px 0 0;
+    overflow: hidden;
+    background: #fff;
+  }
+
   .hero-wash {
     position: absolute;
-    inset: 0;
-    height: 100%;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 62%;
     pointer-events: none;
     background: radial-gradient(
-      120% 90% at 50% 0%,
-      var(--wash) 0%,
-      var(--wash-mid) 52%,
-      var(--wash-deep) 100%
+      90% 80% at 50% 100%,
+      #e6ecff 0%,
+      #bccbff 45%,
+      #86a0ee 100%
     );
   }
 
@@ -125,7 +133,7 @@
     inset: 0;
     background-image: repeating-linear-gradient(
       90deg,
-      rgba(255, 255, 255, 0.42) 0 1px,
+      rgba(255, 255, 255, 0.78) 0 1px,
       transparent 1px 12px
     );
   }
@@ -134,15 +142,178 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: radial-gradient(
-      80% 55% at 50% 0%,
-      rgba(255, 255, 255, 0.55) 0%,
-      rgba(255, 255, 255, 0) 70%
-    );
+    background: radial-gradient(70% 110% at 50% 0%, #ffffff 28%, rgba(255, 255, 255, 0) 68%);
   }
 
-  .hero-wash-shell {
-    height: 100%;
+  .hero-copy {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 0 var(--pad);
+    max-width: 860px;
+    margin: 0 auto 52px;
+  }
+
+  .hero-sub {
+    margin: 0 auto 28px;
+    max-width: 34rem;
+    font-size: 16px;
+    line-height: 20.8px;
+    color: var(--mute);
+    font-weight: 500;
+    letter-spacing: -0.17px;
+  }
+
+  .hero-ctas {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .hero h1 {
+    margin: 0 0 18px;
+    font-size: clamp(40px, 5.6vw, 80px);
+    font-weight: 600;
+    letter-spacing: -1.12px;
+    line-height: 0.95;
+    color: var(--ink);
+  }
+
+  @media (min-width: 1280px) {
+    .hero h1 {
+      letter-spacing: -2.4px;
+    }
+  }
+
+  .stage-wrap {
+    position: relative;
+    z-index: 1;
+    padding: 0 var(--pad) 80px;
+    max-width: 1240px;
+    margin: 0 auto;
+  }
+
+  .window {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .window-bar {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    height: 40px;
+    padding: 0 14px;
+    background: #fafafa;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .tl {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .tl-r {
+    background: #e15c6b;
+  }
+  .tl-y {
+    background: #f5b400;
+  }
+  .tl-g {
+    background: #12a150;
+  }
+
+  .desk {
+    display: grid;
+    grid-template-columns: 196px 1fr;
+    min-height: 480px;
+    background: #fff;
+  }
+
+  .desk-rail {
+    background: var(--rail);
+    border-right: 1px solid var(--line);
+    padding: 10px 8px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .rail-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 34px;
+    padding: 0 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--mute);
+    text-decoration: none;
+  }
+
+  .rail-item svg {
+    flex-shrink: 0;
+    opacity: 0.8;
+  }
+
+  .rail-item:hover {
+    color: var(--ink);
+    background: rgba(255, 255, 255, 0.6);
+  }
+
+  .rail-item.is-active {
+    background: #fff;
+    color: var(--ink);
+    box-shadow: 0 1px 2px rgba(17, 17, 20, 0.06);
+  }
+
+  .desk-chrome {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    height: 44px;
+    padding: 0 16px;
+    border-bottom: 1px solid var(--line);
+    background: #fbfbfc;
+  }
+
+  .desk-chrome-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+
+  .desk-chrome-meta {
+    font-size: 12px;
+    color: var(--mute-2);
+    font-weight: 500;
+  }
+
+  @media (max-width: 639px) {
+    .desk {
+      grid-template-columns: 1fr;
+    }
+    .desk-rail {
+      display: none;
+    }
+  }
+
+  @media (max-width: 1023px) {
+    .apply-desk {
+      grid-template-columns: 1fr;
+    }
+    .apply-desk .desk-rail {
+      display: none;
+    }
   }
 
   /* Desk table, avatars, and status pills — ported from design/attio-inspired. */

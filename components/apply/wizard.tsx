@@ -133,14 +133,14 @@ export function ApplyWizard({ property }: { property: Property }) {
   const errorCount = Object.keys(errors).length;
 
   return (
-    <div className="relative min-h-screen bg-paper print:bg-white">
+    <div className="relative min-h-screen overflow-hidden bg-white print:bg-white">
       <PageWash />
 
       <a href="#apply-step" className="skip-link">
         Skip to the current step
       </a>
 
-      <header className="sticky top-0 z-40 border-b border-line bg-paper/95 backdrop-blur print:hidden">
+      <header className="relative z-40 bg-white print:hidden">
         <div className="relative z-10 mx-auto flex h-16 max-w-shell items-center gap-4 px-5 sm:px-8">
           <Link
             href="/"
@@ -177,10 +177,12 @@ export function ApplyWizard({ property }: { property: Property }) {
       </header>
 
       <div className="relative z-10 mx-auto max-w-shell px-5 py-8 sm:px-8 lg:py-12">
-        <PacketWindow title={`Application • ${shortAddress(property.address)}`}>
-          <div className="grid lg:grid-cols-[212px_minmax(0,1fr)]">
-        {/* Step rail — desktop only; the progress bar covers small screens. */}
-        <nav aria-label="Application steps" className="hidden border-r border-line bg-rail p-2 pt-2.5 lg:block print:hidden">
+        <PacketWindow
+          title={`Application packet • ${shortAddress(property.address)}`}
+          meta={`Desk • step ${step} of ${TOTAL_STEPS}`}
+        >
+          <div className="desk apply-desk">
+        <nav aria-label="Application steps" className="desk-rail print:hidden">
           <ol className="space-y-0.5">
             {APPLY_STEPS.map((entry) => {
               const done = entry.id < step;

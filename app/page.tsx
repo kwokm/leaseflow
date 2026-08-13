@@ -3,7 +3,6 @@ import { BrandMark, BrandWord } from "@/components/brand";
 import { ApplicationTable } from "@/components/desk/application-table";
 import { DeskSidebar } from "@/components/desk/desk-sidebar";
 import { DeskPill, DeskToolbar, PacketWindow } from "@/components/desk/packet-window";
-import { PageWash } from "@/components/page-wash";
 import { Button } from "@/components/ui/button";
 import { deskHeroApplicants } from "@/lib/desk/display";
 import { getPropertyById } from "@/lib/data/mock-data";
@@ -57,14 +56,12 @@ export default function Home() {
   const heroRows = deskHeroApplicants();
 
   return (
-    <div className="relative min-h-screen">
-      <PageWash />
-
+    <div className="min-h-screen bg-white">
       <a href="#main" className="skip-link">
         Skip to content
       </a>
 
-      <header className="relative z-50">
+      <header className="relative z-50 bg-white">
         <div className="mx-auto flex h-16 max-w-header items-center gap-9 px-5 sm:px-8 lg:px-14">
           <Link
             href="/"
@@ -103,22 +100,16 @@ export default function Home() {
         </div>
       </header>
 
-      <main id="main" className="relative z-10">
-        <section className="pt-16 sm:pt-[88px]" aria-labelledby="hero-title">
-          <div className="mx-auto mb-[52px] max-w-[860px] px-5 text-center sm:px-8">
-            <h1
-              id="hero-title"
-              className="text-[clamp(40px,5.6vw,80px)] font-semibold leading-[0.95] tracking-[-1.12px] text-ink xl:tracking-[-2.4px]"
-            >
-              Welcome to the packet.
-            </h1>
-
-            <p className="mx-auto mt-[18px] max-w-[34rem] text-[16px] font-medium leading-[20.8px] tracking-[-0.17px] text-mute">
+      <main id="main">
+        <section className="hero" id="top" aria-labelledby="hero-title">
+          <div className="hero-wash" aria-hidden />
+          <div className="hero-copy">
+            <h1 id="hero-title">Welcome to the packet.</h1>
+            <p className="hero-sub">
               LeaseFlow is the screening service that collects applications, runs credit and
               background, and hands you a LeaseScore you can approve or decline.
             </p>
-
-            <div className="mt-7 flex flex-wrap justify-center gap-2.5">
+            <div className="hero-ctas">
               <Button asChild size="cta">
                 <Link href={DESK_HREF}>Open the desk</Link>
               </Button>
@@ -128,13 +119,13 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="mx-auto max-w-shell px-5 pb-20 sm:px-8" id="desk">
-            <PacketWindow title="Application packet • 742 Evergreen Terrace">
-              <div className="grid min-h-[420px] grid-cols-1 bg-paper sm:grid-cols-[196px_minmax(0,1fr)]">
+          <div className="stage-wrap" id="desk">
+            <PacketWindow title="Application packet • 742 Evergreen Terrace" meta="Desk • 3 files">
+              <div className="desk">
                 <DeskSidebar staticActive="Applications" />
                 <div className="min-w-0">
                   <DeskToolbar meta="3 in queue">
-                    <DeskPill active>All properties</DeskPill>
+                    <DeskPill>All properties</DeskPill>
                     <DeskPill active>Received</DeskPill>
                   </DeskToolbar>
                   <ApplicationTable rows={heroRows} packetLinks />
@@ -144,10 +135,10 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="platform" className="pb-16 sm:pb-28" aria-labelledby="platform-title">
+        <section id="platform" className="bg-white pb-16 sm:pb-28" aria-labelledby="platform-title">
           <div className="mx-auto max-w-shell px-5 sm:px-8">
-            <p className="mb-[18px] inline-flex h-6 items-center rounded-full bg-fill px-2.5 text-[13px] font-medium tracking-[-0.16px] text-fill-text">
-              Preview
+            <p className="mb-[18px] text-[13px] font-medium tracking-[-0.13px] text-mute">
+              Platform
             </p>
             <Headline
               id="platform-title"

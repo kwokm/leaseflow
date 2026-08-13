@@ -42,19 +42,16 @@ export function DeskSidebar({
   const pathname = usePathname();
 
   return (
-    <aside className="hidden flex-col gap-0.5 border-r border-line bg-rail p-2 pt-2.5 sm:flex sm:w-[196px] sm:shrink-0">
+    <aside className="desk-rail" aria-label="Desk navigation">
       {NAV.map((item) => {
         const active = staticActive ? item.label === staticActive : item.match(pathname);
         const Icon = item.icon;
-        const className = cn(
-          "flex h-[34px] items-center gap-2 rounded-md px-2.5 text-[13px] font-medium tracking-[-0.2px] transition-colors duration-160 ease-premium",
-          active ? "bg-paper text-ink shadow-[0_1px_2px_rgba(17,17,20,0.06)]" : "text-mute hover:text-ink"
-        );
+        const className = cn("rail-item", active && "is-active");
 
         if (staticActive) {
           return (
             <span key={item.label} className={className}>
-              <Icon className="h-3.5 w-3.5" aria-hidden />
+              <Icon width={16} height={16} aria-hidden />
               {item.label}
             </span>
           );
@@ -67,7 +64,7 @@ export function DeskSidebar({
             aria-current={active ? "page" : undefined}
             className={className}
           >
-            <Icon className="h-3.5 w-3.5" aria-hidden />
+            <Icon width={16} height={16} aria-hidden />
             {item.label}
           </Link>
         );

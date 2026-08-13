@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative min-h-screen print:bg-white">
+    <div className="relative min-h-screen overflow-hidden bg-white print:bg-white">
       <PageWash />
 
-      <header className="relative z-50 print:hidden">
+      <header className="relative z-50 bg-white print:hidden">
         <div className="mx-auto flex h-16 max-w-header items-center gap-4 px-5 sm:px-8">
           <Link href="/" className="flex items-center gap-2.5 text-ink">
             <BrandMark />
@@ -26,7 +26,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </header>
 
-      <div className="relative z-10 mx-auto max-w-shell px-5 pb-12 sm:px-8">
+      <div className="relative z-10 mx-auto max-w-shell px-5 pb-12 pt-2 sm:px-8">
         <DeskFrame>{children}</DeskFrame>
       </div>
     </div>

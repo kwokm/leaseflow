@@ -34,8 +34,8 @@ export function DeskFrame({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   return (
-    <PacketWindow title={titleFor(pathname)} className="min-h-[640px]">
-      <div className="grid min-h-[600px] grid-cols-1 bg-paper sm:grid-cols-[196px_minmax(0,1fr)]">
+    <PacketWindow title={titleFor(pathname)} meta="Desk • 3 files">
+      <div className="desk">
         <DeskSidebar />
         <div className="min-w-0">{children}</div>
       </div>
