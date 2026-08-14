@@ -122,7 +122,8 @@
   .reveal-item,
   .reveal-tone,
   .reveal-cta,
-  .reveal-spatial {
+  .reveal-spatial,
+  .pillar-spatial {
     opacity: 0;
   }
 
@@ -167,7 +168,8 @@
     transition-delay: 0.4s;
   }
 
-  .reveal-spatial {
+  .reveal-spatial,
+  .pillar-spatial {
     transform: scale(0.9) translateY(20px);
     transition:
       transform 800ms var(--ease-spatial),
@@ -179,40 +181,49 @@
   }
 
   .reveal-stagger > .reveal-item:nth-child(8n + 1),
-  .reveal-stagger > .reveal-spatial:nth-child(8n + 1) {
+  .reveal-stagger > .reveal-spatial:nth-child(8n + 1),
+  .reveal-stagger > .pillar-spatial:nth-child(8n + 1) {
     --i: 0;
   }
   .reveal-stagger > .reveal-item:nth-child(8n + 2),
-  .reveal-stagger > .reveal-spatial:nth-child(8n + 2) {
+  .reveal-stagger > .reveal-spatial:nth-child(8n + 2),
+  .reveal-stagger > .pillar-spatial:nth-child(8n + 2) {
     --i: 1;
   }
   .reveal-stagger > .reveal-item:nth-child(8n + 3),
-  .reveal-stagger > .reveal-spatial:nth-child(8n + 3) {
+  .reveal-stagger > .reveal-spatial:nth-child(8n + 3),
+  .reveal-stagger > .pillar-spatial:nth-child(8n + 3) {
     --i: 2;
   }
   .reveal-stagger > .reveal-item:nth-child(8n + 4),
-  .reveal-stagger > .reveal-spatial:nth-child(8n + 4) {
+  .reveal-stagger > .reveal-spatial:nth-child(8n + 4),
+  .reveal-stagger > .pillar-spatial:nth-child(8n + 4) {
     --i: 3;
   }
   .reveal-stagger > .reveal-item:nth-child(8n + 5),
-  .reveal-stagger > .reveal-spatial:nth-child(8n + 5) {
+  .reveal-stagger > .reveal-spatial:nth-child(8n + 5),
+  .reveal-stagger > .pillar-spatial:nth-child(8n + 5) {
     --i: 4;
   }
   .reveal-stagger > .reveal-item:nth-child(8n + 6),
-  .reveal-stagger > .reveal-spatial:nth-child(8n + 6) {
+  .reveal-stagger > .reveal-spatial:nth-child(8n + 6),
+  .reveal-stagger > .pillar-spatial:nth-child(8n + 6) {
     --i: 5;
   }
   .reveal-stagger > .reveal-item:nth-child(8n + 7),
-  .reveal-stagger > .reveal-spatial:nth-child(8n + 7) {
+  .reveal-stagger > .reveal-spatial:nth-child(8n + 7),
+  .reveal-stagger > .pillar-spatial:nth-child(8n + 7) {
     --i: 6;
   }
   .reveal-stagger > .reveal-item:nth-child(8n + 8),
-  .reveal-stagger > .reveal-spatial:nth-child(8n + 8) {
+  .reveal-stagger > .reveal-spatial:nth-child(8n + 8),
+  .reveal-stagger > .pillar-spatial:nth-child(8n + 8) {
     --i: 7;
   }
 
   .reveal-item,
-  .reveal-spatial {
+  .reveal-spatial,
+  .pillar-spatial {
     transition-delay: calc((var(--i, 0) * var(--stagger-loose)));
   }
 
@@ -225,7 +236,9 @@
   .is-visible .reveal-tone,
   .is-visible .reveal-cta,
   .is-visible > .reveal-spatial,
-  .reveal-stagger.is-visible > .reveal-spatial {
+  .is-visible > .pillar-spatial,
+  .reveal-stagger.is-visible > .reveal-spatial,
+  .reveal-stagger.is-visible > .pillar-spatial {
     opacity: 1;
     transform: none;
   }
@@ -734,6 +747,7 @@
   .reveal-tone,
   .reveal-cta,
   .reveal-spatial,
+  .pillar-spatial,
   .split-rise {
     opacity: 1 !important;
     transform: none !important;

@@ -156,13 +156,13 @@ export default function Home() {
                   tone: "Filled application, listing photos, Experian, income check, and a LeaseScore. Tenant, realtor, owner — same file.",
                 },
               ].map((pillar) => (
-                <li key={pillar.lead} className="reveal-spatial">
-                  <article className="window h-full">
+                <li key={pillar.lead} className="pillar-spatial">
+                  <article className="h-full rounded-lg border border-line bg-paper shadow-window">
                     <div className="p-6 sm:p-7">
                       <h3 className="text-[17px] font-semibold leading-6 tracking-[-0.3px] text-ink">
-                        {pillar.lead}
+                        <SplitWords>{pillar.lead}</SplitWords>
                       </h3>
-                      <p className="mt-2 text-[14px] font-medium leading-5 tracking-[-0.14px] text-mute">
+                      <p className="tone reveal-tone mt-2 text-[14px] font-medium leading-5 tracking-[-0.14px] text-mute">
                         {pillar.tone}
                       </p>
                     </div>
