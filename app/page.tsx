@@ -5,7 +5,7 @@ import { DeskSidebar } from "@/components/desk/desk-sidebar";
 import { DeskPill, DeskToolbar, PacketWindow } from "@/components/desk/packet-window";
 import { Float } from "@/components/motion/float";
 import { InView } from "@/components/motion/in-view";
-import { Reveal, RevealItem, RevealStagger } from "@/components/motion/reveal";
+import { Reveal } from "@/components/motion/reveal";
 import { SectionHeadline } from "@/components/motion/section-headline";
 import { SplitWords } from "@/components/motion/split-words";
 import { Button } from "@/components/ui/button";
@@ -148,22 +148,24 @@ export default function Home() {
               />
             </InView>
 
-            <RevealStagger
+            <InView
               as="ol"
-              className="mt-10 grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-line bg-line shadow-window sm:grid-cols-2 lg:grid-cols-4"
+              className="reveal-stagger mt-10 grid grid-cols-1 gap-px rounded-lg border border-line bg-line shadow-window sm:grid-cols-2 lg:grid-cols-4"
             >
               {STEPS.map((step) => (
-                <RevealItem key={step.n} as="li" motion="spatial" className="bg-paper p-6">
-                  <p className="num text-[13px] font-medium text-mute-2">{step.n}</p>
-                  <p className="mt-3 text-[17px] font-semibold leading-6 tracking-[-0.3px] text-ink">
-                    {step.lead}
-                  </p>
-                  <p className="mt-1.5 text-[14px] font-medium leading-5 tracking-[-0.14px] text-mute">
-                    {step.tone}
-                  </p>
-                </RevealItem>
+                <li key={step.n} className="reveal-spatial">
+                  <div className="bg-paper p-6">
+                    <p className="num text-[13px] font-medium text-mute-2">{step.n}</p>
+                    <p className="mt-3 text-[17px] font-semibold leading-6 tracking-[-0.3px] text-ink">
+                      {step.lead}
+                    </p>
+                    <p className="mt-1.5 text-[14px] font-medium leading-5 tracking-[-0.14px] text-mute">
+                      {step.tone}
+                    </p>
+                  </div>
+                </li>
               ))}
-            </RevealStagger>
+            </InView>
           </div>
         </section>
 
@@ -181,30 +183,30 @@ export default function Home() {
               />
             </InView>
 
-            <RevealStagger className="mt-14 grid grid-cols-1 overflow-hidden rounded-lg border border-line bg-paper shadow-window sm:grid-cols-2">
-              <RevealItem as="article" motion="spatial" className="p-7">
-                <p className="mb-2 text-[14px] font-medium text-mute">Standard</p>
-                <p className="num mb-3 text-[40px] font-medium leading-[44px] tracking-[-0.4px] text-ink">
-                  $39.99
-                </p>
-                <p className="max-w-[32ch] text-[15px] font-medium leading-[1.5] text-mute">
-                  Credit, criminal, and eviction, sealed into the packet with a LeaseScore.
-                </p>
-              </RevealItem>
-              <RevealItem
-                as="article"
-                motion="spatial"
-                className="border-t border-line p-7 sm:border-l sm:border-t-0"
-              >
-                <p className="mb-2 text-[14px] font-medium text-mute">Premium</p>
-                <p className="num mb-3 text-[40px] font-medium leading-[44px] tracking-[-0.4px] text-ink">
-                  $59.99
-                </p>
-                <p className="max-w-[32ch] text-[15px] font-medium leading-[1.5] text-mute">
-                  Standard plus income. Employer, stated pay, and rent multiple on the same file.
-                </p>
-              </RevealItem>
-            </RevealStagger>
+            <InView className="reveal-stagger mt-14 grid grid-cols-1 rounded-lg border border-line bg-paper shadow-window sm:grid-cols-2">
+              <article className="reveal-spatial">
+                <div className="p-7">
+                  <p className="mb-2 text-[14px] font-medium text-mute">Standard</p>
+                  <p className="num mb-3 text-[40px] font-medium leading-[44px] tracking-[-0.4px] text-ink">
+                    $39.99
+                  </p>
+                  <p className="max-w-[32ch] text-[15px] font-medium leading-[1.5] text-mute">
+                    Credit, criminal, and eviction, sealed into the packet with a LeaseScore.
+                  </p>
+                </div>
+              </article>
+              <article className="reveal-spatial">
+                <div className="border-t border-line p-7 sm:border-l sm:border-t-0">
+                  <p className="mb-2 text-[14px] font-medium text-mute">Premium</p>
+                  <p className="num mb-3 text-[40px] font-medium leading-[44px] tracking-[-0.4px] text-ink">
+                    $59.99
+                  </p>
+                  <p className="max-w-[32ch] text-[15px] font-medium leading-[1.5] text-mute">
+                    Standard plus income. Employer, stated pay, and rent multiple on the same file.
+                  </p>
+                </div>
+              </article>
+            </InView>
           </div>
         </section>
 

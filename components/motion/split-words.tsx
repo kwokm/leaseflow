@@ -1,9 +1,14 @@
+"use client";
+
 import type { CSSProperties } from "react";
+import { useReducedMotion } from "motion/react";
 import { cn } from "@/lib/utils";
 
 /**
- * Masked word split. Always emit the same markup (no hydration mismatch).
- * `prefers-reduced-motion` skips the motion via CSS end-state.
+ * Masked word split. Wrappers are paint-only — resting layout matches
+ * unsplit text. Reduced motion renders the plain string (no split DOM).
+ *
+ * JSX is compacted so React does not insert whitespace text nodes.
  */
 export function SplitWords({
   children,
@@ -12,27 +17,19 @@ export function SplitWords({
   children: string;
   className?: string;
 }) {
-  const parts = children.split(/(\s+)/);
-  let wordIndex = 0;
+  const reduce = useReducedMotion();
+
+  if (reduce) {
+    return <span className={className}>{children}</span>;
+  }
+
+  const words = children.trim().split(/\s+/);
 
   return (
-    <span className={cn(className)}>
-      {parts.map((part, index) => {
-        if (/^\s+$/.test(part)) {
-          return <span key={index}>{part}</span>;
-        }
-
-        const w = wordIndex % 8;
-        wordIndex += 1;
-
-        return (
-          <span key={index} className="line-mask">
-            <span data-word style={{ "--w": w } as CSSProperties}>
-              {part}
-            </span>
-          </span>
-        );
-      })}
+    <span className={cn("split-words", className)}>
+      {words.map((word, index) => (
+        <span className="split-word" key={`${word}-${index}`}>{index > 0 ? " " : null}<span className="split-mask"><span className="split-rise" style={{ "--w": index % 8 } as CSSProperties}>{word}</span></span></span>
+      ))}
     </span>
   );
 }

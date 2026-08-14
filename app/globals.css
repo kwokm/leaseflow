@@ -224,21 +224,37 @@
   .is-visible .reveal-item,
   .is-visible .reveal-tone,
   .is-visible .reveal-cta,
-  .is-visible .reveal-spatial {
+  .is-visible > .reveal-spatial,
+  .reveal-stagger.is-visible > .reveal-spatial {
     opacity: 1;
     transform: none;
   }
 
-  .line-mask {
-    display: inline-block;
-    overflow: hidden;
-    margin-bottom: -0.15em;
-    vertical-align: bottom;
+  /*
+   * Split-text: outer word stays in normal inline flow (baseline).
+   * Only the inner rise span tweens. Mask padding/margin cancel so the
+   * resting line box matches unsplit text. No full-width line wrappers.
+   */
+  .split-words {
+    text-align: inherit;
   }
 
-  .line-mask > span,
-  [data-word] {
+  .split-word {
+    display: inline;
+    vertical-align: baseline;
+  }
+
+  .split-mask {
     display: inline-block;
+    overflow: hidden;
+    vertical-align: baseline;
+    padding-bottom: 0.2em;
+    margin-bottom: -0.2em;
+  }
+
+  .split-rise {
+    display: inline-block;
+    vertical-align: baseline;
     transform: translateY(100%);
     opacity: 0;
     text-shadow: 0 0 1em transparent;
@@ -248,10 +264,26 @@
     transition-delay: calc(var(--w, 0) * var(--stagger-tight));
   }
 
-  .is-visible .line-mask > span,
-  .is-visible [data-word] {
+  .is-visible .split-rise {
     transform: none;
     opacity: 1;
+  }
+
+  .is-visible .split-mask {
+    overflow: visible;
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+
+  /* Card spatial expand is the card only — never tween descendants. */
+  .reveal-spatial .split-rise,
+  .reveal-spatial .reveal-block,
+  .reveal-spatial .reveal-item,
+  .reveal-spatial .reveal-tone,
+  .reveal-spatial .reveal-cta {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
   }
 
   .num {
@@ -702,10 +734,15 @@
   .reveal-tone,
   .reveal-cta,
   .reveal-spatial,
-  .line-mask > span,
-  [data-word] {
+  .split-rise {
     opacity: 1 !important;
     transform: none !important;
+  }
+
+  .split-mask {
+    overflow: visible !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
   }
 
   *,

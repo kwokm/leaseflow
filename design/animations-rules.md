@@ -79,30 +79,42 @@ Displacement scales with element size. Big blocks ~60px; inline 10–15px. Never
 
 ### Pattern A2: Masked word reveal (black headlines)
 **Where to use:** The hero H1 and black section titles on `/` (“The desk that finishes the file.”, “Four steps…”, “Applicants pay the fee.”). Grey secondaries do **not** use this.
-**Behavior:** Each line `overflow: hidden`; words start `yPercent: 100` behind the mask and rise into view.
+**Behavior:** Words start `yPercent: 100` behind a per-word mask and rise into view (600ms power3, stagger 80ms, `i % 8`).
+
+Resting layout after split **must match unsplit text**. Mask/word wrappers are paint-only — they must not change width, wrapping, or baseline.
+
+* **End state is identity:** `transform: none` (or `translate3d(0,0,0)`), `opacity: 1`. No leftover `translateY`, no leftover negative mask margin that shifts the box.
+* **No whitespace nodes** between word spans (compact JSX, or `font-size: 0` on the line + restore on words).
+* **Line masks:** keep `overflow: hidden` for the rise. Any `margin-bottom: -0.15em` (or similar) must be cancelled in the resting layout (matching padding so net 0, then drop both when settled). Descenders must still show during the tween.
+* **Centered headings:** line wrappers must not become full-width blocks that left-align inner words. Lines shrink-wrap and inherit `text-align: center`.
+* **DOM:** outer word span stays in normal inline flow (`display: inline`, `vertical-align: baseline`). An inner span is the only node that tweens `translateY`.
+* **Reduced motion:** render unsplit text (no split DOM) so layout is exact.
+* Overlap: following block starts at 40% through the word stagger; CTA overlaps description by `0.4s`
+* Trigger: in view at ~top 80% (`rootMargin: 0px 0px -20% 0px`). Reversible: toggle `.is-visible`, don’t add-once.
 
 ```css
-.line-mask { overflow: hidden; margin-bottom: -0.15em; }
-.line-mask > span, [data-word] {
+.split-word { display: inline; vertical-align: baseline; }
+.split-mask {
   display: inline-block;
+  overflow: hidden;
+  vertical-align: baseline;
+  padding-bottom: 0.2em;
+  margin-bottom: -0.2em; /* cancels — net 0 on the line box */
+}
+.split-rise {
+  display: inline-block;
+  vertical-align: baseline;
   transform: translateY(100%);
   opacity: 0;
-  text-shadow: 0 0 1em transparent;
   transition: transform 600ms var(--ease-power3), opacity 600ms var(--ease-power3);
   transition-delay: calc(var(--w, 0) * 80ms);
 }
-.is-visible .line-mask > span, .is-visible [data-word] { transform: none; opacity: 1; }
+.is-visible .split-rise { transform: none; opacity: 1; }
+.is-visible .split-mask { overflow: visible; padding-bottom: 0; margin-bottom: 0; }
 ```
 
-* `margin-bottom: -0.15em` on masks so descenders (g, y, p) aren’t clipped
-* `text-shadow: 0 0 1em transparent` for compositing
-* Overlap: following block starts at 40% through the word stagger; CTA overlaps description by `0.4s`
-* Trigger: in view at ~top 80% (`rootMargin: 0px 0px -20% 0px`)
-* Reversible: toggle `.is-visible`, don’t add-once
-* Reduced motion: skip the split and show the end-state (CSS and JS)
-
 ### Pattern B: The "App-Modal" Spatial Expansion
-**Where to use:** Opening deep interactive modes (e.g. Open the desk, opening a packet from a row).
+**Where to use:** Opening deep interactive modes (e.g. Open the desk, opening a packet from a row). Also the landing step cards, fee cards, and apply module — **one spatial expansion on the entire card element**. Inner text does not animate (no per-label, per-price, or per-body tween). Stagger **between cards** `150ms` (`i % 8`), not inside. Do not put spatial/split classes on children. The spatial wrapper must sit **outside** any `overflow: hidden` chrome so the expand is not clipped into a sequential inner reveal.
 **Behavior:**
 * **Background (Origin Page):** Scales down slightly `scale(0.96)`, darkens slightly, rounded corners `16px`. Timing `800ms cubic-bezier(0.32, 0.72, 0, 1)`.
 * **Foreground (New Modal/View):** From `opacity: 0`, `scale(0.9) translateY(20px)` to `opacity: 1`, `scale(1) translateY(0)`.
