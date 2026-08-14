@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ApplyListing } from "@/components/apply/apply-listing";
 
 export const metadata: Metadata = {
-  title: "Apply — LeaseFlow",
+  title: "Apply — Leaseproof",
   description: "Rental application and screening. Demo prototype with mock data.",
 };
 

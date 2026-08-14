@@ -42,7 +42,7 @@ export default function ErrorPage({
                 Try again
               </Button>
               <Button asChild variant="outline">
-                <Link href="/">Back to LeaseFlow</Link>
+                <Link href="/">Back to Leaseproof</Link>
               </Button>
             </div>
           </section>

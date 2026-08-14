@@ -51,7 +51,7 @@ export function ApplicationToRent({
           I. Application to Rent
         </p>
         <h2 className="mt-1 text-[20px] font-semibold tracking-[-0.4px] text-ink">
-          LeaseFlow rental application
+          Leaseproof rental application
         </h2>
         <p className="mt-1 text-[13px] font-medium text-mute">
           Auto-filled from the apply packet. Prototype form — not a C.A.R. document.
@@ -184,7 +184,7 @@ export function ApplicationToRent({
           <Field label="Package" value={application.screeningFee.packageLabel} />
           <Field label="Amount" value={application.screeningFee.amount} />
           <Field label="Status" value={application.screeningFee.status} />
-          <Field label="Paid via" value="LeaseFlow · applicant pays" />
+          <Field label="Paid via" value="Leaseproof · applicant pays" />
         </dl>
         <p className="mt-2 text-[12px] text-mute">{application.screeningFee.note}</p>
       </Block>

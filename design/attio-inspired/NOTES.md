@@ -13,4 +13,4 @@ On-dark: ghost #101010/#ECEFF3/#2D3238; fill #2D3238 + rgba(80,89,103,.5)
 Platform pill #266DF0 on 12% blue, sticky left nav, 2px blue rule
 Logo grid 5×3 hairline cells, no headline
 Dark close + footer #101010
-Copy is LeaseFlow. No Attio marks, no RentSpree.
+Copy is Leaseproof. No Attio marks, no RentSpree.

@@ -371,7 +371,7 @@ export function demoRentalProfile(): RentalProfile {
       reasonForLeaving: "Shorter commute",
     },
     currentEmployer: {
-      employer: "LeaseFlow Demo Co",
+      employer: "Leaseproof Demo Co"
       position: "Product designer",
       from: "03/2022",
       to: "Present",
@@ -519,7 +519,7 @@ export function createDemoState(listingId: string, pkg: ScreeningPackage): Apply
     idFront: dummyFile("demo-id-front.png", "image/png", 184320),
     idBack: dummyFile("demo-id-back.png", "image/png", 176128),
     income: {
-      employer: "LeaseFlow Demo Co",
+      employer: "Leaseproof Demo Co"
       position: "Product designer",
       monthlyIncome: "8500",
       startDate: "03/2022",

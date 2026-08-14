@@ -77,9 +77,11 @@ export function ListingThumb({
 export function ListingGallery({
   photos,
   alt,
+  enhanced = false,
 }: {
   photos?: string[];
   alt: string;
+  enhanced?: boolean;
 }) {
   if (!photos?.length) return null;
 
@@ -87,7 +89,12 @@ export function ListingGallery({
 
   return (
     <div className="space-y-2">
-      <div className="relative aspect-[16/9] overflow-hidden rounded-md border border-line bg-mist">
+      <div
+        className={cn(
+          "relative aspect-[16/9] overflow-hidden rounded-md border border-line bg-mist",
+          enhanced && "photo-enhance",
+        )}
+      >
         <Photo src={hero} alt={alt} sizes="(min-width: 768px) 720px, 100vw" />
       </div>
       {rest.length > 0 ? (
@@ -95,7 +102,10 @@ export function ListingGallery({
           {rest.map((src, index) => (
             <li
               key={`${src}-${index}`}
-              className="relative aspect-[4/3] overflow-hidden rounded-md border border-line bg-mist"
+              className={cn(
+                "relative aspect-[4/3] overflow-hidden rounded-md border border-line bg-mist",
+                enhanced && "photo-enhance",
+              )}
             >
               <Photo src={src} alt={`${alt} photo ${index + 2}`} sizes="160px" />
             </li>

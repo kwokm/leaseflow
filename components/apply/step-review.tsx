@@ -210,7 +210,7 @@ export function StepReview({ state, patch, errors, property, goTo }: StepProps) 
             error={errors.fcra}
             onChange={(checked) => setConsent({ fcra: checked })}
           >
-            I have read the disclosure and authorize LeaseFlow to obtain consumer reports about me
+            I have read the disclosure and authorize Leaseproof to obtain consumer reports about me
             for this rental application.
           </Checkbox>
           <Checkbox

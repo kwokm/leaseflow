@@ -12,6 +12,7 @@ import { listingThumb } from "@/lib/listings/store";
 import { loadDeskApplicants, listingRollup } from "@/lib/desk/queue";
 import { shortAddress } from "@/lib/desk/display";
 import { Reveal } from "@/components/motion/reveal";
+import { listingPricing, listingSyndication, pricingLabel } from "@/lib/leasing/ops";
 
 export default function ListingsPage() {
   const router = useRouter();
@@ -41,6 +42,7 @@ export default function ListingsPage() {
               <th className="num">Applicants</th>
               <th className="num">LeaseScore</th>
               <th>Lead status</th>
+              <th>Market</th>
               <th>Package</th>
             </tr>
           </thead>
@@ -86,6 +88,12 @@ export default function ListingsPage() {
                     ) : (
                       <span className="status">Empty</span>
                     )}
+                  </td>
+                  <td>
+                    <span className="desk-pill">
+                      {pricingLabel(listingPricing(property.id))}
+                      {listingSyndication(property.id) === "live" ? " · live" : ""}
+                    </span>
                   </td>
                   <td className="capitalize">{property.screeningPackage}</td>
                 </tr>

@@ -231,6 +231,7 @@
   .is-visible.reveal-item,
   .is-visible.reveal-cta,
   .is-visible.reveal-spatial,
+  .is-visible.pillar-spatial,
   .is-visible .reveal-block,
   .is-visible .reveal-item,
   .is-visible .reveal-tone,
@@ -766,6 +767,17 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+.photo-enhance {
+  filter: contrast(1.14) saturate(1.2) brightness(1.05);
+  transition: filter var(--dur-medium) var(--ease-power3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photo-enhance {
+    transition: none;
   }
 }
 

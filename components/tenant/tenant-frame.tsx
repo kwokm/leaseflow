@@ -9,6 +9,8 @@ import { shortAddress } from "@/lib/desk/display";
 function titleFor(pathname: string): string {
   if (pathname.startsWith("/tenant/messages")) return "Messages";
   if (pathname.startsWith("/tenant/payments")) return "Payments";
+  if (pathname.startsWith("/tenant/showings")) return "Book a showing • 510 S Resh St";
+  if (pathname.startsWith("/tenant/lease")) return "Lease to sign";
   const property = getPropertyById(FEATURED_LISTING_ID);
   if (property) return `Your application • ${shortAddress(property.address)}`;
   return "Your application";

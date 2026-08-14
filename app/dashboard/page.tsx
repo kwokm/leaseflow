@@ -1,5 +1,5 @@
-import { ApplicationDesk } from "@/components/desk/application-desk";
+import { PipelineDesk } from "@/components/leasing/pipeline-desk";
 
 export default function DashboardPage() {
-  return <ApplicationDesk extras />;
+  return <PipelineDesk />;
 }

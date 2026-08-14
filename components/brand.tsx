@@ -28,7 +28,7 @@ export function BrandMark({ size = 22, className }: { size?: number; className?:
 export function BrandWord({ className }: { className?: string }) {
   return (
     <span className={cn("text-[16px] font-semibold tracking-[-0.64px]", className)}>
-      leaseflow
+      leaseproof
     </span>
   );
 }

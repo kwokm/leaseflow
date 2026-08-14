@@ -28,11 +28,11 @@ export default function NotFound() {
               This page is not in the packet.
             </h1>
             <p className="mx-auto mt-2 max-w-md text-[15px] font-medium leading-6 text-mute">
-              The link may be old, or the file lives on another desk. Head back to LeaseFlow.
+              The link may be old, or the file lives on another desk. Head back to Leaseproof.
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-2">
               <Button asChild>
-                <Link href="/">Back to LeaseFlow</Link>
+                <Link href="/">Back to Leaseproof</Link>
               </Button>
               <Button asChild variant="outline">
                 <Link href="/dashboard">Open realtor desk</Link>

@@ -1,4 +1,4 @@
-// Mock data for LeaseFlow prototype
+// Mock data for Leaseproof prototype
 
 export type ApplicationStatus = "invited" | "in_progress" | "completed" | "approved" | "declined";
 
@@ -819,7 +819,7 @@ export const mockApplicationDetails: Record<string, ApplicationDetails> = {
       reasonForLeaving: "Relocating to Anaheim",
     },
     employment: {
-      employer: "LeaseFlow Demo Co",
+      employer: "Leaseproof Demo Co",
       position: "Product designer",
       startDate: "2022-03",
       supervisor: "Mina Alvarez",

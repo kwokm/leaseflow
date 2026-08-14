@@ -33,7 +33,7 @@ export default function SharedPacketPage({
         <div className="relative z-10 mx-auto max-w-shell px-5 py-24 text-center">
           <p className="text-[15px] font-medium text-ink">Packet not found</p>
           <Button asChild className="mt-4">
-            <Link href="/">Back to LeaseFlow</Link>
+            <Link href="/">Back to Leaseproof</Link>
           </Button>
         </div>
       </div>

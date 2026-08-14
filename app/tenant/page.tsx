@@ -10,10 +10,14 @@ import { FEATURED_LISTING_ID } from "@/lib/data/mock-data";
 import { shortAddress } from "@/lib/desk/display";
 import { AiDocCheckCompact } from "@/components/docs/ai-check";
 import { checkApplyState } from "@/lib/docs/ai-check";
-import { loadTenantPacket, tenantStatusLabel, type TenantPacket } from "@/lib/tenant/session";
+import { TENANT_APPLICANT_ID, loadTenantPacket, tenantStatusLabel, type TenantPacket } from "@/lib/tenant/session";
+import { BookShowing } from "@/components/leasing/book-showing";
+import { leaseStatusLabel, useLeaseByApplication, useLeases } from "@/lib/leasing/store";
 
 export default function TenantDeskPage() {
   const [packet, setPacket] = useState<TenantPacket | null>(null);
+  const janeLease = useLeaseByApplication(TENANT_APPLICANT_ID);
+  const leases = useLeases();
 
   useEffect(() => {
     setPacket(loadTenantPacket(FEATURED_LISTING_ID));
@@ -24,12 +28,14 @@ export default function TenantDeskPage() {
   const { property, applicant, draft, submitted, status, step, stepName } = packet;
   const income = Number(draft.income.monthlyIncome) || 0;
   const multiple = property.rent ? income / property.rent : 0;
+  const lease = janeLease ?? leases.find((row) => row.listingId === property.id);
+  const leasePending = lease && (lease.status === "pending_sign" || lease.status === "draft");
 
   return (
     <Reveal>
       <DeskToolbar meta="Signed in as Jane Doe">
         <span className="desk-pill is-on">
-          {tenantStatusLabel(status, submitted)}
+          {leasePending ? "Lease to sign" : tenantStatusLabel(status, submitted)}
         </span>
         <Button asChild size="sm">
           <Link href={`/apply/${property.id}`}>{submitted ? "Review apply" : "Continue apply"}</Link>
@@ -48,6 +54,22 @@ export default function TenantDeskPage() {
             {property.rent.toLocaleString()}/mo
           </p>
         </div>
+
+        {lease ? (
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-line bg-mist/40 px-4 py-3">
+            <div>
+              <p className="text-[14px] font-semibold text-ink">
+                {leasePending ? "Lease to sign" : leaseStatusLabel(lease.status)}
+              </p>
+              <p className="mt-0.5 text-[12px] font-medium text-mute">
+                Dummy e-sign for {shortAddress(property.address)}. Deposit queues to ACH after sign.
+              </p>
+            </div>
+            <Button asChild size="sm">
+              <Link href="/tenant/lease">{leasePending ? "Sign lease" : "Open lease"}</Link>
+            </Button>
+          </div>
+        ) : null}
 
         <ListingGallery photos={property.photos} alt={shortAddress(property.address)} />
 
@@ -111,12 +133,17 @@ export default function TenantDeskPage() {
           </p>
         )}
 
+        <BookShowing />
+
         <div className="flex flex-wrap gap-2">
           <Button asChild>
             <Link href={`/apply/${property.id}`}>{submitted ? "Open apply packet" : "Continue apply"}</Link>
           </Button>
           <Button asChild variant="outline">
             <Link href={`/tenant/applications/${property.id}`}>Application to Rent</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/tenant/showings">Book a showing</Link>
           </Button>
           <Button asChild variant="outline">
             <Link href={`/packet/${applicant.id}`}>Share packet</Link>

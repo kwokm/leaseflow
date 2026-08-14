@@ -6,10 +6,13 @@ import { notFound } from "next/navigation";
 import { ApplicationDesk } from "@/components/desk/application-desk";
 import { DeskToolbar } from "@/components/desk/packet-window";
 import { ListingGallery } from "@/components/listings/photos";
+import { SyndicationTiles } from "@/components/leasing/syndication";
 import { Button } from "@/components/ui/button";
 import { getPropertyById, type Applicant } from "@/lib/data/mock-data";
 import { loadDeskApplicantsForListing, listingRollup } from "@/lib/desk/queue";
 import { shortAddress } from "@/lib/desk/display";
+import { listingPricing, pricingLabel } from "@/lib/leasing/ops";
+import { setEnhanced, useEnhanced } from "@/lib/leasing/store";
 import { Reveal } from "@/components/motion/reveal";
 
 export default function ListingDetailPage({
@@ -21,6 +24,9 @@ export default function ListingDetailPage({
   const [property, setProperty] = useState(() => getPropertyById(id));
   const [applicants, setApplicants] = useState<Applicant[]>([]);
   const [ready, setReady] = useState(false);
+
+  const enhanced = useEnhanced(id);
+  const pricing = listingPricing(id);
 
   useEffect(() => {
     setProperty(getPropertyById(id));
@@ -44,6 +50,7 @@ export default function ListingDetailPage({
             <Link href={`/apply/${property.id}`}>Apply link</Link>
           </Button>
           <span className="desk-pill capitalize">{property.screeningPackage}</span>
+          <span className="desk-pill">{pricingLabel(pricing)} · demo</span>
         </DeskToolbar>
       </Reveal>
 
@@ -70,9 +77,29 @@ export default function ListingDetailPage({
         </dl>
         {property.photos?.length ? (
           <div className="mt-5">
-            <ListingGallery photos={property.photos} alt={shortAddress(property.address)} />
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+              <p className="text-[13px] font-medium text-mute">
+                AI photo enhance · CSS grade, not a live model
+              </p>
+              <button
+                type="button"
+                className={`desk-pill ${enhanced ? "is-on" : ""}`}
+                aria-pressed={enhanced}
+                onClick={() => setEnhanced(property.id, !enhanced)}
+              >
+                {enhanced ? "Enhanced on" : "Show enhance"}
+              </button>
+            </div>
+            <ListingGallery
+              photos={property.photos}
+              alt={shortAddress(property.address)}
+              enhanced={enhanced}
+            />
           </div>
         ) : null}
+        <div className="mt-5">
+          <SyndicationTiles listingId={property.id} />
+        </div>
       </Reveal>
 
       <ApplicationDesk propertyId={property.id} extras chrome={false} />

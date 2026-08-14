@@ -130,7 +130,7 @@ function DemoAuthorizationDialog({
             id="experian-demo-title"
             className="text-[20px] font-semibold tracking-[-0.4px] text-ink"
           >
-            Authorize LeaseFlow to view your credit report
+            Authorize Leaseproof to view your credit report
           </h2>
           <p className="mt-2 text-[14px] font-medium leading-5 tracking-[-0.14px] text-mute">
             This is simulated authorization chrome for a prototype. No credit bureau is contacted
@@ -370,7 +370,7 @@ export function StepCredit({ state, patch, errors }: StepProps) {
       )}
 
       <Note tone="warn">
-        Demo only. LeaseFlow never asks for your bureau username or password, and this prototype
+        Demo only. Leaseproof never asks for your bureau username or password, and this prototype
         does not contact Experian or any other consumer reporting agency.
       </Note>
 

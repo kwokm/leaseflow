@@ -31,7 +31,7 @@ function newConfirmationId(): string {
   for (let i = 0; i < 6; i += 1) {
     suffix += alphabet[Math.floor(Math.random() * alphabet.length)];
   }
-  return `LF-${suffix}`;
+  return `LP-${suffix}`;
 }
 
 const STEP_COMPONENTS: Record<number, (props: StepProps) => React.ReactElement> = {
@@ -237,7 +237,7 @@ export function ApplyWizard({ property }: { property: Property }) {
         <Reveal className="mx-auto flex max-w-shell flex-wrap items-center justify-between gap-3 px-5 py-6 text-[13px] font-medium text-mute sm:px-8">
           <p>Demo prototype · mock data only, no consumer reporting agency is used.</p>
           <Link href="/" className="text-ink-2 transition-colors duration-240 ease-premium hover:text-ink">
-            Back to LeaseFlow
+            Back to Leaseproof
           </Link>
         </Reveal>
       </footer>

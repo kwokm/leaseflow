@@ -50,7 +50,7 @@ export default function Home() {
         <div className="mx-auto flex h-16 max-w-header items-center gap-9 px-5 sm:px-8 lg:px-14">
           <Link
             href="/"
-            aria-label="LeaseFlow home"
+            aria-label="Leaseproof home"
             className="flex shrink-0 items-center gap-2.5 text-ink"
           >
             <BrandMark />
@@ -93,7 +93,7 @@ export default function Home() {
               <SplitWords>Welcome to the packet.</SplitWords>
             </h1>
             <p className="hero-sub reveal-tone">
-              LeaseFlow is the screening service that collects applications, runs credit and
+              Leaseproof is the screening service that collects applications, runs credit and
               background, and hands you a LeaseScore you can approve or decline.
             </p>
             <div className="hero-ctas reveal-cta">
@@ -111,13 +111,13 @@ export default function Home() {
 
           <div className="stage-wrap" id="desk">
             <Float>
-              <PacketWindow title="Application packet • 510 S Resh St" meta="Realtor desk • 3 files">
+              <PacketWindow title="Pipeline • 510 S Resh St" meta="Realtor desk • Demo sync">
                 <div className="desk">
-                  <DeskSidebar staticActive="Applications" />
+                  <DeskSidebar staticActive="Pipeline" />
                   <div className="min-w-0">
-                    <DeskToolbar meta="3 in queue">
-                      <DeskPill active>All properties</DeskPill>
-                      <DeskPill>Received</DeskPill>
+                    <DeskToolbar meta="Demo sync">
+                      <DeskPill active>Vacant units</DeskPill>
+                      <DeskPill>Application review</DeskPill>
                     </DeskToolbar>
                     <ApplicationTable rows={heroRows} packetLinks selectedId="app-1" />
                   </div>
@@ -164,6 +164,70 @@ export default function Home() {
                       </h3>
                       <p className="tone reveal-tone mt-2 text-[14px] font-medium leading-5 tracking-[-0.14px] text-mute">
                         {pillar.tone}
+                      </p>
+                    </div>
+                  </article>
+                </li>
+              ))}
+            </InView>
+          </div>
+        </section>
+
+        <section id="flow" className="bg-white pb-16 sm:pb-28" aria-labelledby="flow-title">
+          <div className="mx-auto max-w-shell px-5 sm:px-8">
+            <InView>
+              <h2
+                id="flow-title"
+                className="text-[30px] font-medium leading-[1.08] tracking-[-0.6px] text-ink sm:text-[40px] sm:leading-[44px] sm:tracking-[-0.4px]"
+              >
+                <SplitWords>Vacant unit to signed lease.</SplitWords>
+              </h2>
+              <p className="reveal-tone mt-3 max-w-[46ch] text-[15px] font-medium leading-6 tracking-[-0.16px] text-mute">
+                Syndicate, reply, show, screen, sign. Screening in the middle is ours — Experian, AI
+                income, one packet.
+              </p>
+            </InView>
+
+            <InView
+              as="ol"
+              className="reveal-stagger mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5"
+            >
+              {[
+                {
+                  n: "01",
+                  lead: "Syndicate.",
+                  tone: "One listing to Zillow, Apartments.com, HotPads, Facebook, Craigslist. Demo sync.",
+                },
+                {
+                  n: "02",
+                  lead: "Reply.",
+                  tone: "SMS, Facebook, or web. The agent offers a showing in the first message.",
+                },
+                {
+                  n: "03",
+                  lead: "Show.",
+                  tone: "Self-book slots. Tuesday route around Anaheim, starting at Resh St.",
+                },
+                {
+                  n: "04",
+                  lead: "Screen.",
+                  tone: "Experian, AI income check, filled Application to Rent. The packet we already run.",
+                },
+                {
+                  n: "05",
+                  lead: "Sign.",
+                  tone: "Approve generates the lease. Dummy e-sign, then deposit queued to ACH.",
+                },
+              ].map((step) => (
+                <li key={step.n} className="pillar-spatial">
+                  <article className="h-full rounded-lg border border-line bg-paper shadow-window">
+                    <div className="p-5 sm:p-6">
+                      <p className="num text-[13px] font-medium text-mute-2">{step.n}</p>
+                      <h3 className="mt-3 text-[17px] font-semibold leading-6 tracking-[-0.3px] text-ink">
+                        {step.lead}
+                      </h3>
+                      <p className="tone reveal-tone mt-1.5 text-[14px] font-medium leading-5 tracking-[-0.14px] text-mute">
+                        {step.tone}
                       </p>
                     </div>
                   </article>
@@ -303,7 +367,8 @@ export default function Home() {
           </div>
           <p className="max-w-xl text-[12px] font-medium leading-5 text-mute">
             Screening reports are consumer reports under the FCRA. This site is a prototype — names,
-            scores, and tradelines are mock data, and no consumer reporting agency is used.
+            scores, and tradelines are mock data, and no consumer reporting agency is used. Leaseproof
+            is a working name, not a live trademark claim.
           </p>
         </Reveal>
       </footer>

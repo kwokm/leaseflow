@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CreditCard, Folder, LayoutGrid } from "lucide-react";
+import { Calendar, CreditCard, Folder, LayoutGrid, PenLine } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -11,6 +11,18 @@ const NAV = [
     label: "Application",
     icon: LayoutGrid,
     match: (path: string) => path === "/tenant" || path.startsWith("/tenant/applications"),
+  },
+  {
+    href: "/tenant/showings",
+    label: "Showings",
+    icon: Calendar,
+    match: (path: string) => path.startsWith("/tenant/showings"),
+  },
+  {
+    href: "/tenant/lease",
+    label: "Lease",
+    icon: PenLine,
+    match: (path: string) => path.startsWith("/tenant/lease"),
   },
   {
     href: "/tenant/messages",

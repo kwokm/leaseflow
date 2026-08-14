@@ -17,6 +17,9 @@ function titleFor(pathname: string): string {
     return "Application packet";
   }
 
+  const lease = pathname.match(/^\/dashboard\/leases\/([^/]+)/);
+  if (lease) return "Lease • e-sign";
+
   const listing = pathname.match(/^\/dashboard\/listings\/([^/]+)/);
   if (listing && listing[1] !== "new") {
     const property = getPropertyById(listing[1]);
@@ -26,15 +29,19 @@ function titleFor(pathname: string): string {
 
   if (pathname.startsWith("/dashboard/listings")) return "Properties";
   if (pathname.startsWith("/dashboard/payments")) return "Payments";
-  if (pathname.startsWith("/dashboard/messages")) return "Messages";
-  return "Application packet • 510 S Resh St";
+  if (pathname.startsWith("/dashboard/messages") || pathname.startsWith("/dashboard/leads")) {
+    return "Lead inbox";
+  }
+  if (pathname.startsWith("/dashboard/showings")) return "Showings • Tuesday Anaheim";
+  if (pathname.startsWith("/dashboard/applications")) return "Application packet • 510 S Resh St";
+  return "Pipeline • 510 S Resh St";
 }
 
 export function DeskFrame({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   return (
-    <PacketWindow title={titleFor(pathname)} meta="Realtor desk • 3 files">
+    <PacketWindow title={titleFor(pathname)} meta="Realtor desk • Demo sync">
       <div className="desk">
         <DeskSidebar />
         <div className="min-w-0">{children}</div>

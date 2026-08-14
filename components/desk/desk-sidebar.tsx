@@ -2,34 +2,47 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CreditCard, Folder, Home, LayoutGrid } from "lucide-react";
+import { Calendar, CreditCard, Home, Inbox, LayoutGrid, ScrollText } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV = [
   {
     href: "/dashboard",
-    label: "Applications",
+    label: "Pipeline",
     icon: LayoutGrid,
     match: (path: string) =>
-      path === "/dashboard" || path.startsWith("/dashboard/applications"),
+      path === "/dashboard" || path.startsWith("/dashboard/leases"),
   },
   {
-    href: "/dashboard/payments",
-    label: "Payments",
-    icon: CreditCard,
-    match: (path: string) => path.startsWith("/dashboard/payments"),
+    href: "/dashboard/applications",
+    label: "Applications",
+    icon: ScrollText,
+    match: (path: string) => path.startsWith("/dashboard/applications"),
   },
   {
-    href: "/dashboard/messages",
-    label: "Messages",
-    icon: Folder,
-    match: (path: string) => path.startsWith("/dashboard/messages"),
+    href: "/dashboard/leads",
+    label: "Leads",
+    icon: Inbox,
+    match: (path: string) =>
+      path.startsWith("/dashboard/leads") || path.startsWith("/dashboard/messages"),
+  },
+  {
+    href: "/dashboard/showings",
+    label: "Showings",
+    icon: Calendar,
+    match: (path: string) => path.startsWith("/dashboard/showings"),
   },
   {
     href: "/dashboard/listings",
     label: "Properties",
     icon: Home,
     match: (path: string) => path.startsWith("/dashboard/listings"),
+  },
+  {
+    href: "/dashboard/payments",
+    label: "Payments",
+    icon: CreditCard,
+    match: (path: string) => path.startsWith("/dashboard/payments"),
   },
 ] as const;
 

@@ -32,7 +32,7 @@ export function StepDone({ state, property }: StepProps) {
         <div className="flex flex-wrap items-start justify-between gap-3 border-b border-line pb-4">
           <div>
             <p className="text-[13px] font-medium text-mute">Receipt</p>
-            <p className="mt-1 text-[20px] font-semibold tracking-[-0.4px] text-ink">LeaseFlow</p>
+            <p className="mt-1 text-[20px] font-semibold tracking-[-0.4px] text-ink">Leaseproof</p>
           </div>
           <div className="text-right">
             <p className="text-[13px] font-medium text-mute">Confirmation</p>
