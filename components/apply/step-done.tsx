@@ -90,6 +90,9 @@ export function StepDone({ state, property }: StepProps) {
           <Printer className="h-4 w-4" aria-hidden />
           Print receipt
         </Button>
+        <Button asChild size="touch" variant="outline">
+          <Link href={`/packet/${property.id}`}>Application to Rent</Link>
+        </Button>
         <Button asChild size="touch">
           <Link href={packetHref}>View the landlord packet</Link>
         </Button>

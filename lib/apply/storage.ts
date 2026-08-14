@@ -39,6 +39,22 @@ export function loadDraft(listingId: string, pkg: ScreeningPackage): ApplyState 
       experian: { ...fresh.experian, ...parsed.experian },
       household: { ...fresh.household, ...parsed.household },
       consent: { ...fresh.consent, ...parsed.consent },
+      rental: {
+        ...fresh.rental,
+        ...parsed.rental,
+        license: { ...fresh.rental.license, ...parsed.rental?.license },
+        emergency: { ...fresh.rental.emergency, ...parsed.rental?.emergency },
+        vehicle: { ...fresh.rental.vehicle, ...parsed.rental?.vehicle },
+        currentResidence: { ...fresh.rental.currentResidence, ...parsed.rental?.currentResidence },
+        previousResidence: { ...fresh.rental.previousResidence, ...parsed.rental?.previousResidence },
+        currentEmployer: { ...fresh.rental.currentEmployer, ...parsed.rental?.currentEmployer },
+        previousEmployer: { ...fresh.rental.previousEmployer, ...parsed.rental?.previousEmployer },
+        disclosures: { ...fresh.rental.disclosures, ...parsed.rental?.disclosures },
+        creditors: parsed.rental?.creditors ?? fresh.rental.creditors,
+        references: parsed.rental?.references ?? fresh.rental.references,
+        relatives: parsed.rental?.relatives ?? fresh.rental.relatives,
+        bankAccount: { ...fresh.rental.bankAccount, ...parsed.rental?.bankAccount },
+      },
       // Card details are not persisted; refill the demo card so Review stays clickable.
       payment: parsed.payment?.cardNumber
         ? { ...fresh.payment, ...parsed.payment }

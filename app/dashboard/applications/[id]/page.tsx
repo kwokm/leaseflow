@@ -4,7 +4,9 @@ import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Avatar } from "@/components/desk/avatar";
+import { DeskPill } from "@/components/desk/packet-window";
 import { StatusPill } from "@/components/desk/status-pill";
+import { ApplicationToRent } from "@/components/rental-app/application-to-rent";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -37,8 +39,10 @@ import { creditScore, incomeMultiple, shortAddress } from "@/lib/desk/display";
 import { Reveal } from "@/components/motion/reveal";
 import { AiDocCheck } from "@/components/docs/ai-check";
 import { SAMPLE_MISMATCH, checkApplicationDetails } from "@/lib/docs/ai-check";
+import { resolveRentalPacket } from "@/lib/apply/rental-app";
 import type { ApplyState } from "@/lib/apply/types";
 import type { ApplicationStatus } from "@/lib/data/mock-data";
+import type { RentalApplication } from "@/lib/apply/rental-app";
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
@@ -74,6 +78,8 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
   const [adverseActionOpen, setAdverseActionOpen] = useState(false);
   const [statusOverride, setStatusOverride] = useState<ApplicationStatus | null>(null);
   const [showSample, setShowSample] = useState(false);
+  const [tab, setTab] = useState<"packet" | "application">("packet");
+  const [rental, setRental] = useState<RentalApplication | null>(null);
 
   const local = isLocalApplicantId(id);
   const [submission, setSubmission] = useState<ApplyState | undefined>();
@@ -84,6 +90,10 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
     setSubmission(getSubmission(confirmationIdFromApplicantId(id)));
     setSubmissionChecked(true);
   }, [id, local]);
+
+  useEffect(() => {
+    setRental(resolveRentalPacket(id)?.application ?? null);
+  }, [id, submission]);
 
   const seeded = local
     ? submission
@@ -165,6 +175,9 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
         </div>
         <div className="flex flex-wrap items-center gap-2 print:hidden">
           <Button asChild variant="outline" size="sm">
+            <Link href={`/packet/${id}`}>Share</Link>
+          </Button>
+          <Button asChild variant="outline" size="sm">
             <Link href="/dashboard">Back</Link>
           </Button>
           <Button variant="outline" size="sm" onClick={() => window.print()}>
@@ -191,6 +204,25 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
       </div>
       </Reveal>
 
+      <div className="border-b border-line px-5 py-3 print:hidden sm:px-6">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <DeskPill active={tab === "packet"} onClick={() => setTab("packet")}>
+            Packet
+          </DeskPill>
+          <DeskPill active={tab === "application"} onClick={() => setTab("application")}>
+            Application
+          </DeskPill>
+        </div>
+      </div>
+
+      {tab === "application" && rental ? (
+        <Reveal>
+          <ApplicationToRent application={rental} />
+        </Reveal>
+      ) : null}
+
+      {tab === "packet" ? (
+        <>
       <Section title="Identity">
         <dl>
           <Row label="Applicant" value={fullName} />
@@ -342,6 +374,8 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
           </dl>
         ) : null}
       </Section>
+        </>
+      ) : null}
 
       <Dialog open={adverseActionOpen} onOpenChange={setAdverseActionOpen}>
         <DialogContent className="max-w-lg">

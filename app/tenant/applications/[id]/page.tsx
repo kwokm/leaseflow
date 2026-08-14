@@ -8,8 +8,10 @@ import { ListingPhotoStrip } from "@/components/listings/photos";
 import { Reveal } from "@/components/motion/reveal";
 import { FEATURED_LISTING_ID } from "@/lib/data/mock-data";
 import { shortAddress } from "@/lib/desk/display";
+import { ApplicationToRent } from "@/components/rental-app/application-to-rent";
 import { AiDocCheckCompact } from "@/components/docs/ai-check";
 import { checkApplyState } from "@/lib/docs/ai-check";
+import { rentalApplicationFromState } from "@/lib/apply/rental-app";
 import { loadTenantPacket, tenantStatusLabel, type TenantPacket } from "@/lib/tenant/session";
 
 export default function TenantApplicationPage({
@@ -34,6 +36,9 @@ export default function TenantApplicationPage({
       <DeskToolbar meta={tenantStatusLabel(status, submitted)}>
         <Button asChild variant="outline" size="sm">
           <Link href="/tenant">Back to desk</Link>
+        </Button>
+        <Button asChild variant="outline" size="sm">
+          <Link href={`/packet/${applicant.id}`}>Share</Link>
         </Button>
         <Button asChild size="sm">
           <Link href={`/apply/${property.id}`}>{submitted ? "Review apply" : "Continue apply"}</Link>
@@ -90,6 +95,10 @@ export default function TenantApplicationPage({
         </dl>
 
         <AiDocCheckCompact report={checkApplyState(draft)} />
+
+        <div className="overflow-hidden rounded-lg border border-line">
+          <ApplicationToRent application={rentalApplicationFromState(draft, property)} />
+        </div>
       </div>
     </Reveal>
   );

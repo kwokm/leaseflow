@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { CreditCard, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AiDocCheck } from "@/components/docs/ai-check";
@@ -123,6 +124,21 @@ export function StepReview({ state, patch, errors, property, goTo }: StepProps) 
         showSample={showSample}
         onToggleSample={() => setShowSample((value) => !value)}
       />
+
+      <section className="rounded-lg border border-line bg-paper p-5 shadow-window">
+        <h2 className="text-[17px] font-semibold tracking-[-0.3px] text-ink">
+          Application to Rent
+        </h2>
+        <p className="mt-1 text-[13px] font-medium text-mute">
+          Auto-filled from this packet for {property.address.split(",")[0]}. Everyone with the
+          share link can open it.
+        </p>
+        <div className="mt-3">
+          <Button asChild variant="outline" size="sm">
+            <Link href={`/packet/${property.id}`}>Open filled application</Link>
+          </Button>
+        </div>
+      </section>
 
       <ReviewBlock title="Credit report" step={6} goTo={goTo}>
         <SummaryRow label="Source" value="Experian (demo)" />

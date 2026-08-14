@@ -116,7 +116,10 @@ export default function TenantDeskPage() {
             <Link href={`/apply/${property.id}`}>{submitted ? "Open apply packet" : "Continue apply"}</Link>
           </Button>
           <Button asChild variant="outline">
-            <Link href={`/tenant/applications/${property.id}`}>Application detail</Link>
+            <Link href={`/tenant/applications/${property.id}`}>Application to Rent</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href={`/packet/${applicant.id}`}>Share packet</Link>
           </Button>
         </div>
       </div>

@@ -828,7 +828,7 @@ export const mockApplicationDetails: Record<string, ApplicationDetails> = {
     },
     occupants: [{ name: "Jane Doe", relationship: "Applicant", age: 32 }],
     pets: [],
-    vehicles: [],
+    vehicles: [{ year: 2021, make: "Honda", model: "Civic", plate: "CA 8JANE" }],
     disclosures: { smoker: false, priorEviction: false, bankruptcy: false },
     documents: [
       {

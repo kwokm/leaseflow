@@ -1,5 +1,5 @@
 import type { ApplicationDocument, ApplicationDetails, DocumentType } from "@/lib/data/mock-data";
-import type { ApplyState, LocalFile } from "@/lib/apply/types";
+import type { ApplyState } from "@/lib/apply/types";
 
 /** Prototype “today” — August 2026. Recency is measured from this date. */
 export const PROTOTYPE_TODAY = new Date("2026-08-14T12:00:00.000Z");
