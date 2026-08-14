@@ -13,7 +13,6 @@ import {
   LyRoute,
   LyScreening,
   LyShowings,
-  LySyndication,
 } from "@/components/demos/ly-widgets";
 import { Float } from "@/components/motion/float";
 import { InView } from "@/components/motion/in-view";
@@ -52,16 +51,16 @@ const FLOW_PAIRS = [
     id: "demo-pair-1",
     items: [
       {
-        id: "demo-syndicate",
-        title: "Marketplace syndication",
-        caption: "One Anaheim listing. Destination boards flip to Live.",
-        Demo: LySyndication,
-      },
-      {
         id: "demo-leads",
         title: "Lead / AI chat",
-        caption: "Maria texts at 11:52pm. A showing is booked.",
+        caption: "Maria inquires on 510 S Resh. Without a reply she is gone; the agent books Tuesday.",
         Demo: LyLead,
+      },
+      {
+        id: "demo-phone",
+        title: "AI phone transcript",
+        caption: "Caller asks if 510 S Resh is available. Agent books Tuesday 2pm.",
+        Demo: LyPhone,
       },
     ],
   },
@@ -90,12 +89,6 @@ const FLOW_PAIRS = [
         title: "Lease signing",
         caption: "Approved → generated → e-sign → deposit queued.",
         Demo: LyLease,
-      },
-      {
-        id: "demo-phone",
-        title: "AI phone transcript",
-        caption: "Caller asks about 510 S Resh. Agent books Tuesday 2pm.",
-        Demo: LyPhone,
       },
     ],
   },
@@ -281,15 +274,15 @@ export default function Home() {
                 <SplitWords>Vacant unit to signed lease.</SplitWords>
               </h2>
               <p className="reveal-tone mt-3 max-w-[46ch] text-[15px] font-medium leading-6 tracking-[-0.16px] text-mute">
-                Syndicate, reply, show, screen, sign. Each pair is one scroll beat. Screening in the
-                middle is ours — Experian, AI income, one packet.
+                Reply, show, screen, sign. Each pair is one scroll beat. Screening in the middle is
+                ours — Experian, AI income, one packet.
               </p>
             </InView>
 
             {FLOW_PAIRS.map((pair) => (
               <InView key={pair.id} id={pair.id} className="ly-beat">
                 <div className="pillar-spatial">
-                  <div className="ly-pair">
+                  <div className={`ly-pair${pair.items.length === 1 ? " is-single" : ""}`}>
                     {pair.items.map((item) => (
                       <article key={item.id} id={item.id} className="scroll-mt-24">
                         <div className="ly-kicker">

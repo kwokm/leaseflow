@@ -44,45 +44,71 @@ export function LySyndication() {
   );
 }
 
-const LEAD_LINES = [
-  { delay: "0s", from: "lead" as const, body: "Hi — is 510 S Resh St still available? Saw it on Zillow." },
-  { delay: "1.25s", from: "agent" as const, body: "Yes. 3 bed, 2 bath, $4,700/mo, September 1. Tuesday in Anaheim?" },
-  { delay: "2.35s", from: "lead" as const, body: "Tuesday 10:30 works." },
-  { delay: "4.05s", from: "agent" as const, body: "Booked Tuesday 10:30 at 510 S Resh St." },
-];
+function LeadBeat({
+  delay,
+  time,
+  text,
+  tone,
+  side,
+}: {
+  delay: string;
+  time: string;
+  text: string;
+  tone: "late" | "lost" | "win";
+  side: "without" | "with";
+}) {
+  return (
+    <div className={cn("d d-thread ly-lead-beat", `is-${side}`)} style={{ animationDelay: delay }}>
+      <p className="ly-lead-time">{time}</p>
+      <div className={cn("ly-lead-bubble", `is-${tone}`)}>{text}</div>
+    </div>
+  );
+}
 
 export function LyLead() {
   return (
-    <DemoPlay flush className="ly ly-card ly-dark ly-pad">
-      <div className="mb-4 flex items-center justify-between gap-2">
-        <p className="text-[13px] font-semibold">Maria S. submits inquiry</p>
-        <span className="ly-live">
-          <span className="d d-dot ly-dot" /> 11:52pm
-        </span>
+    <DemoPlay flush className="ly ly-card ly-proof ly-pad">
+      <div className="ly-lead-head">
+        <span>Maria S. submits inquiry on</span>
+        <span className="ly-lead-channel">Zillow</span>
       </div>
-      <div className="grid grid-cols-2 gap-3">
-        <div className="rounded-xl bg-[color:var(--ly-bg-2)] p-3 opacity-55">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[color:var(--ly-mute)]">
-            Without
-          </p>
-          <p className="mt-2 text-[12px] font-medium leading-5 text-[color:var(--ly-mute)]">
-            Reply lands the next morning.
-          </p>
-        </div>
-        <div className="space-y-2">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[color:var(--ly-green)]">
-            With agent
-          </p>
-          {LEAD_LINES.map((line) => (
-            <div
-              key={line.body}
-              className={cn("d d-thread", line.from === "agent" ? "ly-bubble-out" : "ly-bubble-in")}
-              style={{ animationDelay: line.delay }}
-            >
-              {line.body}
-            </div>
-          ))}
-        </div>
+
+      <div className="ly-lead-grid">
+        <p className="ly-lead-label is-without">Without</p>
+        <span className="ly-lead-gutter" />
+        <p className="ly-lead-label is-with">With agent</p>
+
+        <LeadBeat
+          delay="0s"
+          time="Sun 9:14am"
+          tone="late"
+          side="without"
+          text="You reply — 9.5 hours later."
+        />
+        <span className="ly-lead-node" />
+        <LeadBeat
+          delay="1.25s"
+          time="Sat 11:47pm"
+          tone="win"
+          side="with"
+          text="AI replies in 18 seconds."
+        />
+
+        <LeadBeat
+          delay="2.35s"
+          time="Sun 9:21am"
+          tone="lost"
+          side="without"
+          text={'Maria: “Already rented elsewhere.”'}
+        />
+        <span className="ly-lead-node" />
+        <LeadBeat
+          delay="4.05s"
+          time="Sat 11:52pm"
+          tone="win"
+          side="with"
+          text="Maria books Tuesday 10:30 at 510 S Resh."
+        />
       </div>
     </DemoPlay>
   );
@@ -247,34 +273,41 @@ const PHONE_LINES = [
 
 export function LyPhone() {
   return (
-    <DemoPlay flush className="ly ly-card ly-dark ly-pad">
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <span className="d d-dot-call ly-dot" />
-          <p className="text-[14px] font-semibold">AI Agent — live call</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <span className="text-[12px] font-medium text-[color:var(--ly-mute)]">0:47</span>
-          <div className="ly-eq">
-            {[0, 0.1, 0.2, 0.3, 0.4].map((delay) => (
-              <span key={delay} className="d d-eq" style={{ animationDelay: `${delay}s` }} />
-            ))}
-          </div>
-        </div>
-      </div>
-      <div className="space-y-2">
-        {PHONE_LINES.map((line) => (
-          <div
-            key={line.body}
-            className={cn("d d-thread", line.from === "agent" ? "ly-bubble-out" : "ly-bubble-in")}
-            style={{ animationDelay: line.delay }}
-          >
-            <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.08em] opacity-70">
-              {line.from === "agent" ? "Agent" : "Caller"}
+    <DemoPlay flush className="ly ly-card ly-proof ly-pad">
+      <div className="ly-proof-card px-3 py-3">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="d d-dot-call ly-dot" />
+            <p className="text-[14px] font-semibold tracking-[-0.2px] text-ink">
+              AI Agent — live call
             </p>
-            {line.body}
           </div>
-        ))}
+          <span className="text-[12px] font-medium text-mute">0:47</span>
+        </div>
+        <div className="ly-eq mx-auto mt-3">
+          {[0, 0.1, 0.2, 0.3, 0.4].map((delay) => (
+            <span key={delay} className="d d-eq" style={{ animationDelay: `${delay}s` }} />
+          ))}
+        </div>
+        <div className="mt-4 space-y-3">
+          {PHONE_LINES.map((line) => (
+            <div
+              key={line.body}
+              className={cn("d d-thread", line.from === "agent" ? "ml-8" : "mr-8")}
+              style={{ animationDelay: line.delay }}
+            >
+              <p
+                className={cn(
+                  "mb-1 text-[10px] font-semibold uppercase tracking-[0.08em]",
+                  line.from === "agent" ? "text-right text-[color:var(--ly-accent)]" : "text-mute-2",
+                )}
+              >
+                {line.from === "agent" ? "Agent" : "Caller"}
+              </p>
+              <div className={line.from === "agent" ? "ly-proof-out" : "ly-proof-in"}>{line.body}</div>
+            </div>
+          ))}
+        </div>
       </div>
     </DemoPlay>
   );
