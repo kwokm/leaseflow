@@ -4,7 +4,8 @@ import Link from "next/link";
 import { DeskPill, DeskToolbar } from "@/components/desk/packet-window";
 import { Reveal } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/button";
-import { ShowingsRouteDemo } from "@/components/demos/showings-route";
+import { ShowingsAgendaDemo } from "@/components/demos/showings-route";
+import { SmartRouteDemo } from "@/components/demos/smart-route";
 import { TUESDAY_ROUTE, type ShowingSlot } from "@/lib/leasing/ops";
 import { useBookedShowings } from "@/lib/leasing/store";
 
@@ -44,7 +45,10 @@ export function ShowingsCalendar() {
         </Button>
       </DeskToolbar>
 
-      <ShowingsRouteDemo />
+      <ShowingsAgendaDemo />
+      <div className="border-t border-line">
+        <SmartRouteDemo />
+      </div>
 
       <div className="space-y-5 border-t border-line px-5 py-5 sm:px-6">
         <p className="text-[13px] font-medium leading-5 text-mute">

@@ -1,33 +1,25 @@
+"use client";
+
 import type { ReactNode } from "react";
+import { useDemoPlay } from "@/lib/demos/loop";
 import { cn } from "@/lib/utils";
 
-export function DemoShell({
+export function DemoPlay({
   children,
   className,
-  reset,
 }: {
   children: ReactNode;
   className?: string;
-  reset?: boolean;
 }) {
+  const { ref, playing, reduce } = useDemoPlay();
+
   return (
     <div
-      className={cn("demo-stage px-5 py-4", reset && "is-reset", className)}
+      ref={ref}
+      className={cn("demo-play px-5 py-4", playing && "is-playing", reduce && "is-frozen", className)}
       aria-hidden
     >
       {children}
     </div>
   );
-}
-
-export function DemoLine({
-  on,
-  children,
-  className,
-}: {
-  on: boolean;
-  children: ReactNode;
-  className?: string;
-}) {
-  return <div className={cn("demo-row", on && "is-on", className)}>{children}</div>;
 }

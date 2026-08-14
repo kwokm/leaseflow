@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { ApplicationDesk } from "@/components/desk/application-desk";
 import { DeskToolbar } from "@/components/desk/packet-window";
 import { ListingGallery } from "@/components/listings/photos";
+import { CraigslistDemo } from "@/components/demos/craigslist";
 import { PhotoEnhanceDemo } from "@/components/demos/photo-enhance";
 import { SyndicationDemo } from "@/components/demos/syndication";
 import { SyndicationTiles } from "@/components/leasing/syndication";
@@ -104,6 +105,9 @@ export default function ListingDetailPage({
         ) : null}
         <div className="mt-5 overflow-hidden rounded-md border border-line">
           <SyndicationDemo />
+        </div>
+        <div className="mt-5 overflow-hidden rounded-md border border-line">
+          <CraigslistDemo />
         </div>
         <div className="mt-5">
           <SyndicationTiles listingId={property.id} />
