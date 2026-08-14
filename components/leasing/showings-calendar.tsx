@@ -4,6 +4,7 @@ import Link from "next/link";
 import { DeskPill, DeskToolbar } from "@/components/desk/packet-window";
 import { Reveal } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/button";
+import { ShowingsRouteDemo } from "@/components/demos/showings-route";
 import { TUESDAY_ROUTE, type ShowingSlot } from "@/lib/leasing/ops";
 import { useBookedShowings } from "@/lib/leasing/store";
 
@@ -43,10 +44,12 @@ export function ShowingsCalendar() {
         </Button>
       </DeskToolbar>
 
-      <div className="space-y-5 px-5 py-5 sm:px-6">
+      <ShowingsRouteDemo />
+
+      <div className="space-y-5 border-t border-line px-5 py-5 sm:px-6">
         <p className="text-[13px] font-medium leading-5 text-mute">
-          Clustered Tuesday stops around 510 S Resh St. Self-book slots stay open until a renter
-          claims them. Demo calendar — not a live lockbox.
+          Live desk after the loop: clustered Tuesday stops around 510 S Resh St. Demo calendar —
+          not a live lockbox.
         </p>
 
         <ol className="space-y-2">

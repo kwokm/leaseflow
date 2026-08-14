@@ -5,6 +5,8 @@ import Link from "next/link";
 import { DeskPill, DeskToolbar } from "@/components/desk/packet-window";
 import { Reveal } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/button";
+import { LeadAgentDemo } from "@/components/demos/lead-agent";
+import { MarketplaceDemo } from "@/components/demos/marketplace";
 import { LEAD_THREADS, channelLabel, type LeadChannel } from "@/lib/leasing/ops";
 import { shortAddress } from "@/lib/desk/display";
 import { getPropertyById } from "@/lib/data/mock-data";
@@ -76,22 +78,30 @@ export function LeadInbox() {
               </Button>
             </div>
 
-            <div className="mt-4 space-y-3">
-              {active.messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={cn(
-                    "max-w-[86%] rounded-btn border border-line px-3.5 py-2.5 text-[13px] font-medium leading-5",
-                    message.from === "agent" ? "ml-auto bg-rail text-ink" : "bg-mist text-ink",
-                  )}
-                >
-                  <p>{message.body}</p>
-                  <p className="mt-1 text-[11px] font-medium text-mute-2">
-                    {message.from === "agent" ? "AI agent · instant" : "Lead"} ·{" "}
-                    {new Date(message.at).toLocaleString()}
-                  </p>
+            <div className="mt-4">
+              {active.id === "lead-maria" ? (
+                <LeadAgentDemo />
+              ) : active.channel === "facebook" ? (
+                <MarketplaceDemo />
+              ) : (
+                <div className="space-y-3">
+                  {active.messages.map((message) => (
+                    <div
+                      key={message.id}
+                      className={cn(
+                        "max-w-[86%] rounded-btn border border-line px-3.5 py-2.5 text-[13px] font-medium leading-5",
+                        message.from === "agent" ? "ml-auto bg-rail text-ink" : "bg-mist text-ink",
+                      )}
+                    >
+                      <p>{message.body}</p>
+                      <p className="mt-1 text-[11px] font-medium text-mute-2">
+                        {message.from === "agent" ? "AI agent · instant" : "Lead"} ·{" "}
+                        {new Date(message.at).toLocaleString()}
+                      </p>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
           </div>
         ) : (

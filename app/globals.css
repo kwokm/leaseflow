@@ -749,9 +749,17 @@
   .reveal-cta,
   .reveal-spatial,
   .pillar-spatial,
-  .split-rise {
+  .split-rise,
+  .demo-row,
+  .demo-stage,
+  .demo-stage.is-reset {
     opacity: 1 !important;
     transform: none !important;
+  }
+
+  .demo-pulse {
+    animation: none !important;
+    opacity: 1 !important;
   }
 
   .split-mask {
@@ -775,8 +783,50 @@
   transition: filter var(--dur-medium) var(--ease-power3);
 }
 
+.demo-stage {
+  transition: opacity 500ms ease-in-out;
+}
+
+.demo-stage.is-reset {
+  opacity: 0;
+}
+
+.demo-row {
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 600ms var(--ease-power3),
+    transform 600ms var(--ease-power3);
+}
+
+.demo-row.is-on {
+  opacity: 1;
+  transform: none;
+}
+
+.demo-pulse {
+  animation: demo-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes demo-pulse {
+  0%,
+  100% {
+    opacity: 0.42;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.demo-wipe,
+.demo-wipe > div {
+  transition: transform 200ms ease-in-out;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .photo-enhance {
+  .photo-enhance,
+  .demo-wipe,
+  .demo-wipe > div {
     transition: none;
   }
 }

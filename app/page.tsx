@@ -1,8 +1,16 @@
 import Link from "next/link";
 import { BrandMark, BrandWord } from "@/components/brand";
-import { ApplicationTable } from "@/components/desk/application-table";
 import { DeskSidebar } from "@/components/desk/desk-sidebar";
 import { DeskPill, DeskToolbar, PacketWindow } from "@/components/desk/packet-window";
+import { LeadAgentDemo } from "@/components/demos/lead-agent";
+import { LeaseSignDemo } from "@/components/demos/lease-sign";
+import { MarketplaceDemo } from "@/components/demos/marketplace";
+import { PhoneDemo } from "@/components/demos/phone";
+import { PhotoEnhanceDemo } from "@/components/demos/photo-enhance";
+import { PipelineFunnelDemo } from "@/components/demos/pipeline-funnel";
+import { ScreeningDemo } from "@/components/demos/screening";
+import { ShowingsRouteDemo } from "@/components/demos/showings-route";
+import { SyndicationDemo } from "@/components/demos/syndication";
 import { Float } from "@/components/motion/float";
 import { InView } from "@/components/motion/in-view";
 import { Reveal } from "@/components/motion/reveal";
@@ -10,7 +18,6 @@ import { SectionHeadline } from "@/components/motion/section-headline";
 import { SplitWords } from "@/components/motion/split-words";
 import { Button } from "@/components/ui/button";
 import { ListingPhotoStrip } from "@/components/listings/photos";
-import { deskHeroApplicants } from "@/lib/desk/display";
 import { FEATURED_LISTING_ID, getPropertyById } from "@/lib/data/mock-data";
 
 const APPLY_HREF = `/apply/${FEATURED_LISTING_ID}`;
@@ -36,9 +43,19 @@ const STEPS = [
   },
 ];
 
+const FLOW_DEMOS = [
+  { n: "01", title: "Syndicate • 510 S Resh St", meta: "Demo loop", Demo: SyndicationDemo },
+  { n: "02", title: "Lead reply • Maria", meta: "Demo loop", Demo: LeadAgentDemo },
+  { n: "03", title: "Showings • Tuesday Anaheim", meta: "Demo loop", Demo: ShowingsRouteDemo },
+  { n: "04", title: "Screen • our checker", meta: "Demo loop", Demo: ScreeningDemo },
+  { n: "05", title: "Sign • dummy e-sign", meta: "Demo loop", Demo: LeaseSignDemo },
+  { n: "06", title: "AI phone • 510 S Resh", meta: "Demo loop", Demo: PhoneDemo },
+  { n: "07", title: "Facebook / Craigslist", meta: "Demo sync", Demo: MarketplaceDemo },
+  { n: "08", title: "Photo enhance", meta: "Demo loop", Demo: PhotoEnhanceDemo },
+] as const;
+
 export default function Home() {
   const property = getPropertyById(FEATURED_LISTING_ID)!;
-  const heroRows = deskHeroApplicants();
 
   return (
     <div className="min-h-screen bg-white">
@@ -119,7 +136,7 @@ export default function Home() {
                       <DeskPill active>Vacant units</DeskPill>
                       <DeskPill>Application review</DeskPill>
                     </DeskToolbar>
-                    <ApplicationTable rows={heroRows} packetLinks selectedId="app-1" />
+                    <PipelineFunnelDemo />
                   </div>
                 </div>
               </PacketWindow>
@@ -190,47 +207,13 @@ export default function Home() {
 
             <InView
               as="ol"
-              className="reveal-stagger mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5"
+              className="reveal-stagger mt-10 grid grid-cols-1 gap-4 lg:grid-cols-2"
             >
-              {[
-                {
-                  n: "01",
-                  lead: "Syndicate.",
-                  tone: "One listing to Zillow, Apartments.com, HotPads, Facebook, Craigslist. Demo sync.",
-                },
-                {
-                  n: "02",
-                  lead: "Reply.",
-                  tone: "SMS, Facebook, or web. The agent offers a showing in the first message.",
-                },
-                {
-                  n: "03",
-                  lead: "Show.",
-                  tone: "Self-book slots. Tuesday route around Anaheim, starting at Resh St.",
-                },
-                {
-                  n: "04",
-                  lead: "Screen.",
-                  tone: "Experian, AI income check, filled Application to Rent. The packet we already run.",
-                },
-                {
-                  n: "05",
-                  lead: "Sign.",
-                  tone: "Approve generates the lease. Dummy e-sign, then deposit queued to ACH.",
-                },
-              ].map((step) => (
+              {FLOW_DEMOS.map((step) => (
                 <li key={step.n} className="pillar-spatial">
-                  <article className="h-full rounded-lg border border-line bg-paper shadow-window">
-                    <div className="p-5 sm:p-6">
-                      <p className="num text-[13px] font-medium text-mute-2">{step.n}</p>
-                      <h3 className="mt-3 text-[17px] font-semibold leading-6 tracking-[-0.3px] text-ink">
-                        {step.lead}
-                      </h3>
-                      <p className="tone reveal-tone mt-1.5 text-[14px] font-medium leading-5 tracking-[-0.14px] text-mute">
-                        {step.tone}
-                      </p>
-                    </div>
-                  </article>
+                  <PacketWindow title={`${step.n} ${step.title}`} meta={step.meta}>
+                    <step.Demo />
+                  </PacketWindow>
                 </li>
               ))}
             </InView>

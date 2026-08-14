@@ -5,6 +5,7 @@ import type { Applicant, ApplicationStatus } from "@/lib/data/mock-data";
 import { loadDeskApplicants } from "@/lib/desk/queue";
 import { ApplicationTable } from "@/components/desk/application-table";
 import { DeskPill, DeskToolbar } from "@/components/desk/packet-window";
+import { ScreeningDemo } from "@/components/demos/screening";
 import { Reveal } from "@/components/motion/reveal";
 
 type StatusFilter = "all" | "received" | ApplicationStatus;
@@ -55,6 +56,11 @@ export function ApplicationDesk({
             Received
           </DeskPill>
         </DeskToolbar>
+      ) : null}
+      {chrome ? (
+        <div className="border-b border-line">
+          <ScreeningDemo />
+        </div>
       ) : null}
       <ApplicationTable
         rows={scoped}

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { DeskToolbar } from "@/components/desk/packet-window";
+import { LeaseSignDemo } from "@/components/demos/lease-sign";
 import { Reveal } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,6 +30,10 @@ export function LeasePacket({
           <Link href={backHref}>{backLabel}</Link>
         </Button>
       </DeskToolbar>
+
+      <div className="border-b border-line">
+        <LeaseSignDemo />
+      </div>
 
       <div className="space-y-5 px-5 py-5 sm:px-6">
         <div>

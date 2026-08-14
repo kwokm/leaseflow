@@ -6,6 +6,8 @@ import { notFound } from "next/navigation";
 import { ApplicationDesk } from "@/components/desk/application-desk";
 import { DeskToolbar } from "@/components/desk/packet-window";
 import { ListingGallery } from "@/components/listings/photos";
+import { PhotoEnhanceDemo } from "@/components/demos/photo-enhance";
+import { SyndicationDemo } from "@/components/demos/syndication";
 import { SyndicationTiles } from "@/components/leasing/syndication";
 import { Button } from "@/components/ui/button";
 import { getPropertyById, type Applicant } from "@/lib/data/mock-data";
@@ -90,13 +92,19 @@ export default function ListingDetailPage({
                 {enhanced ? "Enhanced on" : "Show enhance"}
               </button>
             </div>
-            <ListingGallery
-              photos={property.photos}
-              alt={shortAddress(property.address)}
-              enhanced={enhanced}
-            />
+            <PhotoEnhanceDemo />
+            <div className="mt-3">
+              <ListingGallery
+                photos={property.photos}
+                alt={shortAddress(property.address)}
+                enhanced={enhanced}
+              />
+            </div>
           </div>
         ) : null}
+        <div className="mt-5 overflow-hidden rounded-md border border-line">
+          <SyndicationDemo />
+        </div>
         <div className="mt-5">
           <SyndicationTiles listingId={property.id} />
         </div>
