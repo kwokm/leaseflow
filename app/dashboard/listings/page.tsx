@@ -6,23 +6,26 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { DeskPill, DeskToolbar } from "@/components/desk/packet-window";
 import { StatusPill } from "@/components/desk/status-pill";
-import { mockProperties } from "@/lib/data/mock-data";
+import { ListingThumb } from "@/components/listings/photos";
+import { getAllProperties, type Applicant } from "@/lib/data/mock-data";
+import { listingThumb } from "@/lib/listings/store";
 import { loadDeskApplicants, listingRollup } from "@/lib/desk/queue";
 import { shortAddress } from "@/lib/desk/display";
 import { Reveal } from "@/components/motion/reveal";
-import type { Applicant } from "@/lib/data/mock-data";
 
 export default function ListingsPage() {
   const router = useRouter();
   const [applicants, setApplicants] = useState<Applicant[]>([]);
+  const [properties, setProperties] = useState(getAllProperties());
 
   useEffect(() => {
     setApplicants(loadDeskApplicants());
+    setProperties(getAllProperties());
   }, []);
 
   return (
     <Reveal>
-      <DeskToolbar meta={`${mockProperties.length} listings`}>
+      <DeskToolbar meta={`${properties.length} listings`}>
         <DeskPill active>All properties</DeskPill>
         <Button asChild size="sm">
           <Link href="/dashboard/listings/new">New listing</Link>
@@ -42,10 +45,11 @@ export default function ListingsPage() {
             </tr>
           </thead>
           <tbody>
-            {mockProperties.map((property) => {
+            {properties.map((property) => {
               const rollup = listingRollup(
                 applicants.filter((row) => row.propertyId === property.id)
               );
+              const thumb = listingThumb(property);
 
               return (
                 <tr
@@ -62,9 +66,15 @@ export default function ListingsPage() {
                   aria-label={`Open applicants for ${shortAddress(property.address)}`}
                 >
                   <td>
-                    <div className="font-medium text-ink">{shortAddress(property.address)}</div>
-                    <div className="text-[12px] text-mute">
-                      {property.bedrooms} bed · {property.bathrooms} bath
+                    <div className="flex items-center gap-3">
+                      <ListingThumb src={thumb} alt={shortAddress(property.address)} />
+                      <div>
+                        <div className="font-medium text-ink">{shortAddress(property.address)}</div>
+                        <div className="text-[12px] text-mute">
+                          {property.bedrooms} bed · {property.bathrooms} bath
+                          {property.sqft ? ` · ${property.sqft.toLocaleString()} sqft` : ""}
+                        </div>
+                      </div>
                     </div>
                   </td>
                   <td className="num">${property.rent.toLocaleString()}</td>

@@ -1,9 +1,5 @@
 import type { Metadata } from "next";
-import { ApplyWizard } from "@/components/apply/wizard";
-import { getPropertyById } from "@/lib/data/mock-data";
-
-// 742 Evergreen Terrace is the demo listing every unknown id falls back to.
-const DEFAULT_LISTING_ID = "prop-1";
+import { ApplyListing } from "@/components/apply/apply-listing";
 
 export const metadata: Metadata = {
   title: "Apply — LeaseFlow",
@@ -16,7 +12,5 @@ export default async function ApplyPage({
   params: Promise<{ listingId: string }>;
 }) {
   const { listingId } = await params;
-  const property = getPropertyById(listingId) ?? getPropertyById(DEFAULT_LISTING_ID)!;
-
-  return <ApplyWizard property={property} />;
+  return <ApplyListing listingId={listingId} />;
 }

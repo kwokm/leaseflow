@@ -27,14 +27,14 @@ function titleFor(pathname: string): string {
   if (pathname.startsWith("/dashboard/listings")) return "Properties";
   if (pathname.startsWith("/dashboard/payments")) return "Payments";
   if (pathname.startsWith("/dashboard/messages")) return "Messages";
-  return "Application packet • 742 Evergreen Terrace";
+  return "Application packet • 510 S Resh St";
 }
 
 export function DeskFrame({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   return (
-    <PacketWindow title={titleFor(pathname)} meta="Desk • 3 files">
+    <PacketWindow title={titleFor(pathname)} meta="Realtor desk • 3 files">
       <div className="desk">
         <DeskSidebar />
         <div className="min-w-0">{children}</div>

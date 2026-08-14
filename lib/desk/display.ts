@@ -8,7 +8,7 @@ import {
 } from "@/lib/data/mock-data";
 
 /** The three rows from the locked landing screenshot, in that order. */
-export const DESK_HERO_IDS = ["app-1", "app-3", "app-4"] as const;
+export const DESK_HERO_IDS = ["app-1", "app-6", "app-4"] as const;
 
 const AVA_BY_INITIALS: Record<string, string> = {
   SJ: "ava-sj",

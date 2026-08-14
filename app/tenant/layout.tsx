@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { BrandMark, BrandWord } from "@/components/brand";
-import { DeskFrame } from "@/components/desk/desk-frame";
+import { TenantFrame } from "@/components/tenant/tenant-frame";
 import { DashboardMotion } from "@/components/motion/dashboard-motion";
 import { SpatialMount, SpatialOrigin } from "@/components/motion/spatial";
 import { PageWash } from "@/components/page-wash";
 import { Button } from "@/components/ui/button";
 import { FEATURED_LISTING_ID } from "@/lib/data/mock-data";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default function TenantLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative min-h-screen overflow-hidden bg-white print:bg-white">
       <SpatialOrigin>
@@ -22,10 +22,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </Link>
           <div className="ml-auto flex items-center gap-2">
             <Button asChild variant="outline">
-              <Link href={`/apply/${FEATURED_LISTING_ID}`}>Apply as renter</Link>
-            </Button>
-            <Button asChild variant="outline">
-              <Link href="/dashboard/listings/new">New listing</Link>
+              <Link href={`/apply/${FEATURED_LISTING_ID}`}>Continue apply</Link>
             </Button>
             <Button asChild>
               <Link href="/dashboard">Open realtor desk</Link>
@@ -36,9 +33,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       <div className="relative z-10 mx-auto max-w-shell px-5 pb-12 pt-2 sm:px-8">
         <SpatialMount>
-          <DeskFrame>
+          <TenantFrame>
             <DashboardMotion>{children}</DashboardMotion>
-          </DeskFrame>
+          </TenantFrame>
         </SpatialMount>
       </div>
     </div>

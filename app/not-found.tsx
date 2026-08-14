@@ -35,7 +35,7 @@ export default function NotFound() {
                 <Link href="/">Back to LeaseFlow</Link>
               </Button>
               <Button asChild variant="outline">
-                <Link href="/dashboard">Open the desk</Link>
+                <Link href="/dashboard">Open realtor desk</Link>
               </Button>
             </div>
           </section>

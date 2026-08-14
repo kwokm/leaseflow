@@ -9,12 +9,13 @@ import { Reveal } from "@/components/motion/reveal";
 import { SectionHeadline } from "@/components/motion/section-headline";
 import { SplitWords } from "@/components/motion/split-words";
 import { Button } from "@/components/ui/button";
+import { ListingPhotoStrip } from "@/components/listings/photos";
 import { deskHeroApplicants } from "@/lib/desk/display";
-import { getPropertyById } from "@/lib/data/mock-data";
+import { FEATURED_LISTING_ID, getPropertyById } from "@/lib/data/mock-data";
 
-const DEMO_LISTING_ID = "prop-1";
-const APPLY_HREF = `/apply/${DEMO_LISTING_ID}`;
+const APPLY_HREF = `/apply/${FEATURED_LISTING_ID}`;
 const DESK_HREF = "/dashboard";
+const TENANT_HREF = "/tenant";
 
 const STEPS = [
   {
@@ -36,7 +37,7 @@ const STEPS = [
 ];
 
 export default function Home() {
-  const property = getPropertyById(DEMO_LISTING_ID)!;
+  const property = getPropertyById(FEATURED_LISTING_ID)!;
   const heroRows = deskHeroApplicants();
 
   return (
@@ -97,17 +98,20 @@ export default function Home() {
             </p>
             <div className="hero-ctas reveal-cta">
               <Button asChild size="cta">
-                <Link href={DESK_HREF}>Open the desk</Link>
+                <Link href={DESK_HREF}>Open realtor desk</Link>
               </Button>
               <Button asChild variant="outline" size="cta">
                 <Link href={APPLY_HREF}>Apply as renter</Link>
+              </Button>
+              <Button asChild variant="ghost" size="cta">
+                <Link href={TENANT_HREF}>Open tenant desk</Link>
               </Button>
             </div>
           </InView>
 
           <div className="stage-wrap" id="desk">
             <Float>
-              <PacketWindow title="Application packet • 742 Evergreen Terrace" meta="Desk • 3 files">
+              <PacketWindow title="Application packet • 510 S Resh St" meta="Realtor desk • 3 files">
                 <div className="desk">
                   <DeskSidebar staticActive="Applications" />
                   <div className="min-w-0">
@@ -215,7 +219,7 @@ export default function Home() {
             <div className="reveal-spatial">
               <PacketWindow title={`Apply • ${property.address.split(",")[0]}`}>
                 <div className="flex flex-col gap-5 px-6 py-7 md:flex-row md:items-center md:justify-between">
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-[13px] font-medium tracking-[-0.13px] text-mute">For renters</p>
                     <h2
                       id="apply-title"
@@ -224,10 +228,13 @@ export default function Home() {
                       Apply for {property.address.split(",")[0]}
                     </h2>
                     <p className="mt-1.5 text-[14px] font-medium text-mute">
-                      {property.bedrooms} bedroom ·{" "}
+                      {property.bedrooms} bedroom · {property.bathrooms} bath ·{" "}
                       <span className="num">${property.rent.toLocaleString()}</span> per month · you
                       pay the screening fee.
                     </p>
+                    <div className="mt-3">
+                      <ListingPhotoStrip photos={property.photos} alt={property.address} />
+                    </div>
                   </div>
                   <Button asChild size="cta" className="shrink-0">
                     <Link href={APPLY_HREF}>Apply as renter</Link>

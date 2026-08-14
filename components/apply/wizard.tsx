@@ -222,7 +222,7 @@ export function ApplyWizard({ property }: { property: Property }) {
                 </Button>
               ) : (
                 <Button asChild size="touch" className="sm:min-w-[168px]">
-                  <Link href="/dashboard">Open the desk</Link>
+                  <Link href="/tenant">Open tenant desk</Link>
                 </Button>
               )}
             </div>

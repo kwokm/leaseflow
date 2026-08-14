@@ -5,6 +5,7 @@ import { StepBody } from "@/components/apply/motion";
 import { Note, Panel, StepHeading } from "@/components/apply/step-shell";
 import type { StepProps } from "@/components/apply/step-shell";
 import { formatDateOnly, formatDollars } from "@/lib/apply/format";
+import { ListingPhotoStrip } from "@/components/listings/photos";
 import type { ScreeningPackage } from "@/lib/data/mock-data";
 import { cn } from "@/lib/utils";
 
@@ -56,6 +57,11 @@ export function StepStart({ state, patch, property }: StepProps) {
             <p className="text-[17px] font-semibold tracking-[-0.3px] text-ink">
               {property.address}
             </p>
+            {property.photos?.length ? (
+              <div className="mt-3">
+                <ListingPhotoStrip photos={property.photos} alt={property.address} size="md" />
+              </div>
+            ) : null}
             <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[14px] font-medium text-mute">
               <span className="inline-flex items-center gap-1.5">
                 <BedDouble className="h-4 w-4" aria-hidden />

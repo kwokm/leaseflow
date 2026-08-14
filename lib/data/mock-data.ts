@@ -14,6 +14,12 @@ export interface Property {
   screeningPackage: ScreeningPackage;
   applyUrl: string;
   createdAt: string;
+  photos?: string[];
+  sqft?: number;
+  zillowUrl?: string;
+  zpid?: string;
+  neighborhood?: string;
+  propertyType?: string;
 }
 
 export interface Applicant {
@@ -177,7 +183,36 @@ export interface MessageThread {
 }
 
 // Sample Properties
+export const FEATURED_LISTING_ID = "resh-510";
+
+export const ANAHEIM_PHOTOS = [
+  "/listings/510-s-resh/exterior.jpg",
+  "/listings/510-s-resh/street.jpg",
+  "/listings/510-s-resh/living.jpg",
+  "/listings/510-s-resh/kitchen.jpg",
+  "/listings/510-s-resh/bedroom.jpg",
+  "/listings/510-s-resh/bathroom.jpg",
+  "/listings/510-s-resh/backyard.jpg",
+] as const;
+
 export const mockProperties: Property[] = [
+  {
+    id: "resh-510",
+    address: "510 S Resh St, Anaheim, CA 92805",
+    rent: 4700,
+    bedrooms: 3,
+    bathrooms: 2,
+    availableDate: "2026-09-01",
+    screeningPackage: "premium",
+    applyUrl: "https://leaseflow.app/apply/resh-510",
+    createdAt: "2026-08-01T10:00:00Z",
+    photos: [...ANAHEIM_PHOTOS],
+    sqft: 1594,
+    zillowUrl: "https://www.zillow.com/homedetails/510-S-Resh-St-Anaheim-CA-92805/25128456_zpid/",
+    zpid: "25128456",
+    neighborhood: "The Colony / central Anaheim",
+    propertyType: "House for rent",
+  },
   {
     id: "prop-1",
     address: "742 Evergreen Terrace, Springfield, IL 62701",
@@ -217,7 +252,7 @@ export const mockProperties: Property[] = [
 export const mockApplicants: Applicant[] = [
   {
     id: "app-1",
-    propertyId: "prop-1",
+    propertyId: "resh-510",
     status: "completed",
     firstName: "Sarah",
     lastName: "Johnson",
@@ -229,7 +264,7 @@ export const mockApplicants: Applicant[] = [
   },
   {
     id: "app-2",
-    propertyId: "prop-1",
+    propertyId: "resh-510",
     status: "in_progress",
     firstName: "Michael",
     lastName: "Chen",
@@ -251,7 +286,7 @@ export const mockApplicants: Applicant[] = [
   },
   {
     id: "app-4",
-    propertyId: "prop-1",
+    propertyId: "resh-510",
     status: "declined",
     firstName: "James",
     lastName: "Wilson",
@@ -273,7 +308,7 @@ export const mockApplicants: Applicant[] = [
   },
   {
     id: "app-6",
-    propertyId: "prop-1",
+    propertyId: "resh-510",
     status: "completed",
     firstName: "Jessica",
     lastName: "Martinez",
@@ -282,6 +317,16 @@ export const mockApplicants: Applicant[] = [
     appliedAt: "2026-07-25T13:30:00Z",
     completedAt: "2026-07-25T14:00:00Z",
     leaseScore: 695,
+  },
+  {
+    id: "app-jane",
+    propertyId: "resh-510",
+    status: "in_progress",
+    firstName: "Jane",
+    lastName: "Doe",
+    email: "jane.doe@leaseflow.dev",
+    phone: "(555) 010-0142",
+    appliedAt: "2026-08-10T12:00:00Z",
   },
 ];
 
@@ -844,7 +889,7 @@ export const mockPayments: Payment[] = [
     kind: "screening_fee",
     description: "Premium screening fee",
     applicantId: "app-1",
-    propertyId: "prop-1",
+    propertyId: "resh-510",
     amount: 59.99,
     status: "paid",
     method: "Visa ···4242",
@@ -866,7 +911,7 @@ export const mockPayments: Payment[] = [
     kind: "screening_fee",
     description: "Standard screening fee",
     applicantId: "app-4",
-    propertyId: "prop-1",
+    propertyId: "resh-510",
     amount: 39.99,
     status: "refunded",
     method: "Visa ···9931",
@@ -877,7 +922,7 @@ export const mockPayments: Payment[] = [
     kind: "screening_fee",
     description: "Premium screening fee",
     applicantId: "app-6",
-    propertyId: "prop-1",
+    propertyId: "resh-510",
     amount: 59.99,
     status: "paid",
     method: "Amex ···1007",
@@ -888,7 +933,7 @@ export const mockPayments: Payment[] = [
     kind: "screening_fee",
     description: "Premium screening fee",
     applicantId: "app-2",
-    propertyId: "prop-1",
+    propertyId: "resh-510",
     amount: 59.99,
     status: "pending",
     method: "Awaiting payment",
@@ -921,14 +966,14 @@ export const mockThreads: MessageThread[] = [
   {
     id: "thread-1",
     applicantId: "app-1",
-    propertyId: "prop-1",
+    propertyId: "resh-510",
     subject: "Move-in timing",
     unread: 2,
     messages: [
       {
         id: "msg-1",
         from: "applicant",
-        body: "Hi! I just submitted my application for 742 Evergreen Terrace. Is the September 1 move-in date still available?",
+        body: "Hi! I just submitted my application for 510 S Resh St. Is the September 1 move-in date still available?",
         sentAt: "2026-07-18T12:02:00Z",
       },
       {
@@ -948,7 +993,7 @@ export const mockThreads: MessageThread[] = [
   {
     id: "thread-2",
     applicantId: "app-2",
-    propertyId: "prop-1",
+    propertyId: "resh-510",
     subject: "Missing pay stub",
     unread: 1,
     messages: [
@@ -987,11 +1032,54 @@ export const mockThreads: MessageThread[] = [
       },
     ],
   },
+  {
+    id: "thread-jane",
+    applicantId: "app-jane",
+    propertyId: "resh-510",
+    subject: "510 S Resh St application",
+    unread: 1,
+    messages: [
+      {
+        id: "msg-jane-1",
+        from: "landlord",
+        body: "Hi Jane — we received the start of your application for 510 S Resh St. Finish the packet when you can and we’ll review it the same day.",
+        sentAt: "2026-08-10T14:20:00Z",
+      },
+      {
+        id: "msg-jane-2",
+        from: "applicant",
+        body: "Thanks — I’ll finish the uploads this week.",
+        sentAt: "2026-08-10T16:05:00Z",
+      },
+    ],
+  },
 ];
 
 // Helper functions
+const STORED_LISTINGS_KEY = "leaseflow.listings.v1";
+
+function readStoredListings(): Property[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(STORED_LISTINGS_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as Property[];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
 export function getPropertyById(id: string): Property | undefined {
-  return mockProperties.find((p) => p.id === id);
+  const stored = readStoredListings().find((p) => p.id === id);
+  const seeded = mockProperties.find((p) => p.id === id);
+  return stored ?? seeded;
+}
+
+export function getAllProperties(): Property[] {
+  const byId = new Map(mockProperties.map((p) => [p.id, p]));
+  for (const row of readStoredListings()) byId.set(row.id, row);
+  return [...byId.values()];
 }
 
 export function getApplicantById(id: string): Applicant | undefined {

@@ -5,12 +5,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ApplicationDesk } from "@/components/desk/application-desk";
 import { DeskToolbar } from "@/components/desk/packet-window";
+import { ListingGallery } from "@/components/listings/photos";
 import { Button } from "@/components/ui/button";
-import { getPropertyById } from "@/lib/data/mock-data";
+import { getPropertyById, type Applicant } from "@/lib/data/mock-data";
 import { loadDeskApplicantsForListing, listingRollup } from "@/lib/desk/queue";
 import { shortAddress } from "@/lib/desk/display";
 import { Reveal } from "@/components/motion/reveal";
-import type { Applicant } from "@/lib/data/mock-data";
 
 export default function ListingDetailPage({
   params,
@@ -18,14 +18,18 @@ export default function ListingDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const property = getPropertyById(id);
+  const [property, setProperty] = useState(() => getPropertyById(id));
   const [applicants, setApplicants] = useState<Applicant[]>([]);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    setProperty(getPropertyById(id));
     setApplicants(loadDeskApplicantsForListing(id));
+    setReady(true);
   }, [id]);
 
-  if (!property) notFound();
+  if (ready && !property) notFound();
+  if (!property) return null;
 
   const rollup = listingRollup(applicants);
 
@@ -47,11 +51,14 @@ export default function ListingDetailPage({
         <p className="text-[18px] font-semibold tracking-[-0.3px] text-ink">
           {shortAddress(property.address)}
         </p>
+        <p className="mt-1 text-[13px] font-medium text-mute">
+          {property.neighborhood ?? property.propertyType ?? property.address}
+        </p>
         <dl className="mt-3 grid grid-cols-2 gap-x-6 gap-y-2 sm:grid-cols-5">
           {[
             ["Rent", `$${property.rent.toLocaleString()}/mo`],
             ["Beds / baths", `${property.bedrooms} / ${property.bathrooms}`],
-            ["Package", property.screeningPackage],
+            ["Sqft", property.sqft ? property.sqft.toLocaleString() : "—"],
             ["Applicants", String(rollup.count)],
             ["Avg LeaseScore", rollup.avgScore ? String(rollup.avgScore) : "—"],
           ].map(([label, value]) => (
@@ -61,6 +68,11 @@ export default function ListingDetailPage({
             </div>
           ))}
         </dl>
+        {property.photos?.length ? (
+          <div className="mt-5">
+            <ListingGallery photos={property.photos} alt={shortAddress(property.address)} />
+          </div>
+        ) : null}
       </Reveal>
 
       <ApplicationDesk propertyId={property.id} extras chrome={false} />
