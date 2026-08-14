@@ -200,8 +200,8 @@ export default function Home() {
                 <SplitWords>Vacant unit to signed lease.</SplitWords>
               </h2>
               <p className="reveal-tone mt-3 max-w-[46ch] text-[15px] font-medium leading-6 tracking-[-0.16px] text-mute">
-                Syndicate, reply, show, screen, sign. Screening in the middle is ours — Experian, AI
-                income, one packet.
+                Syndicate, reply, show, screen, sign. Each card loops the move. Screening in the
+                middle is ours — Experian, AI income, one packet.
               </p>
             </InView>
 
