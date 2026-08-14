@@ -9,8 +9,6 @@ import {
   LyLead,
   LyLease,
   LyPhone,
-  LyPhoto,
-  LyRoute,
   LyScreening,
   LyShowings,
 } from "@/components/demos/ly-widgets";
@@ -106,23 +104,6 @@ const FLOW_PAIRS = [
         title: "Craigslist auto-post",
         caption: "Three listing rows go live. Demo sync.",
         Demo: LyCraigslist,
-      },
-    ],
-  },
-  {
-    id: "demo-pair-5",
-    items: [
-      {
-        id: "demo-route",
-        title: "Smart route planner",
-        caption: "Resh St first. Nearby Anaheim stops light in order.",
-        Demo: LyRoute,
-      },
-      {
-        id: "demo-photo",
-        title: "AI photo enhance",
-        caption: "Scan, then the Anaheim living room sharpens.",
-        Demo: LyPhoto,
       },
     ],
   },
