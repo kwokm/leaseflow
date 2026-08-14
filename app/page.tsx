@@ -130,36 +130,45 @@ export default function Home() {
         <section id="pillars" className="bg-white pb-16 sm:pb-28" aria-labelledby="pillars-title">
           <div className="mx-auto max-w-shell px-5 sm:px-8">
             <InView>
-              <SectionHeadline
+              <h2
                 id="pillars-title"
-                lead="What we do best."
-                tone="Three pillars."
-                className="max-w-[20ch]"
-              />
+                className="text-[30px] font-medium leading-[1.08] tracking-[-0.6px] text-ink sm:text-[40px] sm:leading-[44px] sm:tracking-[-0.4px]"
+              >
+                <SplitWords>What we do best.</SplitWords>
+              </h2>
             </InView>
 
-            <InView className="reveal-stagger mt-10 grid grid-cols-1 gap-4 lg:grid-cols-3">
-              <article className="reveal-spatial">
-                <div className="window h-full">
-                  <div className="p-6 sm:p-7">
-                    <p className="text-[17px] font-semibold leading-6 tracking-[-0.3px] text-ink">
-                      Secure, verifiable Experian screening — free.
-                    </p>
-                    <p className="mt-2 text-[14px] font-medium leading-5 tracking-[-0.14px] text-mute">
-                      We securely and verifiably screen applicants via Experian for free.
-                    </p>
-                    <p className="mt-3 text-[12px] font-medium leading-4 text-mute-2">
-                      Prototype mock pull in apply. No consumer reporting agency is contacted.
-                    </p>
-                  </div>
-                </div>
-              </article>
-              <article className="reveal-spatial" aria-hidden>
-                <div className="window h-full min-h-[200px]" />
-              </article>
-              <article className="reveal-spatial" aria-hidden>
-                <div className="window h-full min-h-[200px]" />
-              </article>
+            <InView
+              as="ul"
+              className="reveal-stagger mt-10 grid grid-cols-1 gap-4 lg:grid-cols-3"
+            >
+              {[
+                {
+                  lead: "Free Experian screening.",
+                  tone: "We securely and verifiably screen applicants via Experian, at no cost to the landlord.",
+                },
+                {
+                  lead: "AI income check.",
+                  tone: "Paystubs, W-2s, 1099s, bank and investment statements. Names match the applicant. They’re the last two months.",
+                },
+                {
+                  lead: "One packet everyone can open.",
+                  tone: "Filled application, listing photos, Experian, income check, and a LeaseScore. Tenant, realtor, owner — same file.",
+                },
+              ].map((pillar) => (
+                <li key={pillar.lead} className="reveal-spatial">
+                  <article className="window h-full">
+                    <div className="p-6 sm:p-7">
+                      <h3 className="text-[17px] font-semibold leading-6 tracking-[-0.3px] text-ink">
+                        {pillar.lead}
+                      </h3>
+                      <p className="mt-2 text-[14px] font-medium leading-5 tracking-[-0.14px] text-mute">
+                        {pillar.tone}
+                      </p>
+                    </div>
+                  </article>
+                </li>
+              ))}
             </InView>
           </div>
         </section>

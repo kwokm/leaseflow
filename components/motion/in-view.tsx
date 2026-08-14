@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useReducedMotion } from "motion/react";
 import { cn } from "@/lib/utils";
 
-type InViewTag = "div" | "h2" | "ol" | "section" | "footer";
+type InViewTag = "div" | "h2" | "ol" | "ul" | "section" | "footer";
 
 export function InView({
   children,
