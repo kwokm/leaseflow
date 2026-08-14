@@ -7,6 +7,7 @@ import {
   LyCraigslist,
   LyFacebook,
   LyLead,
+  LyLeadStory,
   LyLease,
   LyPhone,
   LyScreening,
@@ -50,10 +51,20 @@ const FLOW_PAIRS = [
     items: [
       {
         id: "demo-leads",
-        title: "Lead / AI chat",
-        caption: "Maria inquires on 510 S Resh. Without a reply she is gone; the agent books Tuesday.",
+        title: "Lead management",
+        caption: "Maria inquires on 510 S Resh. Without a reply she is gone; the agent books Monday.",
+        Demo: LyLeadStory,
+      },
+      {
+        id: "demo-leads-widget",
         Demo: LyLead,
       },
+    ],
+  },
+  {
+    id: "demo-pair-phone",
+    wide: true,
+    items: [
       {
         id: "demo-phone",
         title: "AI phone transcript",
@@ -263,13 +274,19 @@ export default function Home() {
             {FLOW_PAIRS.map((pair) => (
               <InView key={pair.id} id={pair.id} className="ly-beat">
                 <div className="pillar-spatial">
-                  <div className={`ly-pair${pair.items.length === 1 ? " is-single" : ""}`}>
+                  <div
+                    className={`ly-pair${pair.items.length === 1 ? " is-single" : ""}${
+                      "wide" in pair && pair.wide ? " is-wide" : ""
+                    }`}
+                  >
                     {pair.items.map((item) => (
                       <article key={item.id} id={item.id} className="scroll-mt-24">
-                        <div className="ly-kicker">
-                          <h3>{item.title}</h3>
-                          <p>{item.caption}</p>
-                        </div>
+                        {"title" in item && item.title ? (
+                          <div className="ly-kicker">
+                            <h3>{item.title}</h3>
+                            {item.caption ? <p>{item.caption}</p> : null}
+                          </div>
+                        ) : null}
                         <item.Demo />
                       </article>
                     ))}

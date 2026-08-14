@@ -44,70 +44,98 @@ export function LySyndication() {
   );
 }
 
+export function LyLeadStory() {
+  return (
+    <div className="ly-lead-story">
+      <h4 className="ly-lead-headline">
+        Your leads don’t text during business hours. Neither does your AI agent.
+      </h4>
+      <div className="ly-lead-note is-before">
+        <p>✘ Before</p>
+        <p>You reply the next morning. Maria has already signed 510 S Resh elsewhere.</p>
+      </div>
+      <div className="ly-lead-note is-with">
+        <p>✓ With Leaseproof</p>
+        <p>She texts at 11:47pm. By the time you wake up, Monday’s showing is booked.</p>
+      </div>
+    </div>
+  );
+}
+
 function LeadBeat({
-  delay,
+  motion,
   time,
   text,
   tone,
   side,
 }: {
-  delay: string;
+  motion: string;
   time: string;
   text: string;
-  tone: "late" | "lost" | "win";
+  tone: "late" | "lost" | "mint" | "book";
   side: "without" | "with";
 }) {
   return (
-    <div className={cn("d d-thread ly-lead-beat", `is-${side}`)} style={{ animationDelay: delay }}>
+    <div className={cn("d", motion, "ly-lead-beat", `is-${side}`)}>
       <p className="ly-lead-time">{time}</p>
       <div className={cn("ly-lead-bubble", `is-${tone}`)}>{text}</div>
     </div>
   );
 }
 
+function ZillowMark() {
+  return (
+    <span className="ly-zillow">
+      <span>Z</span>
+      Zillow
+    </span>
+  );
+}
+
 export function LyLead() {
   return (
-    <DemoPlay flush className="ly ly-card ly-proof ly-pad">
+    <DemoPlay flush className="ly ly-lead-card">
       <div className="ly-lead-head">
         <span>Maria S. submits inquiry on</span>
-        <span className="ly-lead-channel">Zillow</span>
+        <ZillowMark />
       </div>
 
       <div className="ly-lead-grid">
-        <p className="ly-lead-label is-without">Without</p>
+        <span className="d d-lead-glow" />
+        <p className="ly-lead-label is-without">Without Leaseproof</p>
         <span className="ly-lead-gutter" />
-        <p className="ly-lead-label is-with">With agent</p>
+        <p className="ly-lead-label is-with">With Leaseproof</p>
 
         <LeadBeat
-          delay="0s"
+          motion="d-lead-left-a"
           time="Sun 9:14am"
           tone="late"
           side="without"
-          text="You reply — 9.5 hours later."
+          text="You reply — 9.5 hours later"
         />
         <span className="ly-lead-node" />
         <LeadBeat
-          delay="1.25s"
+          motion="d-lead-right-a"
           time="Sat 11:47pm"
-          tone="win"
+          tone="mint"
           side="with"
-          text="AI replies in 18 seconds."
+          text="AI replies in 18 seconds"
         />
 
         <LeadBeat
-          delay="2.35s"
+          motion="d-lead-left-b"
           time="Sun 9:21am"
           tone="lost"
           side="without"
-          text={'Maria: “Already rented elsewhere.”'}
+          text={'Maria: “Sorry, already signed.”'}
         />
         <span className="ly-lead-node" />
         <LeadBeat
-          delay="4.05s"
+          motion="d-lead-right-b"
           time="Sat 11:52pm"
-          tone="win"
+          tone="book"
           side="with"
-          text="Maria books Tuesday 10:30 at 510 S Resh."
+          text="Maria books a showing for Monday"
         />
       </div>
     </DemoPlay>
@@ -265,49 +293,50 @@ export function LyLease() {
 }
 
 const PHONE_LINES = [
-  { delay: "0s", from: "caller" as const, body: "Hi, I saw your listing on Zillow — is 510 S Resh St still available?" },
-  { delay: "1.35s", from: "agent" as const, body: "Yes. 3-bed, 2-bath, $4,700/mo, September 1. Want to book a showing?" },
+  {
+    delay: "0s",
+    from: "caller" as const,
+    body: "Hi, I saw your listing on Zillow — is 510 S Resh St still available?",
+  },
+  {
+    delay: "1.35s",
+    from: "agent" as const,
+    body: "Yes. 3-bed, 2-bath, $4,700/mo, September 1. Want to book a showing?",
+  },
   { delay: "2.7s", from: "caller" as const, body: "Tuesday at 2pm works." },
-  { delay: "4.05s", from: "agent" as const, body: "Booked Tuesday at 2:00 at 510 S Resh St. Confirmation text incoming." },
+  {
+    delay: "4.05s",
+    from: "agent" as const,
+    body: "Perfect — I’ve booked you in for Tuesday at 2pm at 510 S Resh St. You’ll get a confirmation text shortly.",
+  },
 ];
 
 export function LyPhone() {
   return (
-    <DemoPlay flush className="ly ly-card ly-proof ly-pad">
-      <div className="ly-proof-card px-3 py-3">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <span className="d d-dot-call ly-dot" />
-            <p className="text-[14px] font-semibold tracking-[-0.2px] text-ink">
-              AI Agent — live call
-            </p>
+    <DemoPlay flush className="ly ly-phone-card">
+      <div className="ly-phone-head">
+        <div className="flex items-center gap-2">
+          <span className="d d-dot-call ly-phone-live" />
+          <p>AI Agent — live call</p>
+        </div>
+        <span>0:47</span>
+      </div>
+      <div className="ly-eq ly-phone-eq">
+        {[0, 0.1, 0.2, 0.3, 0.4].map((delay) => (
+          <span key={delay} className="d d-eq" style={{ animationDelay: `${delay}s` }} />
+        ))}
+      </div>
+      <div className="ly-phone-thread">
+        {PHONE_LINES.map((line) => (
+          <div
+            key={line.body}
+            className={cn("d d-thread ly-phone-line", line.from === "agent" ? "is-agent" : "is-caller")}
+            style={{ animationDelay: line.delay }}
+          >
+            <p>{line.from === "agent" ? "Leaseproof" : "Caller"}</p>
+            <div>{line.body}</div>
           </div>
-          <span className="text-[12px] font-medium text-mute">0:47</span>
-        </div>
-        <div className="ly-eq mx-auto mt-3">
-          {[0, 0.1, 0.2, 0.3, 0.4].map((delay) => (
-            <span key={delay} className="d d-eq" style={{ animationDelay: `${delay}s` }} />
-          ))}
-        </div>
-        <div className="mt-4 space-y-3">
-          {PHONE_LINES.map((line) => (
-            <div
-              key={line.body}
-              className={cn("d d-thread", line.from === "agent" ? "ml-8" : "mr-8")}
-              style={{ animationDelay: line.delay }}
-            >
-              <p
-                className={cn(
-                  "mb-1 text-[10px] font-semibold uppercase tracking-[0.08em]",
-                  line.from === "agent" ? "text-right text-[color:var(--ly-accent)]" : "text-mute-2",
-                )}
-              >
-                {line.from === "agent" ? "Agent" : "Caller"}
-              </p>
-              <div className={line.from === "agent" ? "ly-proof-out" : "ly-proof-in"}>{line.body}</div>
-            </div>
-          ))}
-        </div>
+        ))}
       </div>
     </DemoPlay>
   );
