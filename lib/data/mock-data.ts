@@ -97,6 +97,10 @@ export type DocumentType =
   | "photo_id_back"
   | "paystub"
   | "bank_statement"
+  | "w2"
+  | "form_1099"
+  | "portfolio"
+  | "investment"
   | "other";
 
 export interface ApplicationDocument {
@@ -112,7 +116,11 @@ export const documentTypeLabels: Record<DocumentType, string> = {
   photo_id_back: "Photo ID — back",
   paystub: "Pay stub",
   bank_statement: "Bank statement",
-  other: "Other",
+  w2: "W-2",
+  form_1099: "1099",
+  portfolio: "Portfolio statement",
+  investment: "Investment statement",
+  other: "Other proof of income",
 };
 
 // Renter-submitted portion of an application, shown in the application packet
@@ -797,6 +805,95 @@ export const mockApplicationDetails: Record<string, ApplicationDetails> = {
       ipAddress: "203.0.113.12",
     },
   },
+  "app-jane": {
+    applicantId: "app-jane",
+    dateOfBirth: "1994-04-12",
+    ssnLast4: "6789",
+    desiredMoveIn: "2026-09-01",
+    currentAddress: {
+      address: "88 Pine Court 2A, San Francisco, CA 94102",
+      since: "2022-03",
+      monthlyRent: 3200,
+      landlordName: "Pine Court LLC",
+      landlordPhone: "(555) 010-2201",
+      reasonForLeaving: "Relocating to Anaheim",
+    },
+    employment: {
+      employer: "LeaseFlow Demo Co",
+      position: "Product designer",
+      startDate: "2022-03",
+      supervisor: "Mina Alvarez",
+      supervisorPhone: "(555) 010-0188",
+      monthlyIncome: 8500,
+    },
+    occupants: [{ name: "Jane Doe", relationship: "Applicant", age: 32 }],
+    pets: [],
+    vehicles: [],
+    disclosures: { smoker: false, priorEviction: false, bankruptcy: false },
+    documents: [
+      {
+        name: "demo-id-front.png",
+        kind: "Photo ID — front",
+        docType: "photo_id_front",
+        uploadedAt: "2026-08-01T12:00:00Z",
+        sizeLabel: "180 KB",
+      },
+      {
+        name: "demo-id-back.png",
+        kind: "Photo ID — back",
+        docType: "photo_id_back",
+        uploadedAt: "2026-08-01T12:00:00Z",
+        sizeLabel: "172 KB",
+      },
+      {
+        name: "paystub-june-2026.pdf",
+        kind: "Pay stub",
+        docType: "paystub",
+        uploadedAt: "2026-08-01T12:00:00Z",
+        sizeLabel: "96 KB",
+      },
+      {
+        name: "paystub-july-2026.pdf",
+        kind: "Pay stub",
+        docType: "paystub",
+        uploadedAt: "2026-08-01T12:00:00Z",
+        sizeLabel: "99 KB",
+      },
+      {
+        name: "statement-june-2026.pdf",
+        kind: "Bank statement",
+        docType: "bank_statement",
+        uploadedAt: "2026-08-01T12:00:00Z",
+        sizeLabel: "215 KB",
+      },
+      {
+        name: "statement-july-2026.pdf",
+        kind: "Bank statement",
+        docType: "bank_statement",
+        uploadedAt: "2026-08-01T12:00:00Z",
+        sizeLabel: "209 KB",
+      },
+      {
+        name: "w2-2025.pdf",
+        kind: "W-2",
+        docType: "w2",
+        uploadedAt: "2026-08-01T12:00:00Z",
+        sizeLabel: "188 KB",
+      },
+      {
+        name: "brokerage-july-2026.pdf",
+        kind: "Investment statement",
+        docType: "investment",
+        uploadedAt: "2026-08-01T12:00:00Z",
+        sizeLabel: "241 KB",
+      },
+    ],
+    consent: {
+      acceptedAt: "2026-08-10T12:00:00Z",
+      signature: "Jane Doe",
+      ipAddress: "203.0.113.42",
+    },
+  },
 };
 
 /**
@@ -1146,6 +1243,10 @@ export function groupDocuments(
     "photo_id_back",
     "paystub",
     "bank_statement",
+    "w2",
+    "form_1099",
+    "portfolio",
+    "investment",
     "other",
   ];
 

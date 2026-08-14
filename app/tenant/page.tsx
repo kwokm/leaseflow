@@ -8,6 +8,8 @@ import { ListingGallery } from "@/components/listings/photos";
 import { Reveal } from "@/components/motion/reveal";
 import { FEATURED_LISTING_ID } from "@/lib/data/mock-data";
 import { shortAddress } from "@/lib/desk/display";
+import { AiDocCheckCompact } from "@/components/docs/ai-check";
+import { checkApplyState } from "@/lib/docs/ai-check";
 import { loadTenantPacket, tenantStatusLabel, type TenantPacket } from "@/lib/tenant/session";
 
 export default function TenantDeskPage() {
@@ -75,6 +77,8 @@ export default function TenantDeskPage() {
             </dd>
           </div>
         </dl>
+
+        <AiDocCheckCompact report={checkApplyState(draft)} />
 
         {submitted ? (
           <dl className="grid grid-cols-2 gap-x-6 gap-y-3 rounded-md border border-line bg-mist/40 p-4 sm:grid-cols-3">

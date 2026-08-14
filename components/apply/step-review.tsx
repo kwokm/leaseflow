@@ -1,7 +1,10 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import { CreditCard, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { AiDocCheck } from "@/components/docs/ai-check";
+import { SAMPLE_MISMATCH, checkApplyState } from "@/lib/docs/ai-check";
 import { Checkbox, Field, MaskedField } from "@/components/apply/field";
 import { StepBody } from "@/components/apply/motion";
 import { Note, StepHeading, SummaryRow } from "@/components/apply/step-shell";
@@ -44,6 +47,11 @@ function ReviewBlock({
 }
 
 export function StepReview({ state, patch, errors, property, goTo }: StepProps) {
+  const [showSample, setShowSample] = useState(false);
+  const docCheck = useMemo(
+    () => checkApplyState(state, showSample ? [SAMPLE_MISMATCH] : []),
+    [state, showSample],
+  );
   const fee = getScreeningFee(state.screeningPackage);
   const p = state.personal;
   const setConsent = (partial: Partial<ConsentInfo>) =>
@@ -109,6 +117,12 @@ export function StepReview({ state, patch, errors, property, goTo }: StepProps) 
           }
         />
       </ReviewBlock>
+
+      <AiDocCheck
+        report={docCheck}
+        showSample={showSample}
+        onToggleSample={() => setShowSample((value) => !value)}
+      />
 
       <ReviewBlock title="Credit report" step={6} goTo={goTo}>
         <SummaryRow label="Source" value="Experian (demo)" />

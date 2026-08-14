@@ -35,6 +35,8 @@ import {
 import { setDecision, withDecision } from "@/lib/desk/decisions";
 import { creditScore, incomeMultiple, shortAddress } from "@/lib/desk/display";
 import { Reveal } from "@/components/motion/reveal";
+import { AiDocCheck } from "@/components/docs/ai-check";
+import { SAMPLE_MISMATCH, checkApplicationDetails } from "@/lib/docs/ai-check";
 import type { ApplyState } from "@/lib/apply/types";
 import type { ApplicationStatus } from "@/lib/data/mock-data";
 
@@ -71,6 +73,7 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
   const router = useRouter();
   const [adverseActionOpen, setAdverseActionOpen] = useState(false);
   const [statusOverride, setStatusOverride] = useState<ApplicationStatus | null>(null);
+  const [showSample, setShowSample] = useState(false);
 
   const local = isLocalApplicantId(id);
   const [submission, setSubmission] = useState<ApplyState | undefined>();
@@ -257,6 +260,20 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
         ) : (
           <p className="text-[13px] text-mute">No income on this file yet.</p>
         )}
+      </Section>
+
+      <Section title="AI document check">
+        <AiDocCheck
+          report={checkApplicationDetails(
+            details,
+            fullName,
+            showSample ? [SAMPLE_MISMATCH] : [],
+          )}
+          showSample={showSample}
+          onToggleSample={() => setShowSample((value) => !value)}
+          scan={false}
+          embedded
+        />
       </Section>
 
       <Section title="Documents">
