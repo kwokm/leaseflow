@@ -1295,3 +1295,278 @@
     break-inside: avoid;
   }
 }
+
+/* Leasey-cloned demo widgets — scoped to landing feature pairs only. */
+.ly-beat {
+  padding-top: 80px;
+  padding-bottom: 80px;
+}
+
+@media (min-width: 1024px) {
+  .ly-beat {
+    padding-top: 104px;
+    padding-bottom: 104px;
+  }
+}
+
+.ly-pair {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 64px;
+}
+
+@media (min-width: 1024px) {
+  .ly-pair {
+    grid-template-columns: 1fr 1fr;
+    gap: 56px 40px;
+    align-items: start;
+  }
+}
+
+.ly-kicker {
+  margin-bottom: 18px;
+}
+
+.ly-kicker h3 {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.4px;
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.ly-kicker p {
+  margin-top: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.14px;
+  line-height: 1.45;
+  color: var(--mute);
+}
+
+.ly {
+  --ly-bg: #0c0e12;
+  --ly-bg-2: #14171d;
+  --ly-bg-3: #1c2028;
+  --ly-line: rgba(255, 255, 255, 0.08);
+  --ly-text: #f3f4f6;
+  --ly-mute: #9aa1ad;
+  --ly-orange: #ff6a2b;
+  --ly-orange-soft: rgba(255, 106, 43, 0.16);
+  --ly-green: #3dd68c;
+  --ly-green-soft: rgba(61, 214, 140, 0.16);
+  --ly-mint: #7ee0b0;
+  --ly-red: #ff5c6c;
+  --ly-amber: #f5b400;
+  --ly-blue: #1877f2;
+  --ly-fb: #0084ff;
+  --ly-paper: #ffffff;
+  --ly-mist: #f4f5f7;
+  --ly-ink: #111318;
+  --ly-radius: 20px;
+  font-family: var(--font-inter), Inter, system-ui, sans-serif;
+}
+
+.ly-card {
+  overflow: hidden;
+  border-radius: var(--ly-radius);
+  box-shadow: 0 18px 50px -20px rgba(8, 10, 16, 0.55);
+}
+
+.ly-dark {
+  background: var(--ly-bg);
+  color: var(--ly-text);
+}
+
+.ly-light {
+  background: var(--ly-paper);
+  color: var(--ly-ink);
+  border: 1px solid #e6e8ee;
+  box-shadow: 0 16px 40px -22px rgba(20, 24, 36, 0.28);
+}
+
+.ly-pad {
+  padding: 22px;
+}
+
+.ly-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: var(--ly-green-soft);
+  color: var(--ly-green);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.ly-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--ly-green);
+}
+
+.ly-pill-orange {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: var(--ly-orange-soft);
+  color: var(--ly-orange);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.ly-pill-red {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: rgba(255, 92, 108, 0.14);
+  color: var(--ly-red);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.ly-pill-mint {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(61, 214, 140, 0.35);
+  color: #1a8f5a;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.ly-pill-amber {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: rgba(245, 180, 0, 0.16);
+  color: #c48a00;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.ly-pill-gray {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: #eef0f3;
+  color: #6b7280;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.ly-check {
+  display: inline-flex;
+  width: 22px;
+  height: 22px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--ly-green);
+  color: #062414;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.ly-bubble-in {
+  max-width: 88%;
+  border-radius: 16px 16px 16px 4px;
+  background: var(--ly-bg-3);
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.ly-bubble-out {
+  max-width: 88%;
+  margin-left: auto;
+  border-radius: 16px 16px 4px 16px;
+  background: var(--ly-orange);
+  color: #fff;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.ly-fb-in {
+  max-width: 88%;
+  border-radius: 18px 18px 18px 6px;
+  background: #e4e6eb;
+  color: #050505;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.ly-fb-out {
+  max-width: 88%;
+  margin-left: auto;
+  border-radius: 18px 18px 6px 18px;
+  background: var(--ly-fb);
+  color: #fff;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.ly-eq {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 18px;
+}
+
+.ly-eq span {
+  width: 3px;
+  height: 14px;
+  border-radius: 2px;
+  background: var(--ly-orange);
+}
+
+.ly-logo {
+  display: flex;
+  height: 44px;
+  width: 44px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.ly-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.ly-map {
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 20% 80%, rgba(255, 106, 43, 0.16), transparent 40%),
+    linear-gradient(180deg, #171b22, #0f1218);
+}

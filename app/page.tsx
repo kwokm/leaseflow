@@ -2,17 +2,19 @@ import Link from "next/link";
 import { BrandMark, BrandWord } from "@/components/brand";
 import { DeskSidebar } from "@/components/desk/desk-sidebar";
 import { DeskPill, DeskToolbar, PacketWindow } from "@/components/desk/packet-window";
-import { LeadAgentDemo } from "@/components/demos/lead-agent";
-import { LeaseSignDemo } from "@/components/demos/lease-sign";
-import { CraigslistDemo } from "@/components/demos/craigslist";
-import { FacebookDemo } from "@/components/demos/facebook";
-import { PhoneDemo } from "@/components/demos/phone";
-import { PhotoEnhanceDemo } from "@/components/demos/photo-enhance";
 import { PipelineFunnelDemo } from "@/components/demos/pipeline-funnel";
-import { ScreeningDemo } from "@/components/demos/screening";
-import { ShowingsAgendaDemo } from "@/components/demos/showings-route";
-import { SmartRouteDemo } from "@/components/demos/smart-route";
-import { SyndicationDemo } from "@/components/demos/syndication";
+import {
+  LyCraigslist,
+  LyFacebook,
+  LyLead,
+  LyLease,
+  LyPhone,
+  LyPhoto,
+  LyRoute,
+  LyScreening,
+  LyShowings,
+  LySyndication,
+} from "@/components/demos/ly-widgets";
 import { Float } from "@/components/motion/float";
 import { InView } from "@/components/motion/in-view";
 import { Reveal } from "@/components/motion/reveal";
@@ -45,25 +47,92 @@ const STEPS = [
   },
 ];
 
-const FLOW_DEMOS = [
-  { id: "demo-syndicate", n: "01", title: "Syndicate • 510 S Resh St", meta: "7s", Demo: SyndicationDemo },
-  { id: "demo-leads", n: "02", title: "Lead reply • Maria", meta: "10.5s", Demo: LeadAgentDemo },
-  { id: "demo-showings", n: "03", title: "Showings • Tuesday", meta: "7.6s", Demo: ShowingsAgendaDemo },
-  { id: "demo-route", n: "04", title: "Smart route • Anaheim", meta: "7.2s", Demo: SmartRouteDemo },
-  { id: "demo-screen", n: "05", title: "Screen • our checker", meta: "8.4s", Demo: ScreeningDemo },
-  { id: "demo-lease", n: "06", title: "Sign • dummy e-sign", meta: "4.6s", Demo: LeaseSignDemo },
-  { id: "demo-phone", n: "07", title: "AI phone • 510 S Resh", meta: "10.5s", Demo: PhoneDemo },
-  { id: "demo-facebook", n: "08", title: "Facebook Marketplace", meta: "7s", Demo: FacebookDemo },
-  { id: "demo-craigslist", n: "09", title: "Craigslist auto-post", meta: "9.5s", Demo: CraigslistDemo },
-  { id: "demo-photo", n: "10", title: "Photo enhance", meta: "8s", Demo: PhotoEnhanceDemo },
-] as const;
-
-const FLOW_NAV = [
-  { href: "#demo-syndicate", label: "Syndication" },
-  { href: "#demo-leads", label: "Leads" },
-  { href: "#demo-showings", label: "Showings" },
-  { href: "#demo-screen", label: "Screening" },
-  { href: "#demo-lease", label: "Lease" },
+const FLOW_PAIRS = [
+  {
+    id: "demo-pair-1",
+    items: [
+      {
+        id: "demo-syndicate",
+        title: "Marketplace syndication",
+        caption: "One Anaheim listing. Destination boards flip to Live.",
+        Demo: LySyndication,
+      },
+      {
+        id: "demo-leads",
+        title: "Lead / AI chat",
+        caption: "Maria texts at 11:52pm. A showing is booked.",
+        Demo: LyLead,
+      },
+    ],
+  },
+  {
+    id: "demo-pair-2",
+    items: [
+      {
+        id: "demo-showings",
+        title: "Showing agenda",
+        caption: "Tuesday slots fill. Live availability stays on.",
+        Demo: LyShowings,
+      },
+      {
+        id: "demo-screen",
+        title: "Applicant screening",
+        caption: "ID, Experian, income (name + two months), background.",
+        Demo: LyScreening,
+      },
+    ],
+  },
+  {
+    id: "demo-pair-3",
+    items: [
+      {
+        id: "demo-lease",
+        title: "Lease signing",
+        caption: "Approved → generated → e-sign → deposit queued.",
+        Demo: LyLease,
+      },
+      {
+        id: "demo-phone",
+        title: "AI phone transcript",
+        caption: "Caller asks about 510 S Resh. Agent books Tuesday 2pm.",
+        Demo: LyPhone,
+      },
+    ],
+  },
+  {
+    id: "demo-pair-4",
+    items: [
+      {
+        id: "demo-facebook",
+        title: "Facebook Marketplace chat",
+        caption: "Maria on Messenger. Instant reply, Anaheim copy.",
+        Demo: LyFacebook,
+      },
+      {
+        id: "demo-craigslist",
+        title: "Craigslist auto-post",
+        caption: "Three listing rows go live. Demo sync.",
+        Demo: LyCraigslist,
+      },
+    ],
+  },
+  {
+    id: "demo-pair-5",
+    items: [
+      {
+        id: "demo-route",
+        title: "Smart route planner",
+        caption: "Resh St first. Nearby Anaheim stops light in order.",
+        Demo: LyRoute,
+      },
+      {
+        id: "demo-photo",
+        title: "AI photo enhance",
+        caption: "Scan, then the Anaheim living room sharpens.",
+        Demo: LyPhoto,
+      },
+    ],
+  },
 ] as const;
 
 export default function Home() {
@@ -212,30 +281,28 @@ export default function Home() {
                 <SplitWords>Vacant unit to signed lease.</SplitWords>
               </h2>
               <p className="reveal-tone mt-3 max-w-[46ch] text-[15px] font-medium leading-6 tracking-[-0.16px] text-mute">
-                Syndicate, reply, show, screen, sign. Each card loops the move. Screening in the
+                Syndicate, reply, show, screen, sign. Each pair is one scroll beat. Screening in the
                 middle is ours — Experian, AI income, one packet.
               </p>
-              <nav aria-label="Feature demos" className="reveal-tone mt-5 flex flex-wrap gap-1.5">
-                {FLOW_NAV.map((item) => (
-                  <a key={item.href} href={item.href} className="desk-pill">
-                    {item.label}
-                  </a>
-                ))}
-              </nav>
             </InView>
 
-            <InView
-              as="ol"
-              className="reveal-stagger mt-10 grid grid-cols-1 gap-4 lg:grid-cols-2"
-            >
-              {FLOW_DEMOS.map((step) => (
-                <li key={step.n} id={step.id} className="pillar-spatial scroll-mt-24">
-                  <PacketWindow title={`${step.n} ${step.title}`} meta={step.meta}>
-                    <step.Demo />
-                  </PacketWindow>
-                </li>
-              ))}
-            </InView>
+            {FLOW_PAIRS.map((pair) => (
+              <InView key={pair.id} id={pair.id} className="ly-beat">
+                <div className="pillar-spatial">
+                  <div className="ly-pair">
+                    {pair.items.map((item) => (
+                      <article key={item.id} id={item.id} className="scroll-mt-24">
+                        <div className="ly-kicker">
+                          <h3>{item.title}</h3>
+                          <p>{item.caption}</p>
+                        </div>
+                        <item.Demo />
+                      </article>
+                    ))}
+                  </div>
+                </div>
+              </InView>
+            ))}
           </div>
         </section>
 
