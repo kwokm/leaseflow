@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useReducedMotion } from "motion/react";
 import { ApplicationDesk } from "@/components/desk/application-desk";
 import { DeskSidebar, type DeskNavLabel } from "@/components/desk/desk-sidebar";
 import { PacketWindow } from "@/components/desk/packet-window";
@@ -8,7 +9,6 @@ import { PipelineDesk } from "@/components/leasing/pipeline-desk";
 import { LeadInbox } from "@/components/leasing/lead-inbox";
 import { ShowingsCalendar } from "@/components/leasing/showings-calendar";
 import ListingsPage from "@/app/dashboard/listings/page";
-import { useDemoPlay } from "@/lib/demos/loop";
 
 const TOUR: { label: DeskNavLabel; title: string }[] = [
   { label: "Pipeline", title: "Pipeline • 510 S Resh St" },
@@ -21,9 +21,12 @@ const TOUR: { label: DeskNavLabel; title: string }[] = [
 const DWELL_MS = 3000;
 
 export function HeroDesk() {
-  const { ref, playing, reduce } = useDemoPlay();
+  const ref = useRef<HTMLDivElement>(null);
+  const reduceMotion = useReducedMotion();
+  const reduce = reduceMotion === true;
+  const [inView, setInView] = useState(true);
   const [tab, setTab] = useState(0);
-  const [touring, setTouring] = useState(!reduce);
+  const [touring, setTouring] = useState(true);
 
   useEffect(() => {
     if (reduce) {
@@ -33,12 +36,23 @@ export function HeroDesk() {
   }, [reduce]);
 
   useEffect(() => {
-    if (!touring || !playing || reduce) return;
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      { threshold: 0 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!touring || !inView || reduce) return;
     const id = window.setTimeout(() => {
       setTab((current) => (current + 1) % TOUR.length);
     }, DWELL_MS);
     return () => window.clearTimeout(id);
-  }, [touring, playing, reduce, tab]);
+  }, [touring, inView, reduce, tab]);
 
   const active = TOUR[tab] ?? TOUR[0];
 
@@ -75,12 +89,7 @@ export function HeroDesk() {
               </button>
             ) : null}
           </div>
-          <div
-            className="hero-stage min-w-0"
-            onPointerDown={() => {
-              if (touring) setTouring(false);
-            }}
-          >
+          <div className="hero-stage min-w-0">
             <div key={active.label} className="hero-panel is-on">
               {active.label === "Pipeline" ? <PipelineDesk /> : null}
               {active.label === "Applications" ? <ApplicationDesk /> : null}

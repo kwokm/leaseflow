@@ -50,6 +50,10 @@ function writeLeases(map: LeaseMap) {
   localStorage.setItem(LEASE_KEY, JSON.stringify(map));
 }
 
+// Cache for showings to prevent infinite loops in useSyncExternalStore
+let cachedShowings: ShowingList = [];
+let cachedShowingsRaw: string | null = null;
+
 function readShowings(): ShowingList {
   if (typeof window === "undefined") return [];
   try {
@@ -61,7 +65,20 @@ function readShowings(): ShowingList {
 }
 
 function writeShowings(list: ShowingList) {
-  localStorage.setItem(SHOWING_KEY, JSON.stringify(list));
+  const raw = JSON.stringify(list);
+  localStorage.setItem(SHOWING_KEY, raw);
+  cachedShowings = list;
+  cachedShowingsRaw = raw;
+}
+
+function getShowingsSnapshot(): ShowingList {
+  if (typeof window === "undefined") return [];
+  const raw = localStorage.getItem(SHOWING_KEY);
+  if (raw !== cachedShowingsRaw) {
+    cachedShowingsRaw = raw;
+    cachedShowings = raw ? JSON.parse(raw) : [];
+  }
+  return cachedShowings;
 }
 
 function readEnhance(): EnhanceMap {
@@ -162,7 +179,7 @@ export function bookShowing(input: { listingId?: string; name: string; email: st
 }
 
 export function listShowings(): BookedShowing[] {
-  return readShowings();
+  return getShowingsSnapshot();
 }
 
 export function isEnhanced(listingId: string): boolean {
@@ -215,7 +232,7 @@ export function useBookedShowings() {
       showingListeners.add(cb);
       return () => showingListeners.delete(cb);
     },
-    listShowings,
+    getShowingsSnapshot,
     () => [],
   );
 }
