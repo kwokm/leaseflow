@@ -154,6 +154,7 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
   const credit = creditScore(applicant);
 
   function decide(next: "approved" | "declined") {
+    if (!property) return;
     setDecision(id, next);
     setStatusOverride(next);
     if (next === "approved") {
