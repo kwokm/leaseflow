@@ -171,7 +171,7 @@ export default function Home() {
           <div className="hero-wash" aria-hidden />
           <InView className="hero-copy">
             <h1 id="hero-title">
-              <SplitWords>We screen, verify, and organize everything you need to lease your home</SplitWords>
+              <SplitWords>We screen, verify, and organize your lease for you</SplitWords>
             </h1>
             <p className="hero-sub reveal-tone">
               Leaseproof is the screening service that collects applications, runs
