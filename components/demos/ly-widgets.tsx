@@ -244,12 +244,18 @@ export function LyScreening() {
   );
 }
 
-const LEASE_STEPS = [
+const LEASE_STEPS: readonly {
+  label: string;
+  note: string;
+  state: string;
+  icon: string;
+  active?: boolean;
+}[] = [
   { label: "Application approved", note: "Today, 2:14pm", state: "Done", icon: "✓" },
   { label: "Lease generated & sent", note: "Today, 2:15pm — auto", state: "Done", icon: "▦" },
   { label: "E-signature pending", note: "Reminder in 2 hours", state: "Awaiting", icon: "✍", active: true },
   { label: "Deposit collection (ACH)", note: "Scheduled for after signing", state: "Queued", icon: "$" },
-] as const;
+];
 
 export function LyLease() {
   return (
