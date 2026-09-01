@@ -2,12 +2,18 @@
 
 import { DemoPlay } from "@/components/demos/shell";
 
-const SLOTS = [
+const SLOTS: readonly {
+  time: string;
+  place: string;
+  status: string;
+  confirmed: boolean;
+  live?: boolean;
+}[] = [
   { time: "9:00", place: "Broadway", status: "No-show", confirmed: false },
   { time: "10:30", place: "Resh St", status: "Confirmed", confirmed: true },
   { time: "12:00", place: "Anaheim Blvd", status: "Confirmed", confirmed: true },
   { time: "2:00", place: "Resh St", status: "Available", confirmed: false, live: true },
-] as const;
+];
 
 export function ShowingsAgendaDemo() {
   return (

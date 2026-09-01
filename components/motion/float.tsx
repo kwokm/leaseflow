@@ -24,7 +24,7 @@ export function Float({
       transition={{
         duration: durationFloat,
         repeat: Infinity,
-        repeatType: "alternate",
+        repeatType: "reverse",
         ease: "easeInOut",
       }}
     >
