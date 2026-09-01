@@ -19,6 +19,8 @@ const SESSION_KEY = "leaseproof.landlord.session";
 const PROFILES_KEY = "leaseproof.landlord.profiles";
 
 const listeners = new Set<() => void>();
+let cachedSession: LandlordSession | null = null;
+let cachedSessionRaw: string | null = null;
 
 function emit() {
   listeners.forEach((listener) => listener());
@@ -44,9 +46,19 @@ export function subscribeLandlordSession(listener: () => void) {
 }
 
 export function getLandlordSession(): LandlordSession | null {
-  const session = readJson<LandlordSession | null>(SESSION_KEY, null);
-  if (!session?.email) return null;
-  return session;
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(SESSION_KEY);
+    if (raw === cachedSessionRaw) return cachedSession;
+    cachedSessionRaw = raw;
+    const parsed = raw ? (JSON.parse(raw) as LandlordSession) : null;
+    cachedSession = parsed?.email ? parsed : null;
+    return cachedSession;
+  } catch {
+    cachedSession = null;
+    cachedSessionRaw = null;
+    return null;
+  }
 }
 
 export function getLandlordProfile(email: string): LandlordProfile | null {
@@ -73,6 +85,8 @@ export function signInLandlord(
     signedInAt: new Date().toISOString(),
   };
   writeJson(SESSION_KEY, session);
+  cachedSession = session;
+  cachedSessionRaw = JSON.stringify(session);
   saveLandlordProfile(session);
   emit();
   return session;
@@ -81,6 +95,8 @@ export function signInLandlord(
 export function signOutLandlord() {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem(SESSION_KEY);
+  cachedSession = null;
+  cachedSessionRaw = null;
   emit();
 }
 

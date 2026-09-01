@@ -56,10 +56,10 @@ export function LandlordAuth() {
   }, []);
 
   useEffect(() => {
-    if (ready && session) {
+    if (ready && session?.email) {
       router.replace(next);
     }
-  }, [next, ready, router, session]);
+  }, [next, ready, router, session?.email]);
 
   function patch(partial: Partial<LandlordProfile>) {
     setForm((current) => ({ ...current, ...partial }));
