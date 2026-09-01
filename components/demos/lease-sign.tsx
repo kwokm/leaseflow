@@ -2,12 +2,12 @@
 
 import { DemoPlay } from "@/components/demos/shell";
 
-const STEPS = [
+const STEPS: readonly { label: string; note: string; active?: boolean }[] = [
   { label: "Approved", note: "Packet decided" },
   { label: "Lease generated", note: "Same PacketWindow" },
   { label: "E-sign pending", note: "Dummy sign", active: true },
   { label: "Deposit queued", note: "ACH · demo" },
-] as const;
+];
 
 export function LeaseSignDemo() {
   return (
