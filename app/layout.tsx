@@ -10,9 +10,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "LeaseFlow — Rental applications and screening",
+  title: "Leaseproof — Rental applications and screening",
   description:
-    "Collect rental applications, documents, and screening reports in one place. Demo prototype.",
+    "Collect rental applications, documents, and screening reports in one place. Demo prototype. Leaseproof is a working name.",
 };
 
 export default function RootLayout({

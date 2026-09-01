@@ -24,6 +24,37 @@ export function StepHeading({ lead, tone }: { lead: string; tone: string }) {
   );
 }
 
+/** Nested card head — title only, no traffic lights. */
+export function WindowChrome({ label }: { label?: string }) {
+  return (
+    <div className="card-head">
+      {label ? <span className="card-head-title">{label}</span> : null}
+    </div>
+  );
+}
+
+export function WindowPanel({
+  label,
+  children,
+  className,
+}: {
+  label?: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <section
+      className={cn(
+        "overflow-hidden rounded-lg border border-line bg-paper shadow-window",
+        className
+      )}
+    >
+      <WindowChrome label={label} />
+      <div className="p-5">{children}</div>
+    </section>
+  );
+}
+
 export function Panel({
   title,
   description,
@@ -36,7 +67,12 @@ export function Panel({
   className?: string;
 }) {
   return (
-    <section className={cn("rounded-lg border border-line bg-paper p-5", className)}>
+    <section
+      className={cn(
+        "rounded-lg border border-line bg-paper p-5 shadow-mini transition-[border-color,box-shadow] duration-200 ease-premium",
+        className
+      )}
+    >
       {title && (
         <h2 className="text-[17px] font-semibold leading-tight tracking-[-0.3px] text-ink">
           {title}

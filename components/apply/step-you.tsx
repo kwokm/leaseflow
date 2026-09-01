@@ -1,6 +1,7 @@
 "use client";
 
 import { Field, MaskedField } from "@/components/apply/field";
+import { StepBody } from "@/components/apply/motion";
 import { FieldGrid, Note, Panel, StepHeading } from "@/components/apply/step-shell";
 import type { StepProps } from "@/components/apply/step-shell";
 import { formatDob, formatPhone, formatSsn, maskDob, maskSsn } from "@/lib/apply/format";
@@ -11,7 +12,7 @@ export function StepYou({ state, patch, errors }: StepProps) {
   const set = (partial: Partial<PersonalInfo>) => patch({ personal: { ...p, ...partial } });
 
   return (
-    <div className="space-y-5">
+    <StepBody>
       <StepHeading lead="About you." tone="Sensitive fields stay masked." />
       <p className="max-w-xl text-[15px] font-medium leading-[21px] tracking-[-0.16px] text-mute">
         This is a prototype — do not enter real personal details. Anything you type stays in this
@@ -150,6 +151,6 @@ export function StepYou({ state, patch, errors }: StepProps) {
       <Note>
         Nothing here is transmitted anywhere. Clearing your browser storage removes it for good.
       </Note>
-    </div>
+    </StepBody>
   );
 }

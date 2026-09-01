@@ -1,4 +1,4 @@
-# LeaseFlow
+# Leaseproof
 
 A high-fidelity, clickable product prototype for a modern tenant screening and rental application web service. Built with Next.js, TypeScript, and Tailwind CSS.
 
@@ -161,6 +161,10 @@ leaseflow/
 └── README.md
 ```
 
+## Design
+
+Visual lock lives in the landing screenshot and `app/globals.css` (lilac bloom, Inter, screenshot card). **Motion** follows [`design/animations-rules.md`](./design/animations-rules.md) — see also [`design/NOTES.md`](./design/NOTES.md). Landing gray secondaries use reversible split-text. Do not restyle Leaseproof into another product’s look. The npm package and repo stay `leaseflow`.
+
 ## Design Principles
 
 - **Production-quality**: Refined spacing, typography, and component design
@@ -188,7 +192,7 @@ To modify mock data:
 
 To change branding:
 1. Update colors in `tailwind.config.ts`
-2. Change logo/name in headers (search for "LeaseFlow")
+2. Change logo/name in headers (search for "Leaseproof")
 3. Modify global styles in `app/globals.css`
 
 ## Browser Support
@@ -214,4 +218,4 @@ Inspired by rental screening platforms but with distinct branding and no tradema
 
 ---
 
-**LeaseFlow** - Modern Tenant Screening Made Simple (Demo Prototype)
+**Leaseproof** — working name for this screening and leasing-ops prototype.

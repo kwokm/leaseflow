@@ -1,48 +1,35 @@
 "use client";
 
+import { useEffect } from "react";
 import { BedDouble, Bath, CalendarDays, Check } from "lucide-react";
+import { StepBody } from "@/components/apply/motion";
 import { Note, Panel, StepHeading } from "@/components/apply/step-shell";
 import type { StepProps } from "@/components/apply/step-shell";
 import { formatDateOnly, formatDollars } from "@/lib/apply/format";
-import type { ScreeningPackage } from "@/lib/data/mock-data";
-import { cn } from "@/lib/utils";
+import { ListingPhotoStrip } from "@/components/listings/photos";
+import {
+  STANDARD_PACKAGE_NAME,
+  STANDARD_SCREENING_FEE,
+} from "@/lib/data/mock-data";
 
-const PACKAGES: {
-  id: ScreeningPackage;
-  name: string;
-  price: number;
-  blurb: string;
-  features: string[];
-}[] = [
-  {
-    id: "standard",
-    name: "Standard",
-    price: 39.99,
-    blurb: "Everything most landlords ask for.",
-    features: [
-      "Credit report and score",
-      "National criminal records search",
-      "Eviction records",
-      "Identity check",
-    ],
-  },
-  {
-    id: "premium",
-    name: "Premium",
-    price: 59.99,
-    blurb: "Adds income and employment verification.",
-    features: [
-      "Everything in Standard",
-      "Income verified against pay stubs",
-      "Bank statement review",
-      "Landlord reference outreach",
-    ],
-  },
+const STANDARD_FEATURES = [
+  "Credit report and score",
+  "National criminal and eviction search",
+  "Identity check",
+  "AI income and bank verification",
+  "The packet, shared with the landlord",
+  "Apply to as many homes as you want",
 ];
 
 export function StepStart({ state, patch, property }: StepProps) {
+  useEffect(() => {
+    if (state.screeningPackage !== "standard") {
+      patch({ screeningPackage: "standard" });
+    }
+  }, [patch, state.screeningPackage]);
+
   return (
-    <div className="space-y-5">
+    <StepBody>
       <StepHeading lead="Start your application for" tone={property.address.split(",")[0]} />
       <p className="max-w-xl text-[15px] font-medium leading-[21px] tracking-[-0.16px] text-mute">
         It takes about ten minutes. Your progress saves in this browser, so you can stop and pick it
@@ -55,6 +42,11 @@ export function StepStart({ state, patch, property }: StepProps) {
             <p className="text-[17px] font-semibold tracking-[-0.3px] text-ink">
               {property.address}
             </p>
+            {property.photos?.length ? (
+              <div className="mt-3">
+                <ListingPhotoStrip photos={property.photos} alt={property.address} size="md" />
+              </div>
+            ) : null}
             <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[14px] font-medium text-mute">
               <span className="inline-flex items-center gap-1.5">
                 <BedDouble className="h-4 w-4" aria-hidden />
@@ -79,78 +71,57 @@ export function StepStart({ state, patch, property }: StepProps) {
         </div>
       </Panel>
 
-      <fieldset>
-        <legend className="mb-3 text-[17px] font-semibold tracking-[-0.3px] text-ink">
-          Choose a screening package
-        </legend>
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-          {PACKAGES.map((pkg) => {
-            const selected = state.screeningPackage === pkg.id;
-            return (
-              <label
-                key={pkg.id}
-                className={cn(
-                  // The radio itself is visually hidden, so the card carries the focus ring.
-                  "relative flex cursor-pointer flex-col rounded-lg border bg-paper p-5 transition-colors",
-                  "focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-ink",
-                  selected ? "border-ink shadow-mini" : "border-line hover:border-line-2"
-                )}
+      <section aria-labelledby="standard-plan-title">
+        <h2
+          id="standard-plan-title"
+          className="mb-3 text-[17px] font-semibold tracking-[-0.3px] text-ink"
+        >
+          Standard screening
+        </h2>
+        <div className="overflow-hidden rounded-lg border border-line bg-wash/40 shadow-window">
+          <div className="flex flex-col p-6">
+            <span className="flex items-start justify-between gap-3">
+              <span>
+                <span className="block text-[14px] font-medium text-mute">
+                  {STANDARD_PACKAGE_NAME}
+                </span>
+                <span className="mt-0.5 block max-w-[42ch] text-[14px] font-medium text-mute">
+                  Includes everything. Apply to as many homes as you want on this one fee.
+                </span>
+              </span>
+              <span
+                aria-hidden
+                className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-ink bg-ink text-paper"
               >
-                <input
-                  type="radio"
-                  name="screening-package"
-                  value={pkg.id}
-                  checked={selected}
-                  onChange={() => patch({ screeningPackage: pkg.id })}
-                  className="sr-only"
-                />
-                <span className="flex items-start justify-between gap-3">
-                  <span>
-                    <span className="block text-[17px] font-semibold tracking-[-0.3px] text-ink">
-                      {pkg.name}
-                    </span>
-                    <span className="mt-0.5 block text-[14px] font-medium text-mute">
-                      {pkg.blurb}
-                    </span>
-                  </span>
-                  <span
-                    aria-hidden
-                    className={cn(
-                      "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border",
-                      selected ? "border-ink bg-ink text-paper" : "border-line-2 bg-paper"
-                    )}
-                  >
-                    {selected && <Check className="h-3 w-3" strokeWidth={3} />}
-                  </span>
-                </span>
+                <Check className="h-3 w-3" strokeWidth={3} />
+              </span>
+            </span>
 
-                <span className="num mt-4 block text-[32px] font-semibold leading-none tracking-[-0.9px] text-ink">
-                  ${pkg.price.toFixed(2)}
-                </span>
-                <span className="mt-1 block text-[13px] font-medium text-mute">
-                  One-time, paid by you
-                </span>
+            <span className="num mt-4 block text-[40px] font-medium leading-[44px] tracking-[-0.4px] text-ink">
+              ${STANDARD_SCREENING_FEE.toFixed(2)}
+            </span>
+            <span className="mt-1 block text-[13px] font-medium text-mute">
+              One-time, paid by you
+            </span>
 
-                <ul className="mt-4 space-y-2 border-t border-line pt-4">
-                  {pkg.features.map((feature) => (
-                    <li
-                      key={feature}
-                      className="flex items-start gap-2 text-[14px] font-medium tracking-[-0.14px] text-ink-2"
-                    >
-                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-ok" aria-hidden />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-              </label>
-            );
-          })}
+            <ul className="mt-5 space-y-2 border-t border-line pt-4">
+              {STANDARD_FEATURES.map((feature) => (
+                <li
+                  key={feature}
+                  className="flex items-start gap-2 text-[14px] font-medium tracking-[-0.14px] text-ink-2"
+                >
+                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-ok" aria-hidden />
+                  {feature}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
-      </fieldset>
+      </section>
 
       <Note tone="blue">
-        Your credit report is included at no extra cost. You&apos;ll connect it through the Experian
-        (demo) step, and the $0.00 line stays on your receipt.
+        Experian stays $0 extra for the landlord. Your ${STANDARD_SCREENING_FEE.toFixed(2)} Standard
+        fee includes everything — credit, background, ID, and AI income and bank verification.
       </Note>
 
       <Panel title="What you'll need" description="Have these ready before you start.">
@@ -168,6 +139,6 @@ export function StepStart({ state, patch, property }: StepProps) {
           ))}
         </ul>
       </Panel>
-    </div>
+    </StepBody>
   );
 }

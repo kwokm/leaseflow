@@ -1,60 +1,49 @@
 import Link from "next/link";
+import { RequireLandlord } from "@/components/auth/require-landlord";
+import { BrandMark, BrandWord } from "@/components/brand";
+import { DeskFrame } from "@/components/desk/desk-frame";
+import { DashboardMotion } from "@/components/motion/dashboard-motion";
+import { SpatialMount, SpatialOrigin } from "@/components/motion/spatial";
+import { PageWash } from "@/components/page-wash";
 import { Button } from "@/components/ui/button";
-import { DashboardNav } from "@/components/dashboard-nav";
-import { Shield, HelpCircle } from "lucide-react";
+import { FEATURED_LISTING_ID } from "@/lib/data/mock-data";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-mist print:bg-white">
-      {/* Header */}
-      <header className="border-b bg-white sticky top-0 z-50 print:hidden">
-        <div className="flex items-center justify-between px-6 py-4">
-          <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <Shield className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-xl font-bold text-ink">LeaseFlow</span>
-          </Link>
+    <RequireLandlord>
+      <div className="relative min-h-screen overflow-hidden bg-white print:bg-white">
+        <SpatialOrigin>
+          <PageWash />
+        </SpatialOrigin>
 
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm">
-              <HelpCircle className="w-4 h-4 mr-2" />
-              Help
-            </Button>
-            <div className="flex items-center gap-3 pl-4 border-l">
-              <div className="text-right">
-                <div className="text-sm font-medium">John Landlord</div>
-                <div className="text-xs text-mute-2">Property Manager</div>
-              </div>
-              <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                <span className="text-sm font-semibold text-primary">JL</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <div className="flex">
-        {/* Sidebar */}
-        <aside className="w-64 bg-white border-r min-h-[calc(100vh-73px)] p-4 print:hidden">
-          <DashboardNav />
-
-          <div className="mt-8 p-4 bg-mist rounded-lg">
-            <div className="text-sm font-semibold mb-2">Demo mode</div>
-            <p className="text-xs text-mute mb-3">
-              View as Renter to see the application flow
-            </p>
-            <Link href="/apply/prop-1">
-              <Button variant="outline" size="sm" className="w-full text-xs">
-                View Apply Flow
-              </Button>
+        <header className="relative z-50 bg-white print:hidden">
+          <div className="mx-auto flex h-16 max-w-header items-center gap-4 px-5 sm:px-8">
+            <Link href="/" className="flex items-center gap-2.5 text-ink">
+              <BrandMark />
+              <BrandWord />
             </Link>
+            <div className="ml-auto flex items-center gap-2">
+              <Button asChild variant="outline">
+                <Link href={`/apply/${FEATURED_LISTING_ID}`}>Apply as renter</Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link href="/dashboard/listings/new">New listing</Link>
+              </Button>
+              <Button asChild>
+                <Link href="/dashboard">Open realtor desk</Link>
+              </Button>
+            </div>
           </div>
-        </aside>
+        </header>
 
-        {/* Main Content */}
-        <main className="flex-1 p-8 print:p-0">{children}</main>
+        <div className="relative z-10 mx-auto max-w-shell px-5 pb-12 pt-2 sm:px-8">
+          <SpatialMount>
+            <DeskFrame>
+              <DashboardMotion>{children}</DashboardMotion>
+            </DeskFrame>
+          </SpatialMount>
+        </div>
       </div>
-    </div>
+    </RequireLandlord>
   );
 }

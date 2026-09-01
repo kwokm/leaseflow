@@ -1,215 +1,120 @@
+"use client";
+
+import { use, useEffect, useState } from "react";
 import Link from "next/link";
+import { notFound } from "next/navigation";
+import { ApplicationDesk } from "@/components/desk/application-desk";
+import { DeskToolbar } from "@/components/desk/packet-window";
+import { ListingGallery } from "@/components/listings/photos";
+import { CraigslistDemo } from "@/components/demos/craigslist";
+import { PhotoEnhanceDemo } from "@/components/demos/photo-enhance";
+import { SyndicationDemo } from "@/components/demos/syndication";
+import { SyndicationTiles } from "@/components/leasing/syndication";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { 
-  ArrowLeft, 
-  Copy, 
-  ExternalLink, 
-  Edit,
-  Home,
-  DollarSign,
-  Calendar
-} from "lucide-react";
-import { 
-  getPropertyById, 
-  getApplicantsByProperty,
-  getStatusColor,
-  getStatusLabel 
-} from "@/lib/data/mock-data";
+import { getPropertyById, type Applicant } from "@/lib/data/mock-data";
+import { loadDeskApplicantsForListing, listingRollup } from "@/lib/desk/queue";
+import { shortAddress } from "@/lib/desk/display";
+import { listingPricing, pricingLabel } from "@/lib/leasing/ops";
+import { setEnhanced, useEnhanced } from "@/lib/leasing/store";
+import { Reveal } from "@/components/motion/reveal";
 
-export default async function ListingDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const property = getPropertyById(id);
-  
-  if (!property) {
-    return (
-      <div className="text-center py-12">
-        <h2 className="text-2xl font-bold mb-2">Property not found</h2>
-        <Link href="/dashboard">
-          <Button>Back to dashboard</Button>
-        </Link>
-      </div>
-    );
-  }
+export default function ListingDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = use(params);
+  const [property, setProperty] = useState(() => getPropertyById(id));
+  const [applicants, setApplicants] = useState<Applicant[]>([]);
+  const [ready, setReady] = useState(false);
 
-  const applicants = getApplicantsByProperty(property.id);
+  const enhanced = useEnhanced(id);
+  const pricing = listingPricing(id);
+
+  useEffect(() => {
+    setProperty(getPropertyById(id));
+    setApplicants(loadDeskApplicantsForListing(id));
+    setReady(true);
+  }, [id]);
+
+  if (ready && !property) notFound();
+  if (!property) return null;
+
+  const rollup = listingRollup(applicants);
 
   return (
-    <div className="space-y-6">
-      <div>
-        <Link href="/dashboard">
-          <Button variant="ghost" size="sm" className="mb-4">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Dashboard
+    <>
+      <Reveal>
+        <DeskToolbar meta={`${rollup.count} applicant${rollup.count === 1 ? "" : "s"}`}>
+          <Button asChild variant="outline" size="sm">
+            <Link href="/dashboard/listings">All listings</Link>
           </Button>
-        </Link>
-      </div>
-
-      {/* Property Header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-ink">{property.address}</h1>
-          <div className="flex items-center gap-4 mt-2 text-mute">
-            <span className="flex items-center gap-1">
-              <Home className="w-4 h-4" />
-              {property.bedrooms} bed · {property.bathrooms} bath
-            </span>
-            <span className="flex items-center gap-1">
-              <DollarSign className="w-4 h-4" />
-              ${property.rent.toLocaleString()}/mo
-            </span>
-            <span className="flex items-center gap-1">
-              <Calendar className="w-4 h-4" />
-              Available {new Date(property.availableDate).toLocaleDateString()}
-            </span>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <Badge variant="secondary">
-            {property.screeningPackage === "premium" ? "Premium Screening" : "Standard Screening"}
-          </Badge>
-          <Button variant="outline">
-            <Edit className="w-4 h-4 mr-2" />
-            Edit
+          <Button asChild variant="outline" size="sm">
+            <Link href={`/apply/${property.id}`}>Apply link</Link>
           </Button>
-        </div>
-      </div>
+          <span className="desk-pill">Standard</span>
+          <span className="desk-pill">{pricingLabel(pricing)} · demo</span>
+        </DeskToolbar>
+      </Reveal>
 
-      {/* Application Link */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Application link</CardTitle>
-          <CardDescription>Share this link with prospective tenants</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center gap-2">
-            <Input 
-              value={`https://leaseflow.app/apply/${property.id}`} 
-              readOnly 
-              className="font-mono text-sm"
-            />
-            <Button>
-              <Copy className="w-4 h-4 mr-2" />
-              Copy
-            </Button>
-            <Link href={`/apply/${property.id}`} target="_blank">
-              <Button variant="outline">
-                <ExternalLink className="w-4 h-4 mr-2" />
-                Preview
-              </Button>
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Applicants */}
-      <div>
-        <h2 className="text-xl font-semibold mb-4">
-          Applicants ({applicants.length})
-        </h2>
-
-        {applicants.length === 0 ? (
-          <Card>
-            <CardContent className="py-12 text-center">
-              <div className="text-mute-3 mb-4">
-                <Users className="w-16 h-16 mx-auto" />
-              </div>
-              <h3 className="text-lg font-semibold mb-2">No applicants yet</h3>
-              <p className="text-mute mb-4">
-                Share your application link to start receiving applications
+      <Reveal className="border-b border-line px-5 py-5 sm:px-6">
+        <p className="text-[18px] font-semibold tracking-[-0.3px] text-ink">
+          {shortAddress(property.address)}
+        </p>
+        <p className="mt-1 text-[13px] font-medium text-mute">
+          {property.neighborhood ?? property.propertyType ?? property.address}
+        </p>
+        <dl className="mt-3 grid grid-cols-2 gap-x-6 gap-y-2 sm:grid-cols-5">
+          {[
+            ["Rent", `$${property.rent.toLocaleString()}/mo`],
+            ["Beds / baths", `${property.bedrooms} / ${property.bathrooms}`],
+            ["Sqft", property.sqft ? property.sqft.toLocaleString() : "—"],
+            ["Applicants", String(rollup.count)],
+            ["Avg LeaseScore", rollup.avgScore ? String(rollup.avgScore) : "—"],
+          ].map(([label, value]) => (
+            <div key={label}>
+              <dt className="text-[12px] font-medium text-mute-2">{label}</dt>
+              <dd className="mt-0.5 text-[13px] font-medium capitalize text-ink">{value}</dd>
+            </div>
+          ))}
+        </dl>
+        {property.photos?.length ? (
+          <div className="mt-5">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+              <p className="text-[13px] font-medium text-mute">
+                AI photo enhance · CSS grade, not a live model
               </p>
-              <Button>
-                <Copy className="w-4 h-4 mr-2" />
-                Copy Application Link
-              </Button>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="space-y-3">
-            {applicants.map((applicant) => (
-              <Card key={applicant.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-line rounded-full flex items-center justify-center">
-                        <span className="text-sm font-semibold text-mute">
-                          {applicant.firstName[0]}{applicant.lastName[0]}
-                        </span>
-                      </div>
-                      <div>
-                        <div className="font-semibold text-lg">
-                          {applicant.firstName} {applicant.lastName}
-                        </div>
-                        <div className="text-sm text-mute">
-                          {applicant.email} · {applicant.phone}
-                        </div>
-                        <div className="text-xs text-mute-2 mt-1">
-                          Applied {new Date(applicant.appliedAt).toLocaleDateString()}
-                          {applicant.completedAt && (
-                            <> · Completed {new Date(applicant.completedAt).toLocaleDateString()}</>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      {applicant.leaseScore && (
-                        <div className="text-right mr-4">
-                          <div className="text-2xl font-bold text-primary">
-                            {applicant.leaseScore}
-                          </div>
-                          <div className="text-xs text-mute-2">LeaseScore</div>
-                        </div>
-                      )}
-                      <Badge className={getStatusColor(applicant.status)}>
-                        {getStatusLabel(applicant.status)}
-                      </Badge>
-                      <Link href={`/dashboard/applications/${applicant.id}`}>
-                        <Button>
-                          View Packet
-                          <ExternalLink className="w-3 h-3 ml-2" />
-                        </Button>
-                      </Link>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+              <button
+                type="button"
+                className={`desk-pill ${enhanced ? "is-on" : ""}`}
+                aria-pressed={enhanced}
+                onClick={() => setEnhanced(property.id, !enhanced)}
+              >
+                {enhanced ? "Enhanced on" : "Show enhance"}
+              </button>
+            </div>
+            <PhotoEnhanceDemo />
+            <div className="mt-3">
+              <ListingGallery
+                photos={property.photos}
+                alt={shortAddress(property.address)}
+                enhanced={enhanced}
+              />
+            </div>
           </div>
-        )}
-      </div>
-    </div>
-  );
-}
+        ) : null}
+        <div className="mt-5 overflow-hidden rounded-md border border-line">
+          <SyndicationDemo />
+        </div>
+        <div className="mt-5 overflow-hidden rounded-md border border-line">
+          <CraigslistDemo />
+        </div>
+        <div className="mt-5">
+          <SyndicationTiles listingId={property.id} />
+        </div>
+      </Reveal>
 
-function Input({ value, readOnly, className }: { value: string; readOnly?: boolean; className?: string }) {
-  return (
-    <input
-      value={value}
-      readOnly={readOnly}
-      className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ${className}`}
-    />
-  );
-}
-
-function Users({ className }: { className?: string }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-      <circle cx="9" cy="7" r="4" />
-      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-    </svg>
+      <ApplicationDesk propertyId={property.id} extras chrome={false} />
+    </>
   );
 }

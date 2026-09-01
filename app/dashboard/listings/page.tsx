@@ -1,124 +1,107 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Plus, Copy, ExternalLink } from "lucide-react";
-import { mockProperties, getApplicantsByProperty } from "@/lib/data/mock-data";
+import { DeskPill, DeskToolbar } from "@/components/desk/packet-window";
+import { StatusPill } from "@/components/desk/status-pill";
+import { ListingThumb } from "@/components/listings/photos";
+import { getAllProperties, type Applicant } from "@/lib/data/mock-data";
+import { listingThumb } from "@/lib/listings/store";
+import { loadDeskApplicants, listingRollup } from "@/lib/desk/queue";
+import { shortAddress } from "@/lib/desk/display";
+import { Reveal } from "@/components/motion/reveal";
+import { listingPricing, listingSyndication, pricingLabel } from "@/lib/leasing/ops";
 
 export default function ListingsPage() {
+  const router = useRouter();
+  const [applicants, setApplicants] = useState<Applicant[]>([]);
+  const [properties, setProperties] = useState(getAllProperties());
+
+  useEffect(() => {
+    setApplicants(loadDeskApplicants());
+    setProperties(getAllProperties());
+  }, []);
+
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-ink">Properties</h1>
-          <p className="text-mute mt-1">Manage your rental listings</p>
-        </div>
-        <Link href="/dashboard/listings/new">
-          <Button size="lg">
-            <Plus className="w-4 h-4 mr-2" />
-            Create Listing
-          </Button>
-        </Link>
-      </div>
+    <Reveal>
+      <DeskToolbar meta={`${properties.length} listings`}>
+        <DeskPill active>All properties</DeskPill>
+        <Button asChild size="sm">
+          <Link href="/dashboard/listings/new">New listing</Link>
+        </Button>
+      </DeskToolbar>
 
-      {/* Properties Grid */}
-      <div className="space-y-4">
-        {mockProperties.map((property) => {
-          const applicants = getApplicantsByProperty(property.id);
-          const statusCounts = {
-            total: applicants.length,
-            pending: applicants.filter(a => a.status === "in_progress" || a.status === "invited").length,
-            completed: applicants.filter(a => a.status === "completed").length,
-            approved: applicants.filter(a => a.status === "approved").length,
-            declined: applicants.filter(a => a.status === "declined").length,
-          };
+      <div className="overflow-x-auto">
+        <table className="app-table">
+          <thead>
+            <tr>
+              <th>Listing</th>
+              <th className="num">Rent</th>
+              <th className="num">Applicants</th>
+              <th className="num">LeaseScore</th>
+              <th>Lead status</th>
+              <th>Market</th>
+              <th>Package</th>
+            </tr>
+          </thead>
+          <tbody>
+            {properties.map((property) => {
+              const rollup = listingRollup(
+                applicants.filter((row) => row.propertyId === property.id)
+              );
+              const thumb = listingThumb(property);
 
-          return (
-            <Card key={property.id} className="hover:shadow-md transition-shadow">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="text-lg">{property.address}</CardTitle>
-                    <CardDescription className="mt-2 flex items-center gap-4">
-                      <span>{property.bedrooms} bed · {property.bathrooms} bath</span>
-                      <span>·</span>
-                      <span className="font-semibold text-ink">
-                        ${property.rent.toLocaleString()}/mo
-                      </span>
-                      <span>·</span>
-                      <span>Available {new Date(property.availableDate).toLocaleDateString()}</span>
-                    </CardDescription>
-                  </div>
-                  <Badge variant="secondary" className="ml-4">
-                    {property.screeningPackage === "premium" ? "Premium" : "Standard"}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-6 text-sm">
-                    <div>
-                      <span className="text-mute">Total applicants: </span>
-                      <span className="font-semibold">{statusCounts.total}</span>
+              return (
+                <tr
+                  key={property.id}
+                  className="cursor-pointer"
+                  tabIndex={0}
+                  onClick={() => router.push(`/dashboard/listings/${property.id}`)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      router.push(`/dashboard/listings/${property.id}`);
+                    }
+                  }}
+                  aria-label={`Open applicants for ${shortAddress(property.address)}`}
+                >
+                  <td>
+                    <div className="flex items-center gap-3">
+                      <ListingThumb src={thumb} alt={shortAddress(property.address)} />
+                      <div>
+                        <div className="font-medium text-ink">{shortAddress(property.address)}</div>
+                        <div className="text-[12px] text-mute">
+                          {property.bedrooms} bed · {property.bathrooms} bath
+                          {property.sqft ? ` · ${property.sqft.toLocaleString()} sqft` : ""}
+                        </div>
+                      </div>
                     </div>
-                    {statusCounts.pending > 0 && (
-                      <div>
-                        <span className="text-mute">Pending: </span>
-                        <span className="font-semibold text-blue">{statusCounts.pending}</span>
-                      </div>
+                  </td>
+                  <td className="num">${property.rent.toLocaleString()}</td>
+                  <td className="num">{rollup.count}</td>
+                  <td className="num score">{rollup.leadScore ?? "—"}</td>
+                  <td>
+                    {rollup.leadStatus ? (
+                      <StatusPill status={rollup.leadStatus} />
+                    ) : (
+                      <span className="status">Empty</span>
                     )}
-                    {statusCounts.completed > 0 && (
-                      <div>
-                        <span className="text-mute">Completed: </span>
-                        <span className="font-semibold text-ink-2">{statusCounts.completed}</span>
-                      </div>
-                    )}
-                    {statusCounts.approved > 0 && (
-                      <div>
-                        <span className="text-mute">Approved: </span>
-                        <span className="font-semibold text-ok">{statusCounts.approved}</span>
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm">
-                      <Copy className="w-4 h-4 mr-2" />
-                      Copy Link
-                    </Button>
-                    <Link href={`/dashboard/listings/${property.id}`}>
-                      <Button size="sm">
-                        View Details
-                        <ExternalLink className="w-3 h-3 ml-2" />
-                      </Button>
-                    </Link>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+                  </td>
+                  <td>
+                    <span className="desk-pill">
+                      {pricingLabel(listingPricing(property.id))}
+                      {listingSyndication(property.id) === "live" ? " · live" : ""}
+                    </span>
+                  </td>
+                  <td>Standard</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
-
-      {mockProperties.length === 0 && (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <div className="text-mute-3 mb-4">
-              <Plus className="w-16 h-16 mx-auto" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2">No properties yet</h3>
-            <p className="text-mute mb-4">
-              Create your first listing to start receiving applications
-            </p>
-            <Link href="/dashboard/listings/new">
-              <Button>
-                <Plus className="w-4 h-4 mr-2" />
-                Create Listing
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-      )}
-    </div>
+    </Reveal>
   );
 }

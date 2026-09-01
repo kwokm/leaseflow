@@ -1,8 +1,13 @@
 "use client";
 
+import { useMemo, useState } from "react";
+import Link from "next/link";
 import { CreditCard, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { AiDocCheck } from "@/components/docs/ai-check";
+import { SAMPLE_MISMATCH, checkApplyState } from "@/lib/docs/ai-check";
 import { Checkbox, Field, MaskedField } from "@/components/apply/field";
+import { StepBody } from "@/components/apply/motion";
 import { Note, StepHeading, SummaryRow } from "@/components/apply/step-shell";
 import type { StepProps } from "@/components/apply/step-shell";
 import {
@@ -29,7 +34,7 @@ function ReviewBlock({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-lg border border-line bg-paper p-5">
+    <section className="rounded-lg border border-line bg-paper p-5 shadow-window transition-[border-color,box-shadow] duration-200 ease-premium">
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-[17px] font-semibold tracking-[-0.3px] text-ink">{title}</h2>
         <Button type="button" variant="ghost" size="sm" onClick={() => goTo(step)}>
@@ -43,6 +48,11 @@ function ReviewBlock({
 }
 
 export function StepReview({ state, patch, errors, property, goTo }: StepProps) {
+  const [showSample, setShowSample] = useState(false);
+  const docCheck = useMemo(
+    () => checkApplyState(state, showSample ? [SAMPLE_MISMATCH] : []),
+    [state, showSample],
+  );
   const fee = getScreeningFee(state.screeningPackage);
   const p = state.personal;
   const setConsent = (partial: Partial<ConsentInfo>) =>
@@ -55,7 +65,7 @@ export function StepReview({ state, patch, errors, property, goTo }: StepProps) 
     .join(", ");
 
   return (
-    <div className="space-y-5">
+    <StepBody>
       <StepHeading lead="Review and pay." tone="Last look before it goes out." />
 
       <ReviewBlock title="You" step={2} goTo={goTo}>
@@ -109,6 +119,27 @@ export function StepReview({ state, patch, errors, property, goTo }: StepProps) 
         />
       </ReviewBlock>
 
+      <AiDocCheck
+        report={docCheck}
+        showSample={showSample}
+        onToggleSample={() => setShowSample((value) => !value)}
+      />
+
+      <section className="rounded-lg border border-line bg-paper p-5 shadow-window">
+        <h2 className="text-[17px] font-semibold tracking-[-0.3px] text-ink">
+          Application to Rent
+        </h2>
+        <p className="mt-1 text-[13px] font-medium text-mute">
+          Auto-filled from this packet for {property.address.split(",")[0]}. Everyone with the
+          share link can open it.
+        </p>
+        <div className="mt-3">
+          <Button asChild variant="outline" size="sm">
+            <Link href={`/packet/${property.id}`}>Open filled application</Link>
+          </Button>
+        </div>
+      </section>
+
       <ReviewBlock title="Credit report" step={6} goTo={goTo}>
         <SummaryRow label="Source" value="Experian (demo)" />
         <SummaryRow label="Score" value={state.experian.score ?? "Not connected"} />
@@ -140,7 +171,7 @@ export function StepReview({ state, patch, errors, property, goTo }: StepProps) 
       </ReviewBlock>
 
       {/* FCRA-style authorization */}
-      <section className="rounded-lg border border-line bg-paper p-5">
+      <section className="rounded-lg border border-line bg-paper p-5 shadow-window">
         <h2 className="text-[17px] font-semibold tracking-[-0.3px] text-ink">
           Authorization and disclosure
         </h2>
@@ -179,7 +210,7 @@ export function StepReview({ state, patch, errors, property, goTo }: StepProps) 
             error={errors.fcra}
             onChange={(checked) => setConsent({ fcra: checked })}
           >
-            I have read the disclosure and authorize LeaseFlow to obtain consumer reports about me
+            I have read the disclosure and authorize Leaseproof to obtain consumer reports about me
             for this rental application.
           </Checkbox>
           <Checkbox
@@ -208,7 +239,7 @@ export function StepReview({ state, patch, errors, property, goTo }: StepProps) 
       </section>
 
       {/* Mock payment */}
-      <section className="rounded-lg border border-line bg-paper p-5">
+      <section className="rounded-lg border border-line bg-paper p-5 shadow-window">
         <div className="flex items-center gap-2">
           <CreditCard className="h-5 w-5 text-mute" aria-hidden />
           <h2 className="text-[17px] font-semibold tracking-[-0.3px] text-ink">Payment</h2>
@@ -216,7 +247,7 @@ export function StepReview({ state, patch, errors, property, goTo }: StepProps) 
 
         <dl className="mt-4 rounded-btn border border-line bg-mist px-4 py-2">
           <SummaryRow
-            label={`${state.screeningPackage === "premium" ? "Premium" : "Standard"} screening`}
+            label="Standard screening"
             value={formatMoney(fee)}
           />
           <SummaryRow label="Credit report — Experian (demo)" value="$0.00" />
@@ -291,6 +322,6 @@ export function StepReview({ state, patch, errors, property, goTo }: StepProps) 
         Card details are never saved, not even in this prototype&apos;s local draft. Submitting
         records a mock payment only.
       </Note>
-    </div>
+    </StepBody>
   );
 }

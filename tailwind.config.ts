@@ -57,6 +57,11 @@ const config: Config = {
           DEFAULT: "#E15C6B",
           bg: "#F8EEF0",
         },
+        wash: {
+          DEFAULT: "#F4F0F8",
+          mid: "#E8E4F4",
+          deep: "#E4E0F0",
+        },
 
         // Semantic aliases used by the existing shadcn primitives.
         border: "#E3E7EC",
@@ -117,6 +122,16 @@ const config: Config = {
       maxWidth: {
         shell: "1240px",
         header: "1440px",
+      },
+      transitionTimingFunction: {
+        premium: "cubic-bezier(0.22, 1, 0.36, 1)",
+        out: "cubic-bezier(0, 0, 0.2, 1)",
+        spatial: "cubic-bezier(0.32, 0.72, 0, 1)",
+      },
+      transitionDuration: {
+        160: "160ms",
+        200: "200ms",
+        240: "240ms",
       },
     },
   },

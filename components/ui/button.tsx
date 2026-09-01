@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
  * `touch` bumps the height to 44px for the primary controls on small screens.
  */
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-btn text-[14px] font-medium leading-none tracking-[-0.16px] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink disabled:pointer-events-none disabled:opacity-45",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-btn text-[14px] font-medium leading-none tracking-[-0.16px] transition-[background-color,border-color,color,transform] duration-200 ease-out active:translate-y-px focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink disabled:pointer-events-none disabled:opacity-45 disabled:active:translate-y-0",
   {
     variants: {
       variant: {
@@ -24,6 +24,9 @@ const buttonVariants = cva(
         darkFill:
           "bg-dark-2 text-on-dark border border-[rgba(80,89,103,0.5)] hover:bg-[#353b42]",
         link: "text-ink underline-offset-4 hover:underline border border-transparent",
+        // Site lilac — wash bloom, ink label. Used on the landing landlord CTA only.
+        lilac:
+          "bg-wash-deep text-ink border border-[rgba(60,48,80,0.14)] hover:bg-[#d8d2e8]",
       },
       size: {
         default: "h-9 px-3",

@@ -1,4 +1,4 @@
-Build a high-fidelity tenant application and screening flow for LeaseFlow in this Next.js repo.
+Build a high-fidelity tenant application and screening flow for Leaseproof in this Next.js repo.
 Visual source of truth is design/attio-inspired/. Port those tokens into the Next app. Do not keep a parallel look.
 
 THEME TOKENS (must match):
