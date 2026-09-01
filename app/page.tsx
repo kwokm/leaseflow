@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { BrandMark, BrandWord } from "@/components/brand";
-import { DeskSidebar } from "@/components/desk/desk-sidebar";
-import { DeskPill, DeskToolbar, PacketWindow } from "@/components/desk/packet-window";
-import { PipelineFunnelDemo } from "@/components/demos/pipeline-funnel";
+import { PacketWindow } from "@/components/desk/packet-window";
+import { HeroDesk } from "@/components/desk/hero-desk";
 import {
   LyCraigslist,
   LyFacebook,
@@ -13,7 +12,6 @@ import {
   LyScreening,
   LyShowings,
 } from "@/components/demos/ly-widgets";
-import { Float } from "@/components/motion/float";
 import { InView } from "@/components/motion/in-view";
 import { Reveal } from "@/components/motion/reveal";
 import { SectionHeadline } from "@/components/motion/section-headline";
@@ -194,20 +192,7 @@ export default function Home() {
           </InView>
 
           <div className="stage-wrap" id="desk">
-            <Float>
-              <PacketWindow title="Pipeline • 510 S Resh St" meta="Realtor desk • Demo sync">
-                <div className="desk">
-                  <DeskSidebar staticActive="Pipeline" />
-                  <div className="min-w-0">
-                    <DeskToolbar meta="Demo sync">
-                      <DeskPill active>Vacant units</DeskPill>
-                      <DeskPill>Application review</DeskPill>
-                    </DeskToolbar>
-                    <PipelineFunnelDemo />
-                  </div>
-                </div>
-              </PacketWindow>
-            </Float>
+            <HeroDesk />
           </div>
         </section>
 

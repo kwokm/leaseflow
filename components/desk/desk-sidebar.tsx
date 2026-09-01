@@ -46,20 +46,50 @@ const NAV = [
   },
 ] as const;
 
+export type DeskNavLabel = (typeof NAV)[number]["label"];
+
+const PREVIEW_NAV = NAV.filter((item) => item.label !== "Payments");
+
 export function DeskSidebar({
   staticActive,
+  preview,
 }: {
   /** Landing crop: highlight this item without routing. */
-  staticActive?: (typeof NAV)[number]["label"];
+  staticActive?: DeskNavLabel;
+  /** Hero graphic: clickable tabs that do not leave the landing page. */
+  preview?: {
+    active: DeskNavLabel;
+    onSelect: (label: DeskNavLabel) => void;
+  };
 }) {
   const pathname = usePathname();
+  const items = preview ? PREVIEW_NAV : NAV;
 
   return (
     <aside className="desk-rail" aria-label="Desk navigation">
-      {NAV.map((item) => {
-        const active = staticActive ? item.label === staticActive : item.match(pathname);
+      {items.map((item) => {
+        const active = preview
+          ? item.label === preview.active
+          : staticActive
+            ? item.label === staticActive
+            : item.match(pathname);
         const Icon = item.icon;
         const className = cn("rail-item", active && "is-active");
+
+        if (preview) {
+          return (
+            <button
+              key={item.label}
+              type="button"
+              className={className}
+              aria-pressed={active}
+              onClick={() => preview.onSelect(item.label)}
+            >
+              <Icon width={16} height={16} aria-hidden />
+              {item.label}
+            </button>
+          );
+        }
 
         if (staticActive) {
           return (

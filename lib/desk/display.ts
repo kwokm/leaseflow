@@ -51,11 +51,11 @@ export function statusLabel(status: ApplicationStatus): string {
     case "declined":
       return "Declined";
     case "completed":
-      return "Completed";
+      return "In review";
     case "in_progress":
-      return "In progress";
+      return "Incomplete";
     case "invited":
-      return "Invited";
+      return "Incomplete";
   }
 }
 
