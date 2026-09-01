@@ -24,6 +24,12 @@ function stripUrls(files: (LocalFile | null)[]): void {
   }
 }
 
+function withoutPayment(state: ApplyState): Omit<ApplyState, "payment"> {
+  const copy = { ...state } as Partial<ApplyState>;
+  delete copy.payment;
+  return copy as Omit<ApplyState, "payment">;
+}
+
 export function loadDraft(listingId: string, pkg: ScreeningPackage): ApplyState {
   const fresh = createInitialState(listingId, pkg);
   if (typeof window === "undefined") return fresh;
@@ -78,7 +84,7 @@ export function saveDraft(state: ApplyState): void {
   if (typeof window === "undefined") return;
   try {
     // Card details are deliberately never persisted, even in the prototype.
-    const { payment: _payment, ...persisted } = state;
+    const persisted = withoutPayment(state);
     window.localStorage.setItem(draftKey(state.listingId), JSON.stringify(persisted));
   } catch {
     // Storage can be full or blocked (private mode) — the wizard still works.
@@ -120,8 +126,7 @@ export function loadSubmissions(): ApplyState[] {
 export function saveSubmission(state: ApplyState): void {
   if (typeof window === "undefined") return;
   try {
-    const { payment: _payment, ...withoutPayment } = state;
-    const persisted = JSON.parse(JSON.stringify(withoutPayment)) as ApplyState;
+    const persisted = JSON.parse(JSON.stringify(withoutPayment(state))) as ApplyState;
     stripUrls([
       persisted.idFront,
       persisted.idBack,

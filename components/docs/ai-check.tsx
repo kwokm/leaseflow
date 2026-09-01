@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { easePower3 } from "@/lib/motion/tokens";
 import {
-  SAMPLE_MISMATCH,
   type DocCheckReport,
   type DocCheckRow,
 } from "@/lib/docs/ai-check";

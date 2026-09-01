@@ -1311,10 +1311,12 @@ export function getLastMessageAt(thread: MessageThread): string {
   return thread.messages[thread.messages.length - 1]?.sentAt ?? "";
 }
 
-export function getScreeningFee(_pkg?: ScreeningPackage): number {
+export function getScreeningFee(pkg?: ScreeningPackage): number {
+  void pkg;
   return STANDARD_SCREENING_FEE;
 }
 
-export function screeningPackageLabel(_pkg?: ScreeningPackage): string {
+export function screeningPackageLabel(pkg?: ScreeningPackage): string {
+  void pkg;
   return STANDARD_PACKAGE_NAME;
 }
