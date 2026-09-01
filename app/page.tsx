@@ -20,6 +20,7 @@ import { SectionHeadline } from "@/components/motion/section-headline";
 import { SplitWords } from "@/components/motion/split-words";
 import { Button } from "@/components/ui/button";
 import { ListingPhotoStrip } from "@/components/listings/photos";
+import { PillarExperian, PillarIncome, PillarPacket } from "@/components/demos/pillar-demos";
 import { FEATURED_LISTING_ID, getPropertyById } from "@/lib/data/mock-data";
 
 const APPLY_HREF = `/apply/${FEATURED_LISTING_ID}`;
@@ -223,24 +224,27 @@ export default function Home() {
 
             <InView
               as="ul"
-              className="reveal-stagger mt-10 grid grid-cols-1 gap-4 lg:grid-cols-3"
+              className="reveal-stagger mt-10 grid grid-cols-1 gap-8 lg:grid-cols-3 lg:gap-8"
             >
               {[
                 {
                   lead: "Free Experian screening.",
                   tone: "We securely and verifiably screen applicants via Experian, at no cost to the landlord.",
+                  Demo: PillarExperian,
                 },
                 {
                   lead: "AI income check.",
                   tone: "Paystubs, W-2s, 1099s, bank and investment statements. Names match the applicant. They’re the last two months.",
+                  Demo: PillarIncome,
                 },
                 {
                   lead: "One packet everyone can open.",
                   tone: "Filled application, listing photos, Experian, income check, and a LeaseScore. Tenant, realtor, owner — same file.",
+                  Demo: PillarPacket,
                 },
               ].map((pillar) => (
-                <li key={pillar.lead} className="pillar-spatial">
-                  <article className="h-full rounded-lg border border-line bg-paper shadow-window">
+                <li key={pillar.lead} className="pillar-spatial flex flex-col gap-4">
+                  <article className="rounded-lg border border-line bg-paper shadow-window">
                     <div className="p-6 sm:p-7">
                       <h3 className="text-[17px] font-semibold leading-6 tracking-[-0.3px] text-ink">
                         <SplitWords>{pillar.lead}</SplitWords>
@@ -250,6 +254,7 @@ export default function Home() {
                       </p>
                     </div>
                   </article>
+                  <pillar.Demo />
                 </li>
               ))}
             </InView>
