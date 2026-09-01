@@ -5,6 +5,7 @@ import { DashboardMotion } from "@/components/motion/dashboard-motion";
 import { SpatialMount, SpatialOrigin } from "@/components/motion/spatial";
 import { PageWash } from "@/components/page-wash";
 import { Button } from "@/components/ui/button";
+import { LANDLORD_AUTH_HREF } from "@/lib/auth/landlord";
 import { FEATURED_LISTING_ID } from "@/lib/data/mock-data";
 
 export default function TenantLayout({ children }: { children: React.ReactNode }) {
@@ -25,7 +26,7 @@ export default function TenantLayout({ children }: { children: React.ReactNode }
               <Link href={`/apply/${FEATURED_LISTING_ID}`}>Continue apply</Link>
             </Button>
             <Button asChild>
-              <Link href="/dashboard">Open realtor desk</Link>
+              <Link href={LANDLORD_AUTH_HREF}>Open realtor desk</Link>
             </Button>
           </div>
         </div>

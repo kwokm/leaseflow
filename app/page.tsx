@@ -19,10 +19,10 @@ import { SplitWords } from "@/components/motion/split-words";
 import { Button } from "@/components/ui/button";
 import { ListingPhotoStrip } from "@/components/listings/photos";
 import { PillarExperian, PillarIncome, PillarPacket } from "@/components/demos/pillar-demos";
+import { LANDLORD_AUTH_HREF } from "@/lib/auth/landlord";
 import { FEATURED_LISTING_ID, getPropertyById } from "@/lib/data/mock-data";
 
 const APPLY_HREF = `/apply/${FEATURED_LISTING_ID}`;
-const DESK_HREF = "/dashboard";
 
 const STEPS = [
   {
@@ -157,10 +157,10 @@ export default function Home() {
 
           <div className="ml-auto flex items-center gap-2">
             <Button asChild variant="ghost">
-              <Link href={DESK_HREF}>Sign in</Link>
+              <Link href={LANDLORD_AUTH_HREF}>Sign in</Link>
             </Button>
             <Button asChild>
-              <Link href={DESK_HREF}>Start for free</Link>
+              <Link href={LANDLORD_AUTH_HREF}>Start for free</Link>
             </Button>
           </div>
         </div>
@@ -180,7 +180,7 @@ export default function Home() {
             </p>
             <div className="hero-ctas reveal-cta">
               <Button asChild variant="lilac" size="cta">
-                <Link href={DESK_HREF}>Screen as Landlord</Link>
+                <Link href={LANDLORD_AUTH_HREF}>Screen as Landlord</Link>
               </Button>
               <Button asChild variant="outline" size="cta">
                 <Link href={APPLY_HREF}>Apply as renter</Link>
