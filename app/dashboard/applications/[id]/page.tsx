@@ -340,7 +340,14 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
               {groupDocuments(details.documents).flatMap((group) =>
                 group.documents.map((doc) => (
                   <tr key={`${group.type}-${doc.name}`}>
-                    <td>{doc.name}</td>
+                    <td>
+                      {doc.name}
+                      {doc.previewAvailable === false ? (
+                        <span className="mt-0.5 block text-[11px] text-mute-2">
+                          Preview unavailable after reload
+                        </span>
+                      ) : null}
+                    </td>
                     <td>{group.label}</td>
                     <td>{new Date(doc.uploadedAt).toLocaleDateString()}</td>
                   </tr>

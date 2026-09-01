@@ -1,3 +1,8 @@
+import {
+  LANDLORD_SESSION_COOKIE,
+  LANDLORD_SESSION_MAX_AGE,
+} from "@/lib/auth/constants";
+
 export const LANDLORD_AUTH_HREF = "/signin";
 
 export type LandlordProvider = "google" | "email";
@@ -40,6 +45,13 @@ function writeJson(key: string, value: unknown) {
   window.localStorage.setItem(key, JSON.stringify(value));
 }
 
+function writeSessionCookie(active: boolean) {
+  if (typeof document === "undefined") return;
+  document.cookie = active
+    ? `${LANDLORD_SESSION_COOKIE}=1; Path=/; Max-Age=${LANDLORD_SESSION_MAX_AGE}; SameSite=Lax`
+    : `${LANDLORD_SESSION_COOKIE}=; Path=/; Max-Age=0; SameSite=Lax`;
+}
+
 export function subscribeLandlordSession(listener: () => void) {
   listeners.add(listener);
   return () => listeners.delete(listener);
@@ -49,10 +61,14 @@ export function getLandlordSession(): LandlordSession | null {
   if (typeof window === "undefined") return null;
   try {
     const raw = window.localStorage.getItem(SESSION_KEY);
-    if (raw === cachedSessionRaw) return cachedSession;
+    if (raw === cachedSessionRaw) {
+      if (cachedSession) writeSessionCookie(true);
+      return cachedSession;
+    }
     cachedSessionRaw = raw;
     const parsed = raw ? (JSON.parse(raw) as LandlordSession) : null;
     cachedSession = parsed?.email ? parsed : null;
+    if (cachedSession) writeSessionCookie(true);
     return cachedSession;
   } catch {
     cachedSession = null;
@@ -87,6 +103,7 @@ export function signInLandlord(
   writeJson(SESSION_KEY, session);
   cachedSession = session;
   cachedSessionRaw = JSON.stringify(session);
+  writeSessionCookie(true);
   saveLandlordProfile(session);
   emit();
   return session;
@@ -95,6 +112,7 @@ export function signInLandlord(
 export function signOutLandlord() {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem(SESSION_KEY);
+  writeSessionCookie(false);
   cachedSession = null;
   cachedSessionRaw = null;
   emit();

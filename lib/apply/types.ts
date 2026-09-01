@@ -1,6 +1,6 @@
 import type { ScreeningPackage } from "@/lib/data/mock-data";
 
-export const APPLY_STATE_VERSION = 4;
+export const APPLY_STATE_VERSION = 5;
 
 /**
  * A file the renter picked in the browser. `url` is an object URL that only
@@ -259,7 +259,7 @@ export const APPLY_STEPS: StepDefinition[] = [
     name: "Credit",
     title: "Credit report",
     lead: "Connect with Experian",
-    tone: "no cost, and it never affects your score.",
+    tone: "included in Standard, and it never affects your score.",
   },
   {
     id: 7,

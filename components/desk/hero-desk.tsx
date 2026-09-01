@@ -1,24 +1,59 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import type { MouseEvent } from "react";
 import { useReducedMotion } from "motion/react";
 import { ApplicationDesk } from "@/components/desk/application-desk";
 import { DeskSidebar, type DeskNavLabel } from "@/components/desk/desk-sidebar";
 import { PacketWindow } from "@/components/desk/packet-window";
+import { ListingThumb } from "@/components/listings/photos";
 import { PipelineDesk } from "@/components/leasing/pipeline-desk";
 import { LeadInbox } from "@/components/leasing/lead-inbox";
 import { ShowingsCalendar } from "@/components/leasing/showings-calendar";
-import ListingsPage from "@/app/dashboard/listings/page";
+import { getApplicantsByProperty, mockProperties } from "@/lib/data/mock-data";
+import { shortAddress } from "@/lib/desk/display";
 
 const TOUR: { label: DeskNavLabel; title: string }[] = [
   { label: "Pipeline", title: "Pipeline • 510 S Resh St" },
   { label: "Applications", title: "Applications • 510 S Resh St" },
+  { label: "Properties", title: "Properties" },
   { label: "Leads", title: "Lead inbox" },
   { label: "Showings", title: "Showings • Tuesday Anaheim" },
-  { label: "Properties", title: "Properties" },
 ];
 
 const DWELL_MS = 3000;
+
+function PropertiesPreview() {
+  return (
+    <div className="overflow-x-auto">
+      <table className="app-table">
+        <thead>
+          <tr>
+            <th>Property</th>
+            <th className="num">Rent</th>
+            <th className="num">Applicants</th>
+            <th>Package</th>
+          </tr>
+        </thead>
+        <tbody>
+          {mockProperties.map((property) => (
+            <tr key={property.id}>
+              <td>
+                <span className="flex items-center gap-3">
+                  <ListingThumb src={property.photos?.[0]} alt="" />
+                  <span>{shortAddress(property.address)}</span>
+                </span>
+              </td>
+              <td className="num">${property.rent.toLocaleString()}</td>
+              <td className="num">{getApplicantsByProperty(property.id).length}</td>
+              <td>Standard</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
 
 export function HeroDesk() {
   const ref = useRef<HTMLDivElement>(null);
@@ -68,11 +103,19 @@ export function HeroDesk() {
     setTouring(true);
   }
 
+  function keepPreviewInPlace(event: MouseEvent<HTMLDivElement>) {
+    const link = (event.target as Element).closest("a");
+    if (!link) return;
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
   return (
     <div
       ref={ref}
       className="hero-desk"
       data-tab={active.label}
+      onClickCapture={keepPreviewInPlace}
     >
       <PacketWindow title={active.title} meta="Realtor desk • Demo sync">
         <div className="desk">
@@ -91,11 +134,11 @@ export function HeroDesk() {
           </div>
           <div className="hero-stage min-w-0">
             <div key={active.label} className="hero-panel is-on">
-              {active.label === "Pipeline" ? <PipelineDesk /> : null}
-              {active.label === "Applications" ? <ApplicationDesk /> : null}
+              {active.label === "Pipeline" ? <PipelineDesk preview /> : null}
+              {active.label === "Applications" ? <ApplicationDesk preview /> : null}
               {active.label === "Leads" ? <LeadInbox /> : null}
               {active.label === "Showings" ? <ShowingsCalendar /> : null}
-              {active.label === "Properties" ? <ListingsPage /> : null}
+              {active.label === "Properties" ? <PropertiesPreview /> : null}
             </div>
           </div>
         </div>

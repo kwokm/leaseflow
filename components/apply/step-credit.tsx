@@ -230,7 +230,7 @@ export function StepCredit({ state, patch, errors }: StepProps) {
 
   return (
     <StepBody>
-      <StepHeading lead="Credit report." tone="Included at no extra cost." />
+      <StepHeading lead="Credit report." tone="Included in the $24.99 Standard fee." />
       <p className="max-w-xl text-[15px] font-medium leading-[21px] tracking-[-0.16px] text-mute">
         Connect your report once and it travels with this application. The landlord sees your score
         and a summary — never your full account numbers.
@@ -262,7 +262,7 @@ export function StepCredit({ state, patch, errors }: StepProps) {
               <SummaryRow label="Recent inquiries" value={experian.recentInquiries} />
               <SummaryRow label="Public records" value={experian.publicRecords} />
               <SummaryRow label="Pulled" value={formatDateTime(experian.pulledAt)} />
-              <SummaryRow label="Cost to you" value="$0.00" />
+              <SummaryRow label="Extra Experian fee" value="$0.00" />
             </motion.dl>
           </div>
 

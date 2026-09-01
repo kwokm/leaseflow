@@ -20,8 +20,10 @@ import { StepDone } from "@/components/apply/step-done";
 import { StepTransition } from "@/components/apply/motion";
 import type { StepProps } from "@/components/apply/step-shell";
 import { clearDraft, loadDraft, saveDraft, saveSubmission } from "@/lib/apply/storage";
-import { APPLY_STEPS, TOTAL_STEPS, createDemoState, type ApplyState } from "@/lib/apply/types";
+import { localApplicantId } from "@/lib/apply/to-packet";
+import { APPLY_STEPS, TOTAL_STEPS, createInitialState, type ApplyState } from "@/lib/apply/types";
 import type { StepErrors } from "@/lib/apply/validate";
+import { firstErrorKey, validateStep } from "@/lib/apply/validate";
 import type { Property } from "@/lib/data/mock-data";
 import { cn } from "@/lib/utils";
 
@@ -48,7 +50,7 @@ const STEP_COMPONENTS: Record<number, (props: StepProps) => React.ReactElement> 
 
 export function ApplyWizard({ property }: { property: Property }) {
   const [state, setState] = React.useState<ApplyState>(() =>
-    createDemoState(property.id, property.screeningPackage)
+    createInitialState(property.id, property.screeningPackage)
   );
   const [errors, setErrors] = React.useState<StepErrors>({});
   const [hydrated, setHydrated] = React.useState(false);
@@ -112,8 +114,16 @@ export function ApplyWizard({ property }: { property: Property }) {
   };
 
   const goNext = () => {
-    // Prototype: never gate on validation. Jane Doe is prefilled so every
-    // step is browseable with Back / Next or the rail.
+    const nextErrors = validateStep(step, state);
+    if (Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors);
+      const first = firstErrorKey(nextErrors);
+      if (first) {
+        window.requestAnimationFrame(() => document.getElementById(first)?.focus());
+      }
+      return;
+    }
+
     if (step === 8) {
       submit();
       return;
@@ -123,6 +133,7 @@ export function ApplyWizard({ property }: { property: Property }) {
 
   const goTo = (target: number) => {
     if (target < 1 || target > TOTAL_STEPS) return;
+    if (target > state.furthestStep) return;
     moveTo(target);
   };
 
@@ -171,8 +182,13 @@ export function ApplyWizard({ property }: { property: Property }) {
                 key={entry.id}
                 type="button"
                 aria-current={current ? "step" : undefined}
+                disabled={entry.id > state.furthestStep}
                 onClick={() => goTo(entry.id)}
-                className={cn("rail-item", current && "is-active")}
+                className={cn(
+                  "rail-item",
+                  current && "is-active",
+                  entry.id > state.furthestStep && "cursor-not-allowed opacity-45"
+                )}
               >
                 {entry.name}
               </button>
@@ -222,7 +238,9 @@ export function ApplyWizard({ property }: { property: Property }) {
                 </Button>
               ) : (
                 <Button asChild size="touch" className="sm:min-w-[168px]">
-                  <Link href="/tenant">Open tenant desk</Link>
+                  <Link href={`/packet/${localApplicantId(state.confirmationId ?? "")}`}>
+                    Open renter packet
+                  </Link>
                 </Button>
               )}
             </div>

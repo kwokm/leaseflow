@@ -205,8 +205,8 @@ export default function Home() {
             >
               {[
                 {
-                  lead: "Free Experian screening.",
-                  tone: "We securely and verifiably screen applicants via Experian, at no cost to the landlord.",
+                  lead: "Experian screening included.",
+                  tone: "Applicants pay $24.99; Experian is included, $0 extra for landlords.",
                   Demo: PillarExperian,
                 },
                 {
@@ -291,6 +291,36 @@ export default function Home() {
               className="max-w-[28ch]"
             />
           </InView>
+          <InView
+            as="ul"
+            className="reveal-stagger mx-auto mt-10 grid max-w-shell grid-cols-1 gap-5 px-5 sm:px-8 lg:grid-cols-3"
+          >
+            {[
+              {
+                title: "Desk",
+                meta: "One queue",
+                copy: "Properties and applicants stay together, with the next screening task visible.",
+              },
+              {
+                title: "Screening",
+                meta: "Standard · $24.99",
+                copy: "Experian, background, identity, and AI income checks arrive in one review flow.",
+              },
+              {
+                title: "Packet",
+                meta: "One share",
+                copy: "Application, evidence, checks, and decision status stay in one renter packet.",
+              },
+            ].map((item) => (
+              <li key={item.title} className="reveal-spatial">
+                <PacketWindow title={item.title} meta={item.meta}>
+                  <p className="px-5 py-6 text-[14px] font-medium leading-5 text-mute">
+                    {item.copy}
+                  </p>
+                </PacketWindow>
+              </li>
+            ))}
+          </InView>
         </section>
 
         <section className="pb-16 sm:pb-24" aria-labelledby="how-title">
@@ -334,7 +364,7 @@ export default function Home() {
               <SectionHeadline
                 id="rates-title"
                 lead="Applicants pay the fee."
-                tone="One Standard plan. Landlords do not pay to use the desk. Experian stays $0 extra for the landlord."
+                tone="Applicants pay $24.99; Experian is included, $0 extra for landlords."
                 className="max-w-[22ch]"
               />
             </InView>
@@ -351,7 +381,7 @@ export default function Home() {
                     and the packet. Apply to as many homes as you want on this one fee.
                   </p>
                   <p className="mt-3 max-w-[40ch] text-[14px] font-medium leading-[1.45] text-mute">
-                    Experian screening stays $0 extra for the landlord.
+                    Applicants pay $24.99; Experian is included, $0 extra for landlords.
                   </p>
                 </div>
               </article>

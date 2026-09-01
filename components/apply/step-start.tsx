@@ -5,15 +5,18 @@ import { BedDouble, Bath, CalendarDays, Check } from "lucide-react";
 import { StepBody } from "@/components/apply/motion";
 import { Note, Panel, StepHeading } from "@/components/apply/step-shell";
 import type { StepProps } from "@/components/apply/step-shell";
+import { Button } from "@/components/ui/button";
 import { formatDateOnly, formatDollars } from "@/lib/apply/format";
+import { createDemoState } from "@/lib/apply/types";
 import { ListingPhotoStrip } from "@/components/listings/photos";
 import {
   STANDARD_PACKAGE_NAME,
+  STANDARD_PRICING_STORY,
   STANDARD_SCREENING_FEE,
 } from "@/lib/data/mock-data";
 
 const STANDARD_FEATURES = [
-  "Credit report and score",
+  "Experian credit report and score",
   "National criminal and eviction search",
   "Identity check",
   "AI income and bank verification",
@@ -35,6 +38,19 @@ export function StepStart({ state, patch, property }: StepProps) {
         It takes about ten minutes. Your progress saves in this browser, so you can stop and pick it
         back up.
       </p>
+      <div>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => patch(createDemoState(property.id, "standard"))}
+        >
+          Fill demo
+        </Button>
+        <p className="mt-1.5 text-[12px] font-medium text-mute">
+          Optional: load Jane Doe&apos;s fictional details to preview the flow.
+        </p>
+      </div>
 
       <Panel>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -120,8 +136,8 @@ export function StepStart({ state, patch, property }: StepProps) {
       </section>
 
       <Note tone="blue">
-        Experian stays $0 extra for the landlord. Your ${STANDARD_SCREENING_FEE.toFixed(2)} Standard
-        fee includes everything — credit, background, ID, and AI income and bank verification.
+        {STANDARD_PRICING_STORY} The Standard fee also includes background, ID, and AI income and
+        bank verification.
       </Note>
 
       <Panel title="What you'll need" description="Have these ready before you start.">

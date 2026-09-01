@@ -35,6 +35,7 @@ function toDocument(
     docType,
     uploadedAt: file.addedAt,
     sizeLabel: formatFileSize(file.size),
+    previewAvailable: Boolean(file.url),
   };
 }
 

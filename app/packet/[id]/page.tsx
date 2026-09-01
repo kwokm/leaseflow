@@ -60,13 +60,7 @@ export default function SharedPacketPage({
           </Link>
           <div className="ml-auto flex items-center gap-2">
             <Button type="button" variant="outline" onClick={() => window.print()}>
-              Print
-            </Button>
-            <Button asChild variant="outline">
-              <Link href="/tenant">Tenant desk</Link>
-            </Button>
-            <Button asChild>
-              <Link href={`/dashboard/applications/${applicant.id}`}>Realtor packet</Link>
+              Print renter packet
             </Button>
           </div>
         </div>

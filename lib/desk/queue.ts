@@ -1,6 +1,7 @@
 import {
   getAllApplications,
   getApplicantsByProperty,
+  isDemoDataLoaded,
   type Applicant,
   type ApplicationStatus,
 } from "@/lib/data/mock-data";
@@ -9,10 +10,10 @@ import { submissionApplicant } from "@/lib/apply/to-packet";
 import { loadDecisions, withDecision } from "@/lib/desk/decisions";
 import { sortDeskFirst } from "@/lib/desk/display";
 
-export function loadDeskApplicants(): Applicant[] {
+export function loadDeskApplicants(includeDemo = isDemoDataLoaded()): Applicant[] {
   const decisions = loadDecisions();
   const submitted = loadSubmissions().map(submissionApplicant);
-  const seeded = getAllApplications();
+  const seeded = includeDemo ? getAllApplications() : [];
   return sortDeskFirst([...submitted, ...seeded].map((row) => withDecision(row, decisions)));
 }
 
@@ -21,7 +22,7 @@ export function loadDeskApplicantsForListing(propertyId: string): Applicant[] {
   const submitted = loadSubmissions()
     .map(submissionApplicant)
     .filter((row) => row.propertyId === propertyId);
-  const seeded = getApplicantsByProperty(propertyId);
+  const seeded = isDemoDataLoaded() ? getApplicantsByProperty(propertyId) : [];
   return sortDeskFirst([...submitted, ...seeded].map((row) => withDecision(row, decisions)));
 }
 

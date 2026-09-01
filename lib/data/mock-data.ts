@@ -2,11 +2,13 @@
 
 export type ApplicationStatus = "invited" | "in_progress" | "completed" | "approved" | "declined";
 
-export type ScreeningPackage = "standard" | "premium";
+export type ScreeningPackage = "standard";
 
-/** Single applicant-paid plan. Premium is retired in the prototype UI. */
+/** The single applicant-paid screening plan. */
 export const STANDARD_SCREENING_FEE = 24.99;
 export const STANDARD_PACKAGE_NAME = "Standard";
+export const STANDARD_PRICING_STORY =
+  "Applicants pay $24.99; Experian is included, $0 extra for landlords.";
 
 export interface Property {
   id: string;
@@ -113,6 +115,7 @@ export interface ApplicationDocument {
   docType: DocumentType;
   uploadedAt: string;
   sizeLabel?: string;
+  previewAvailable?: boolean;
 }
 
 export const documentTypeLabels: Record<DocumentType, string> = {
@@ -1158,6 +1161,7 @@ export const mockThreads: MessageThread[] = [
 
 // Helper functions
 const STORED_LISTINGS_KEY = "leaseflow.listings.v1";
+const DEMO_DATA_KEY = "leaseproof.demo.loaded";
 
 function readStoredListings(): Property[] {
   if (typeof window === "undefined") return [];
@@ -1177,8 +1181,21 @@ export function getPropertyById(id: string): Property | undefined {
   return stored ?? seeded;
 }
 
+export function isDemoDataLoaded(): boolean {
+  if (typeof window === "undefined") return false;
+  return window.localStorage.getItem(DEMO_DATA_KEY) === "true";
+}
+
+export function loadDemoData(): void {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(DEMO_DATA_KEY, "true");
+}
+
 export function getAllProperties(): Property[] {
-  const byId = new Map(mockProperties.map((p) => [p.id, p]));
+  const byId = new Map<string, Property>();
+  if (isDemoDataLoaded()) {
+    for (const property of mockProperties) byId.set(property.id, property);
+  }
   for (const row of readStoredListings()) byId.set(row.id, row);
   return [...byId.values()];
 }

@@ -10,6 +10,7 @@ import { CraigslistDemo } from "@/components/demos/craigslist";
 import { PhotoEnhanceDemo } from "@/components/demos/photo-enhance";
 import { SyndicationDemo } from "@/components/demos/syndication";
 import { SyndicationTiles } from "@/components/leasing/syndication";
+import { ApplyLinkActions } from "@/components/listings/apply-link-actions";
 import { Button } from "@/components/ui/button";
 import { getPropertyById, type Applicant } from "@/lib/data/mock-data";
 import { loadDeskApplicantsForListing, listingRollup } from "@/lib/desk/queue";
@@ -49,9 +50,7 @@ export default function ListingDetailPage({
           <Button asChild variant="outline" size="sm">
             <Link href="/dashboard/listings">All listings</Link>
           </Button>
-          <Button asChild variant="outline" size="sm">
-            <Link href={`/apply/${property.id}`}>Apply link</Link>
-          </Button>
+          <ApplyLinkActions listingId={property.id} address={property.address} compact />
           <span className="desk-pill">Standard</span>
           <span className="desk-pill">{pricingLabel(pricing)} · demo</span>
         </DeskToolbar>

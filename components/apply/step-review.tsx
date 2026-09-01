@@ -144,7 +144,7 @@ export function StepReview({ state, patch, errors, property, goTo }: StepProps) 
         <SummaryRow label="Source" value="Experian (demo)" />
         <SummaryRow label="Score" value={state.experian.score ?? "Not connected"} />
         <SummaryRow label="Pulled" value={formatDateTime(state.experian.pulledAt)} />
-        <SummaryRow label="Cost" value="$0.00" />
+        <SummaryRow label="Extra Experian fee" value="$0.00" />
       </ReviewBlock>
 
       <ReviewBlock title="Household" step={7} goTo={goTo}>
@@ -250,7 +250,7 @@ export function StepReview({ state, patch, errors, property, goTo }: StepProps) 
             label="Standard screening"
             value={formatMoney(fee)}
           />
-          <SummaryRow label="Credit report — Experian (demo)" value="$0.00" />
+          <SummaryRow label="Experian — included" value="$0 extra" />
           <SummaryRow
             label="Total due today"
             value={<span className="num text-[16px] font-semibold">{formatMoney(fee)}</span>}

@@ -202,7 +202,11 @@ export function buildPacketHtml({
                         (doc) =>
                           `<li>${escapeHtml(doc.name)}${
                             doc.sizeLabel ? ` — ${escapeHtml(doc.sizeLabel)}` : ""
-                          }, uploaded ${formatDate(doc.uploadedAt)}</li>`
+                          }, uploaded ${formatDate(doc.uploadedAt)}${
+                            doc.previewAvailable === false
+                              ? " — preview unavailable after reload"
+                              : ""
+                          }</li>`
                       )
                       .join("")}</ul>`
                 )
@@ -237,7 +241,7 @@ export function buildPacketHtml({
            ["Oldest account", `${experian.oldestAccountYears} years`],
            ["Recent inquiries", String(experian.recentInquiries)],
            ["Public records", String(experian.publicRecords)],
-           ["Cost to applicant", "$0.00"],
+           ["Extra Experian fee", "$0.00"],
          ])}</table>
          ${
            experian.factors.length

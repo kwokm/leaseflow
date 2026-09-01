@@ -19,7 +19,7 @@ export function PillarExperian() {
         <div className="px-3.5 py-3 sm:px-4">
           <div className="flex items-center justify-between gap-2">
             <p className="text-[12px] font-medium text-mute">Jane Doe · 510 S Resh St</p>
-            <span className="pillar-pill">Free · Experian</span>
+            <span className="pillar-pill">Included · $0 landlord extra</span>
           </div>
           <div className="d p-score mt-3 flex items-end justify-between gap-3 rounded-md bg-wash px-3 py-2.5">
             <div>

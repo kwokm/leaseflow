@@ -14,6 +14,7 @@ import { saveListing } from "@/lib/listings/store";
 import { SEEDED_ZILLOW_URL } from "@/lib/listings/zillow";
 import {
   STANDARD_SCREENING_FEE,
+  STANDARD_PRICING_STORY,
   type Property,
   type ScreeningPackage,
 } from "@/lib/data/mock-data";
@@ -296,9 +297,7 @@ export default function NewListingPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Screening package</CardTitle>
-                <CardDescription>
-                  Applicants pay one Standard fee. Experian stays $0 extra for you.
-                </CardDescription>
+                <CardDescription>{STANDARD_PRICING_STORY}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="rounded-lg border border-line bg-wash/40 p-5">
