@@ -72,7 +72,7 @@ export function buildPacketHtml({
       ["Completed", formatDate(applicant.completedAt)],
       [
         "Screening package",
-        property.screeningPackage === "premium" ? "Premium" : "Standard",
+        "Standard",
       ],
     ])}</table>`
   );

@@ -47,7 +47,7 @@ export function StepDone({ state, property }: StepProps) {
           <SummaryRow label="Property" value={property.address} />
           <SummaryRow label="Submitted" value={formatDateTime(state.submittedAt)} />
           <SummaryRow
-            label={`${state.screeningPackage === "premium" ? "Premium" : "Standard"} screening`}
+            label="Standard screening"
             value={formatMoney(fee)}
           />
           <SummaryRow label="Credit report — Experian (demo)" value="$0.00" />

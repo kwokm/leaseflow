@@ -52,7 +52,7 @@ export default function ListingDetailPage({
           <Button asChild variant="outline" size="sm">
             <Link href={`/apply/${property.id}`}>Apply link</Link>
           </Button>
-          <span className="desk-pill capitalize">{property.screeningPackage}</span>
+          <span className="desk-pill">Standard</span>
           <span className="desk-pill">{pricingLabel(pricing)} · demo</span>
         </DeskToolbar>
       </Reveal>

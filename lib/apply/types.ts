@@ -218,8 +218,8 @@ export const APPLY_STEPS: StepDefinition[] = [
     key: "start",
     name: "Start",
     title: "Start your application",
-    lead: "Pick a screening package",
-    tone: "your credit report is included.",
+    lead: "Standard screening",
+    tone: "one fee covers every home.",
   },
   {
     id: 2,

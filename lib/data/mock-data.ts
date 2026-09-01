@@ -4,6 +4,10 @@ export type ApplicationStatus = "invited" | "in_progress" | "completed" | "appro
 
 export type ScreeningPackage = "standard" | "premium";
 
+/** Single applicant-paid plan. Premium is retired in the prototype UI. */
+export const STANDARD_SCREENING_FEE = 24.99;
+export const STANDARD_PACKAGE_NAME = "Standard";
+
 export interface Property {
   id: string;
   address: string;
@@ -211,7 +215,7 @@ export const mockProperties: Property[] = [
     bedrooms: 3,
     bathrooms: 2,
     availableDate: "2026-09-01",
-    screeningPackage: "premium",
+    screeningPackage: "standard",
     applyUrl: "https://leaseflow.app/apply/resh-510",
     createdAt: "2026-08-01T10:00:00Z",
     photos: [...ANAHEIM_PHOTOS],
@@ -228,7 +232,7 @@ export const mockProperties: Property[] = [
     bedrooms: 3,
     bathrooms: 2,
     availableDate: "2026-09-01",
-    screeningPackage: "premium",
+    screeningPackage: "standard",
     applyUrl: "https://leaseflow.app/apply/prop-1",
     createdAt: "2026-07-15T10:00:00Z",
   },
@@ -250,7 +254,7 @@ export const mockProperties: Property[] = [
     bedrooms: 4,
     bathrooms: 3,
     availableDate: "2026-10-01",
-    screeningPackage: "premium",
+    screeningPackage: "standard",
     applyUrl: "https://leaseflow.app/apply/prop-3",
     createdAt: "2026-08-01T09:15:00Z",
   },
@@ -984,10 +988,10 @@ export const mockPayments: Payment[] = [
   {
     id: "pay-1",
     kind: "screening_fee",
-    description: "Premium screening fee",
+    description: "Standard screening fee",
     applicantId: "app-1",
     propertyId: "resh-510",
-    amount: 59.99,
+    amount: 24.99,
     status: "paid",
     method: "Visa ···4242",
     createdAt: "2026-07-18T11:45:00Z",
@@ -998,7 +1002,7 @@ export const mockPayments: Payment[] = [
     description: "Standard screening fee",
     applicantId: "app-3",
     propertyId: "prop-2",
-    amount: 39.99,
+    amount: 24.99,
     status: "paid",
     method: "Mastercard ···5518",
     createdAt: "2026-07-22T10:15:00Z",
@@ -1009,7 +1013,7 @@ export const mockPayments: Payment[] = [
     description: "Standard screening fee",
     applicantId: "app-4",
     propertyId: "resh-510",
-    amount: 39.99,
+    amount: 24.99,
     status: "refunded",
     method: "Visa ···9931",
     createdAt: "2026-07-23T17:20:00Z",
@@ -1017,10 +1021,10 @@ export const mockPayments: Payment[] = [
   {
     id: "pay-4",
     kind: "screening_fee",
-    description: "Premium screening fee",
+    description: "Standard screening fee",
     applicantId: "app-6",
     propertyId: "resh-510",
-    amount: 59.99,
+    amount: 24.99,
     status: "paid",
     method: "Amex ···1007",
     createdAt: "2026-07-25T14:00:00Z",
@@ -1028,10 +1032,10 @@ export const mockPayments: Payment[] = [
   {
     id: "pay-5",
     kind: "screening_fee",
-    description: "Premium screening fee",
+    description: "Standard screening fee",
     applicantId: "app-2",
     propertyId: "resh-510",
-    amount: 59.99,
+    amount: 24.99,
     status: "pending",
     method: "Awaiting payment",
     createdAt: "2026-07-19T14:20:00Z",
@@ -1290,6 +1294,10 @@ export function getLastMessageAt(thread: MessageThread): string {
   return thread.messages[thread.messages.length - 1]?.sentAt ?? "";
 }
 
-export function getScreeningFee(pkg: ScreeningPackage): number {
-  return pkg === "premium" ? 59.99 : 39.99;
+export function getScreeningFee(_pkg?: ScreeningPackage): number {
+  return STANDARD_SCREENING_FEE;
+}
+
+export function screeningPackageLabel(_pkg?: ScreeningPackage): string {
+  return STANDARD_PACKAGE_NAME;
 }

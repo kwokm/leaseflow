@@ -7,12 +7,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Sparkles } from "lucide-react";
+import { ArrowLeft, Check } from "lucide-react";
 import { Reveal, RevealItem, RevealStagger } from "@/components/motion/reveal";
 import { ListingPhotoStrip } from "@/components/listings/photos";
 import { saveListing } from "@/lib/listings/store";
 import { SEEDED_ZILLOW_URL } from "@/lib/listings/zillow";
-import type { Property, ScreeningPackage } from "@/lib/data/mock-data";
+import {
+  STANDARD_SCREENING_FEE,
+  type Property,
+  type ScreeningPackage,
+} from "@/lib/data/mock-data";
 
 type FormState = {
   address: string;
@@ -31,7 +35,7 @@ const EMPTY_FORM: FormState = {
   bathrooms: "",
   sqft: "",
   availableDate: "2026-09-01",
-  screeningPackage: "premium",
+  screeningPackage: "standard",
 };
 
 function formFromListing(listing: Property): FormState {
@@ -109,7 +113,7 @@ export default function NewListingPage() {
       bedrooms: Number(formData.bedrooms) || 0,
       bathrooms: Number(formData.bathrooms) || 0,
       availableDate: formData.availableDate,
-      screeningPackage: formData.screeningPackage,
+      screeningPackage: "standard",
       applyUrl: `/apply/${listingId}`,
       createdAt: pulled?.createdAt ?? new Date().toISOString(),
       photos: pulled?.photos ?? [],
@@ -292,50 +296,40 @@ export default function NewListingPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Screening package</CardTitle>
-                <CardDescription>Choose the level of tenant screening</CardDescription>
+                <CardDescription>
+                  Applicants pay one Standard fee. Experian stays $0 extra for you.
+                </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <button
-                    type="button"
-                    onClick={() => setFormData({ ...formData, screeningPackage: "standard" })}
-                    className={`p-4 border-2 rounded-lg text-left transition-all duration-240 ease-premium ${
-                      formData.screeningPackage === "standard"
-                        ? "border-primary bg-primary/5"
-                        : "border-line hover:border-line-2"
-                    }`}
-                  >
-                    <div className="font-semibold text-lg mb-1">Standard</div>
-                    <div className="text-sm text-mute mb-3">$39.99 per applicant</div>
-                    <ul className="text-sm space-y-1 text-mute">
-                      <li>✓ Credit report</li>
-                      <li>✓ Criminal background</li>
-                      <li>✓ Eviction history</li>
-                      <li>✓ Identity verification</li>
-                    </ul>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setFormData({ ...formData, screeningPackage: "premium" })}
-                    className={`p-4 border-2 rounded-lg text-left transition-all duration-240 ease-premium ${
-                      formData.screeningPackage === "premium"
-                        ? "border-primary bg-primary/5"
-                        : "border-line hover:border-line-2"
-                    }`}
-                  >
-                    <div className="flex items-center gap-2 mb-1">
-                      <div className="font-semibold text-lg">Premium</div>
-                      <Sparkles className="w-4 h-4 text-primary" />
+              <CardContent>
+                <div className="rounded-lg border border-line bg-wash/40 p-5">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="font-semibold text-lg mb-1">Standard</div>
+                      <div className="text-sm text-mute mb-3">
+                        ${STANDARD_SCREENING_FEE.toFixed(2)} per applicant · includes everything
+                      </div>
                     </div>
-                    <div className="text-sm text-mute mb-3">$59.99 per applicant</div>
-                    <ul className="text-sm space-y-1 text-mute">
-                      <li>✓ Everything in Standard</li>
-                      <li>✓ Income verification</li>
-                      <li>✓ Employment verification</li>
-                      <li>✓ Landlord references</li>
-                    </ul>
-                  </button>
+                    <span
+                      aria-hidden
+                      className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-ink bg-ink text-paper"
+                    >
+                      <Check className="h-3 w-3" strokeWidth={3} />
+                    </span>
+                  </div>
+                  <ul className="text-sm space-y-1.5 text-ink-2">
+                    <li className="flex items-start gap-2">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-ok" aria-hidden />
+                      Credit, background, ID, and the packet
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-ok" aria-hidden />
+                      AI income and bank verification
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-ok" aria-hidden />
+                      Applicants can apply to as many homes as they want
+                    </li>
+                  </ul>
                 </div>
               </CardContent>
             </Card>

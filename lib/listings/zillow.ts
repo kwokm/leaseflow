@@ -65,7 +65,7 @@ export function seededZillowImport(): ZillowImport {
 
 export function importToProperty(
   pulled: ZillowImport,
-  pkg: ScreeningPackage = "premium"
+  pkg: ScreeningPackage = "standard"
 ): Property {
   return {
     id: pulled.id,

@@ -95,7 +95,7 @@ export default function ListingsPage() {
                       {listingSyndication(property.id) === "live" ? " · live" : ""}
                     </span>
                   </td>
-                  <td className="capitalize">{property.screeningPackage}</td>
+                  <td>Standard</td>
                 </tr>
               );
             })}

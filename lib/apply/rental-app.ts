@@ -145,7 +145,6 @@ export function buildRentalApplication(input: {
     .filter(Boolean)
     .join(" ");
   const fee = getScreeningFee(state?.screeningPackage ?? property.screeningPackage);
-  const pkg = state?.screeningPackage ?? property.screeningPackage;
   const signed = state?.consent.signature || details?.consent.signature || fullName;
   const signedAt = filledAt(state, details);
   const ssn = state?.personal.ssn ? maskSsn(state.personal.ssn) : details?.ssnLast4 ? `•••-••-${details.ssnLast4}` : "—";
@@ -211,7 +210,7 @@ export function buildRentalApplication(input: {
     signature: signed,
     signedAt,
     screeningFee: {
-      packageLabel: pkg === "premium" ? "Premium" : "Standard",
+      packageLabel: "Standard",
       amount: `$${fee.toFixed(2)}`,
       status: state?.submittedAt ? "Paid" : "Collected when the packet is submitted",
       note: "Applicant pays. Landlord does not collect this fee. Prototype checkout — no card is charged.",

@@ -88,9 +88,7 @@ export default function TenantDeskPage() {
           </div>
           <div>
             <dt className="text-[12px] font-medium text-mute-2">Package</dt>
-            <dd className="mt-0.5 text-[13px] font-medium capitalize text-ink">
-              {property.screeningPackage}
-            </dd>
+            <dd className="mt-0.5 text-[13px] font-medium text-ink">Standard</dd>
           </div>
           <div>
             <dt className="text-[12px] font-medium text-mute-2">Applicant</dt>

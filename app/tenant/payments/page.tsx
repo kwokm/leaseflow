@@ -3,9 +3,8 @@
 import { useEffect, useState } from "react";
 import { DeskToolbar } from "@/components/desk/packet-window";
 import { Reveal } from "@/components/motion/reveal";
-import { getScreeningFee } from "@/lib/data/mock-data";
+import { FEATURED_LISTING_ID, STANDARD_SCREENING_FEE, getScreeningFee } from "@/lib/data/mock-data";
 import { loadTenantPacket, type TenantPacket } from "@/lib/tenant/session";
-import { FEATURED_LISTING_ID } from "@/lib/data/mock-data";
 
 export default function TenantPaymentsPage() {
   const [packet, setPacket] = useState<TenantPacket | null>(null);
@@ -14,7 +13,7 @@ export default function TenantPaymentsPage() {
     setPacket(loadTenantPacket(FEATURED_LISTING_ID));
   }, []);
 
-  const fee = packet ? getScreeningFee(packet.property.screeningPackage) : 59.99;
+  const fee = packet ? getScreeningFee(packet.property.screeningPackage) : STANDARD_SCREENING_FEE;
 
   return (
     <Reveal>
@@ -33,8 +32,7 @@ export default function TenantPaymentsPage() {
           <tbody>
             <tr>
               <td>
-                {packet?.property.screeningPackage === "standard" ? "Standard" : "Premium"} screening
-                fee
+                Standard screening fee
                 <div className="text-[12px] text-mute">Collected when you submit the packet</div>
               </td>
               <td>

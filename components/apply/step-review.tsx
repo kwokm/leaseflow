@@ -247,7 +247,7 @@ export function StepReview({ state, patch, errors, property, goTo }: StepProps) 
 
         <dl className="mt-4 rounded-btn border border-line bg-mist px-4 py-2">
           <SummaryRow
-            label={`${state.screeningPackage === "premium" ? "Premium" : "Standard"} screening`}
+            label="Standard screening"
             value={formatMoney(fee)}
           />
           <SummaryRow label="Credit report — Experian (demo)" value="$0.00" />

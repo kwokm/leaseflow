@@ -28,7 +28,7 @@ const STEPS = [
   {
     n: "01",
     lead: "Add the listing.",
-    tone: "Address, rent, and which package applicants pay for.",
+    tone: "Address, rent, and the Standard screening fee applicants pay.",
   },
   { n: "02", lead: "Share the link.", tone: "One link per listing, by text or email." },
   {
@@ -339,31 +339,24 @@ export default function Home() {
               <SectionHeadline
                 id="rates-title"
                 lead="Applicants pay the fee."
-                tone="Landlords do not pay to use the desk. The renter covers screening when they apply."
+                tone="One Standard plan. Landlords do not pay to use the desk. Experian stays $0 extra for the landlord."
                 className="max-w-[22ch]"
               />
             </InView>
 
-            <InView className="reveal-stagger mt-14 grid grid-cols-1 rounded-lg border border-line bg-paper shadow-window sm:grid-cols-2">
-              <article className="reveal-spatial">
+            <InView className="reveal-stagger mt-14 max-w-xl">
+              <article className="reveal-spatial overflow-hidden rounded-lg border border-line bg-wash/40 shadow-window">
                 <div className="p-7">
                   <p className="mb-2 text-[14px] font-medium text-mute">Standard</p>
                   <p className="num mb-3 text-[40px] font-medium leading-[44px] tracking-[-0.4px] text-ink">
-                    $39.99
+                    $24.99
                   </p>
-                  <p className="max-w-[32ch] text-[15px] font-medium leading-[1.5] text-mute">
-                    Credit, criminal, and eviction, sealed into the packet with a LeaseScore.
+                  <p className="max-w-[40ch] text-[15px] font-medium leading-[1.5] text-mute">
+                    Includes everything — credit, background, ID, AI income and bank verification,
+                    and the packet. Apply to as many homes as you want on this one fee.
                   </p>
-                </div>
-              </article>
-              <article className="reveal-spatial">
-                <div className="border-t border-line p-7 sm:border-l sm:border-t-0">
-                  <p className="mb-2 text-[14px] font-medium text-mute">Premium</p>
-                  <p className="num mb-3 text-[40px] font-medium leading-[44px] tracking-[-0.4px] text-ink">
-                    $59.99
-                  </p>
-                  <p className="max-w-[32ch] text-[15px] font-medium leading-[1.5] text-mute">
-                    Standard plus income. Employer, stated pay, and rent multiple on the same file.
+                  <p className="mt-3 max-w-[40ch] text-[14px] font-medium leading-[1.45] text-mute">
+                    Experian screening stays $0 extra for the landlord.
                   </p>
                 </div>
               </article>
