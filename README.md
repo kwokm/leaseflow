@@ -30,7 +30,7 @@ Unknown listing IDs return a 404 instead of silently remapping to a different pr
 
 One Standard plan: **Applicants pay $24.99; Experian is included, $0 extra for landlords.**
 
-There is no Premium package in the product UI or data model.
+Standard is the only package in the product UI and data model.
 
 ## Main routes
 

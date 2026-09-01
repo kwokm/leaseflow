@@ -27,7 +27,7 @@ Standard is the only package. The prototype checkout never charges a card.
 8. **Review and pay** — summary, consent, signature, and mock card fields.
 9. **Done** — renter receipt and link to the submitted renter packet.
 
-Validation runs before every forward step and again before Review submits payment. The final renter path does not link to `/tenant`.
+Validation runs before every forward step and again before Review submits payment. The final renter path ends at the receipt and shared packet.
 
 ## Storage behavior
 
