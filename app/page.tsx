@@ -141,8 +141,6 @@ export default function Home() {
           <nav aria-label="Primary" className="hidden flex-1 items-center gap-7 md:flex">
             {[
               { href: "#platform", label: "Platform" },
-              { href: "#apply", label: "Resources" },
-              { href: "#desk", label: "Customers" },
               { href: "#rates", label: "Pricing" },
             ].map((item) => (
               <Link
@@ -157,10 +155,7 @@ export default function Home() {
 
           <div className="ml-auto flex items-center gap-2">
             <Button asChild variant="ghost">
-              <Link href={LANDLORD_AUTH_HREF}>Sign in</Link>
-            </Button>
-            <Button asChild>
-              <Link href={LANDLORD_AUTH_HREF}>Start for free</Link>
+              <Link href={LANDLORD_AUTH_HREF}>Sign in / Sign up</Link>
             </Button>
           </div>
         </div>
