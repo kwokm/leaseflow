@@ -142,12 +142,19 @@ export function LyLead() {
   );
 }
 
-const SLOTS = [
+const SLOTS: readonly {
+  time: string;
+  place: string;
+  status: string;
+  pill: string;
+  confirmed?: boolean;
+  live?: boolean;
+}[] = [
   { time: "9:00am", place: "Broadway", status: "no-show", pill: "ly-pill-red" },
   { time: "10:30am", place: "Resh St", status: "confirmed", pill: "ly-live", confirmed: true },
   { time: "12:00pm", place: "Anaheim Blvd", status: "confirmed", pill: "ly-live", confirmed: true },
   { time: "2:00pm", place: "Resh St", status: "available", pill: "ly-pill-mint", live: true },
-] as const;
+];
 
 export function LyShowings() {
   return (
