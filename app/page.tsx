@@ -23,7 +23,6 @@ import { FEATURED_LISTING_ID, getPropertyById } from "@/lib/data/mock-data";
 
 const APPLY_HREF = `/apply/${FEATURED_LISTING_ID}`;
 const DESK_HREF = "/dashboard";
-const TENANT_HREF = "/tenant";
 
 const STEPS = [
   {
@@ -172,21 +171,19 @@ export default function Home() {
           <div className="hero-wash" aria-hidden />
           <InView className="hero-copy">
             <h1 id="hero-title">
-              <SplitWords>Welcome to the packet.</SplitWords>
+              <SplitWords>We screen, verify, and organize everything you need to lease your home</SplitWords>
             </h1>
             <p className="hero-sub reveal-tone">
-              Leaseproof is the screening service that collects applications, runs credit and
-              background, and hands you a LeaseScore you can approve or decline.
+              Leaseproof is the screening service that collects applications, runs
+              credit and background checks, and utilizes AI to fully verify and
+              approve all income and bank statements
             </p>
             <div className="hero-ctas reveal-cta">
-              <Button asChild size="cta">
-                <Link href={DESK_HREF}>Open realtor desk</Link>
+              <Button asChild variant="lilac" size="cta">
+                <Link href={DESK_HREF}>Screen as Landlord</Link>
               </Button>
               <Button asChild variant="outline" size="cta">
                 <Link href={APPLY_HREF}>Apply as renter</Link>
-              </Button>
-              <Button asChild variant="ghost" size="cta">
-                <Link href={TENANT_HREF}>Open tenant desk</Link>
               </Button>
             </div>
           </InView>

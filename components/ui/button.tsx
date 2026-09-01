@@ -24,6 +24,9 @@ const buttonVariants = cva(
         darkFill:
           "bg-dark-2 text-on-dark border border-[rgba(80,89,103,0.5)] hover:bg-[#353b42]",
         link: "text-ink underline-offset-4 hover:underline border border-transparent",
+        // Site lilac — wash bloom, ink label. Used on the landing landlord CTA only.
+        lilac:
+          "bg-wash-deep text-ink border border-[rgba(60,48,80,0.14)] hover:bg-[#d8d2e8]",
       },
       size: {
         default: "h-9 px-3",
