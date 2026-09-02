@@ -4,6 +4,7 @@ import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { BrandMark, BrandWord } from "@/components/brand";
 import { PacketWindow } from "@/components/desk/packet-window";
+import { AiIncomeLine, PacketHouseholdChrome } from "@/components/desk/household-block";
 import { AiDocCheck } from "@/components/docs/ai-check";
 import { PageWash } from "@/components/page-wash";
 import { Reveal } from "@/components/motion/reveal";
@@ -12,7 +13,9 @@ import { ApplicationToRent } from "@/components/rental-app/application-to-rent";
 import { Button } from "@/components/ui/button";
 import { checkApplicationDetails, checkApplyState } from "@/lib/docs/ai-check";
 import { resolveRentalPacket } from "@/lib/apply/rental-app";
+import { getHousehold, getReportByApplicant } from "@/lib/data/mock-data";
 import { shortAddress } from "@/lib/desk/display";
+import { householdTotals } from "@/lib/desk/household";
 
 export default function SharedPacketPage({
   params,
@@ -45,6 +48,19 @@ export default function SharedPacketPage({
   const docCheck = state
     ? checkApplyState(state)
     : checkApplicationDetails(details, fullName);
+  const report = getReportByApplicant(applicant.id);
+  const household = applicant.householdId
+    ? (() => {
+        const seeded = getHousehold(applicant.householdId).filter(
+          (row) => row.propertyId === applicant.propertyId,
+        );
+        const byId = new Map(seeded.map((row) => [row.id, row]));
+        byId.set(applicant.id, applicant);
+        return [...byId.values()];
+      })()
+    : [applicant];
+  const totals = household.length > 1 ? householdTotals(household, property.rent) : undefined;
+  const aiIncome = report?.aiIncome;
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-white print:bg-white">
@@ -79,6 +95,24 @@ export default function SharedPacketPage({
                   income check.
                 </p>
               </div>
+              <PacketHouseholdChrome
+                applicant={applicant}
+                members={household}
+                hrefFor={(memberId) => `/packet/${memberId}`}
+              />
+              {aiIncome || totals ? (
+                <div className="border-b border-line px-5 py-4 sm:px-6">
+                  {aiIncome ? <AiIncomeLine screen={aiIncome} /> : null}
+                  {totals?.vsRent ? (
+                    <p className="mt-1 text-[13px] font-medium text-ink">{totals.vsRent}</p>
+                  ) : null}
+                  {typeof totals?.householdScore === "number" ? (
+                    <p className="mt-0.5 text-[12px] font-medium text-mute">
+                      Household LeaseScore {totals.householdScore}
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
               <ApplicationToRent application={application} />
               <div className="border-t border-line px-5 py-5 sm:px-6">
                 <AiDocCheck report={docCheck} scan={false} embedded />
