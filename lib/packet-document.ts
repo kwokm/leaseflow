@@ -58,6 +58,9 @@ export function buildPacketHtml({
   experian,
 }: PacketInput): string {
   const name = `${applicant.firstName} ${applicant.lastName}`;
+  const ai = report?.aiIncome;
+  const monthly = ai?.grossMonthly ?? report?.income.monthlyIncome;
+  const coTenants = details?.occupants.filter((row) => row.relationship === "Co-tenant") ?? [];
 
   const summary = section(
     "Application Summary",
@@ -70,9 +73,10 @@ export function buildPacketHtml({
       ["Status", getStatusLabel(applicant.status)],
       ["Applied", formatDate(applicant.appliedAt)],
       ["Completed", formatDate(applicant.completedAt)],
+      ["Screening package", "Standard"],
       [
-        "Screening package",
-        "Standard",
+        "Applying with",
+        coTenants.map((row) => `${row.name} (Co-tenant)`).join("; ") || "—",
       ],
     ])}</table>`
   );
@@ -112,20 +116,30 @@ export function buildPacketHtml({
       )
     : "";
 
+  const incomeRows: [string, string][] = report
+    ? [
+        ["Employer", report.income.employer],
+        ["Position", report.income.position],
+        ["AI income", ai ? `${currency(ai.grossMonthly)} / mo gross` : "—"],
+        [
+          "AI source",
+          ai
+            ? ai.documents
+                .map((doc) => `${doc.name} (${doc.note})`)
+                .join("; ") || ai.source
+            : "—",
+        ],
+        ["Monthly income", monthly ? currency(monthly) : "—"],
+        ["Verification", report.income.verified || ai?.verified ? "Verified" : "Not verified"],
+        [
+          "Rent-to-income",
+          monthly ? `${Math.round((property.rent / monthly) * 100)}%` : "—",
+        ],
+      ]
+    : [];
+
   const incomeBlock = report
-    ? section(
-        "Income & Employment (verified)",
-        `<table>${rows([
-          ["Employer", report.income.employer],
-          ["Position", report.income.position],
-          ["Monthly income", currency(report.income.monthlyIncome)],
-          ["Verification", report.income.verified ? "Verified" : "Not verified"],
-          [
-            "Rent-to-income",
-            `${Math.round((property.rent / report.income.monthlyIncome) * 100)}%`,
-          ],
-        ])}</table>`
-      )
+    ? section("Income & Employment (verified)", `<table>${rows(incomeRows)}</table>`)
     : "";
 
   const submittedBlock = details
@@ -202,7 +216,11 @@ export function buildPacketHtml({
                         (doc) =>
                           `<li>${escapeHtml(doc.name)}${
                             doc.sizeLabel ? ` — ${escapeHtml(doc.sizeLabel)}` : ""
-                          }, uploaded ${formatDate(doc.uploadedAt)}</li>`
+                          }, uploaded ${formatDate(doc.uploadedAt)}${
+                            doc.previewAvailable === false
+                              ? " — preview unavailable after reload"
+                              : ""
+                          }</li>`
                       )
                       .join("")}</ul>`
                 )
@@ -237,7 +255,7 @@ export function buildPacketHtml({
            ["Oldest account", `${experian.oldestAccountYears} years`],
            ["Recent inquiries", String(experian.recentInquiries)],
            ["Public records", String(experian.publicRecords)],
-           ["Cost to applicant", "$0.00"],
+           ["Extra Experian fee", "$0.00"],
          ])}</table>
          ${
            experian.factors.length

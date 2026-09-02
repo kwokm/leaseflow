@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { DemoPlay } from "@/components/demos/shell";
 import { cn } from "@/lib/utils";
@@ -8,13 +8,13 @@ const LINES = [
     delay: "0s",
     from: "lead" as const,
     who: "Maria · 11:52pm",
-    body: "Hi — is 510 S Resh St still available? Saw it on Zillow.",
+    body: "Hi — is 170 Chorus still available? Saw it on Zillow.",
   },
   {
     delay: "1.25s",
     from: "agent" as const,
     who: "AI agent · 1.25s later",
-    body: "Yes. 3 bed, 2 bath, $4,700/mo, September 1. Want a showing Tuesday in Anaheim?",
+    body: "Yes. 4 bed, 3.5 bath, $6,500/mo, September 1. Want a showing Tuesday in Irvine?",
   },
   {
     delay: "2.35s",
@@ -26,7 +26,7 @@ const LINES = [
     delay: "4.05s",
     from: "agent" as const,
     who: "Booked",
-    body: "Booked Tuesday 10:30 at 510 S Resh St. Demo sync — not a live carrier.",
+    body: "Booked Tuesday 10:30 at 170 Chorus. Demo sync — not a live carrier.",
   },
 ];
 

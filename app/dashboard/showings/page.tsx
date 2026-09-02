@@ -1,5 +1,5 @@
-import { ShowingsCalendar } from "@/components/leasing/showings-calendar";
+import { redirect } from "next/navigation";
 
 export default function ShowingsPage() {
-  return <ShowingsCalendar />;
+  redirect("/dashboard");
 }

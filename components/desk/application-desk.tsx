@@ -1,7 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import type { Applicant, ApplicationStatus } from "@/lib/data/mock-data";
+import {
+  getAllApplications,
+  type Applicant,
+  type ApplicationStatus,
+} from "@/lib/data/mock-data";
 import { loadDeskApplicants } from "@/lib/desk/queue";
 import { ApplicationTable } from "@/components/desk/application-table";
 import { DeskPill, DeskToolbar } from "@/components/desk/packet-window";
@@ -15,18 +19,20 @@ export function ApplicationDesk({
   extras = true,
   chrome = true,
   selectedId,
+  preview = false,
 }: {
   propertyId?: string;
   extras?: boolean;
   chrome?: boolean;
   selectedId?: string;
+  preview?: boolean;
 }) {
-  const [rows, setRows] = useState<Applicant[]>([]);
+  const [rows, setRows] = useState<Applicant[]>(() => (preview ? getAllApplications() : []));
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
 
   useEffect(() => {
-    setRows(loadDeskApplicants());
-  }, []);
+    setRows(preview ? getAllApplications() : loadDeskApplicants());
+  }, [preview]);
 
   const scoped = useMemo(() => {
     return rows.filter((row) => {
@@ -65,7 +71,7 @@ export function ApplicationDesk({
       <ApplicationTable
         rows={scoped}
         showExtras={extras}
-        packetLinks
+        packetLinks={!preview}
         selectedId={selectedId ?? scoped[0]?.id}
         empty={
           propertyId

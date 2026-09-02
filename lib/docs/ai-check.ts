@@ -1,4 +1,4 @@
-import type { ApplicationDocument, ApplicationDetails, DocumentType } from "@/lib/data/mock-data";
+import type { ApplicationDetails, DocumentType } from "@/lib/data/mock-data";
 import type { ApplyState } from "@/lib/apply/types";
 
 /** Prototype “today” — August 2026. Recency is measured from this date. */

@@ -1,6 +1,6 @@
 import type { ScreeningPackage } from "@/lib/data/mock-data";
 
-export const APPLY_STATE_VERSION = 4;
+export const APPLY_STATE_VERSION = 6;
 
 /**
  * A file the renter picked in the browser. `url` is an object URL that only
@@ -211,74 +211,52 @@ export interface StepDefinition {
   tone: string;
 }
 
-/** The nine steps of the renter application. */
+/** Four visible stages (You · Proof · Credit · Pay) plus a receipt that is not in the stepper. */
+export const APPLY_STEP = {
+  you: 1,
+  proof: 2,
+  credit: 3,
+  pay: 4,
+  done: 5,
+} as const;
+
+export type ApplyStepId = (typeof APPLY_STEP)[keyof typeof APPLY_STEP];
+
 export const APPLY_STEPS: StepDefinition[] = [
   {
-    id: 1,
-    key: "start",
-    name: "Start",
-    title: "Start your application",
-    lead: "Standard screening",
-    tone: "one fee covers every home.",
-  },
-  {
-    id: 2,
+    id: APPLY_STEP.you,
     key: "you",
     name: "You",
     title: "About you",
     lead: "Tell us who you are",
-    tone: "sensitive fields stay masked.",
+    tone: "listing, identity, and household.",
   },
   {
-    id: 3,
-    key: "id",
-    name: "Photo ID",
-    title: "Photo ID",
-    lead: "Add the front and back",
-    tone: "images or PDFs both work.",
+    id: APPLY_STEP.proof,
+    key: "proof",
+    name: "Proof",
+    title: "Proof",
+    lead: "Photo ID, income, and bank",
+    tone: "uploads stay on this device.",
   },
   {
-    id: 4,
-    key: "income",
-    name: "Income",
-    title: "Income",
-    lead: "Where your income comes from",
-    tone: "plus your two most recent pay stubs.",
-  },
-  {
-    id: 5,
-    key: "bank",
-    name: "Bank",
-    title: "Bank statements",
-    lead: "Attach one to three statements",
-    tone: "most recent months first.",
-  },
-  {
-    id: 6,
+    id: APPLY_STEP.credit,
     key: "credit",
     name: "Credit",
     title: "Credit report",
     lead: "Connect with Experian",
-    tone: "no cost, and it never affects your score.",
+    tone: "included in Standard, and it never affects your score.",
   },
   {
-    id: 7,
-    key: "household",
-    name: "Household",
-    title: "Household",
-    lead: "Pets and occupants",
-    tone: "optional, but it speeds up review.",
-  },
-  {
-    id: 8,
-    key: "review",
-    name: "Review",
+    id: APPLY_STEP.pay,
+    key: "pay",
+    name: "Pay",
     title: "Review and pay",
     lead: "Check everything over",
     tone: "then authorize and pay.",
   },
   {
-    id: 9,
+    id: APPLY_STEP.done,
     key: "done",
     name: "Done",
     title: "Application submitted",
@@ -286,6 +264,9 @@ export const APPLY_STEPS: StepDefinition[] = [
     tone: "here is your receipt.",
   },
 ];
+
+/** Visible stepper — Done is the completion screen after Pay, not a fifth rail item. */
+export const APPLY_STEPPER = APPLY_STEPS.filter((step) => step.key !== "done");
 
 export const TOTAL_STEPS = APPLY_STEPS.length;
 

@@ -17,9 +17,6 @@ function titleFor(pathname: string): string {
     return "Application packet";
   }
 
-  const lease = pathname.match(/^\/dashboard\/leases\/([^/]+)/);
-  if (lease) return "Lease • e-sign";
-
   const listing = pathname.match(/^\/dashboard\/listings\/([^/]+)/);
   if (listing && listing[1] !== "new") {
     const property = getPropertyById(listing[1]);
@@ -28,11 +25,6 @@ function titleFor(pathname: string): string {
   }
 
   if (pathname.startsWith("/dashboard/listings")) return "Properties";
-  if (pathname.startsWith("/dashboard/payments")) return "Payments";
-  if (pathname.startsWith("/dashboard/messages") || pathname.startsWith("/dashboard/leads")) {
-    return "Lead inbox";
-  }
-  if (pathname.startsWith("/dashboard/showings")) return "Showings • Tuesday Anaheim";
   if (pathname.startsWith("/dashboard/applications")) return "Application packet • 510 S Resh St";
   return "Pipeline • 510 S Resh St";
 }

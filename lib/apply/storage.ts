@@ -1,4 +1,9 @@
-import { APPLY_STATE_VERSION, createDemoState, type ApplyState, type LocalFile } from "./types";
+import {
+  APPLY_STATE_VERSION,
+  createInitialState,
+  type ApplyState,
+  type LocalFile,
+} from "./types";
 import type { ScreeningPackage } from "@/lib/data/mock-data";
 
 const DRAFT_PREFIX = "leaseflow:apply:";
@@ -19,8 +24,14 @@ function stripUrls(files: (LocalFile | null)[]): void {
   }
 }
 
+function withoutPayment(state: ApplyState): Omit<ApplyState, "payment"> {
+  const copy = { ...state } as Partial<ApplyState>;
+  delete copy.payment;
+  return copy as Omit<ApplyState, "payment">;
+}
+
 export function loadDraft(listingId: string, pkg: ScreeningPackage): ApplyState {
-  const fresh = createDemoState(listingId, pkg);
+  const fresh = createInitialState(listingId, pkg);
   if (typeof window === "undefined") return fresh;
 
   try {
@@ -55,10 +66,7 @@ export function loadDraft(listingId: string, pkg: ScreeningPackage): ApplyState 
         relatives: parsed.rental?.relatives ?? fresh.rental.relatives,
         bankAccount: { ...fresh.rental.bankAccount, ...parsed.rental?.bankAccount },
       },
-      // Card details are not persisted; refill the demo card so Review stays clickable.
-      payment: parsed.payment?.cardNumber
-        ? { ...fresh.payment, ...parsed.payment }
-        : fresh.payment,
+      payment: fresh.payment,
       paystubs: parsed.paystubs ?? fresh.paystubs,
       statements: parsed.statements ?? fresh.statements,
       idFront: parsed.idFront ?? fresh.idFront,
@@ -76,7 +84,7 @@ export function saveDraft(state: ApplyState): void {
   if (typeof window === "undefined") return;
   try {
     // Card details are deliberately never persisted, even in the prototype.
-    const { payment: _payment, ...persisted } = state;
+    const persisted = withoutPayment(state);
     window.localStorage.setItem(draftKey(state.listingId), JSON.stringify(persisted));
   } catch {
     // Storage can be full or blocked (private mode) — the wizard still works.
@@ -102,9 +110,14 @@ export function loadSubmissions(): ApplyState[] {
     const raw = window.localStorage.getItem(SUBMISSION_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw) as ApplyState[];
-    return Array.isArray(parsed)
-      ? parsed.filter((entry) => entry && entry.version === APPLY_STATE_VERSION)
-      : [];
+    if (!Array.isArray(parsed)) return [];
+    const submissions = parsed.filter(
+      (entry) => entry && entry.version === APPLY_STATE_VERSION
+    );
+    for (const entry of submissions) {
+      stripUrls([entry.idFront, entry.idBack, ...entry.paystubs, ...entry.statements]);
+    }
+    return submissions;
   } catch {
     return [];
   }
@@ -113,11 +126,17 @@ export function loadSubmissions(): ApplyState[] {
 export function saveSubmission(state: ApplyState): void {
   if (typeof window === "undefined") return;
   try {
-    const { payment: _payment, ...persisted } = state;
+    const persisted = JSON.parse(JSON.stringify(withoutPayment(state))) as ApplyState;
+    stripUrls([
+      persisted.idFront,
+      persisted.idBack,
+      ...persisted.paystubs,
+      ...persisted.statements,
+    ]);
     const existing = loadSubmissions().filter(
       (entry) => entry.confirmationId !== state.confirmationId
     );
-    const next = [persisted as ApplyState, ...existing].slice(0, 10);
+    const next = [persisted, ...existing].slice(0, 10);
     window.localStorage.setItem(SUBMISSION_KEY, JSON.stringify(next));
   } catch {
     // ignore

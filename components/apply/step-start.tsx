@@ -2,18 +2,20 @@
 
 import { useEffect } from "react";
 import { BedDouble, Bath, CalendarDays, Check } from "lucide-react";
-import { StepBody } from "@/components/apply/motion";
-import { Note, Panel, StepHeading } from "@/components/apply/step-shell";
+import { Note, Panel, StepChrome } from "@/components/apply/step-shell";
 import type { StepProps } from "@/components/apply/step-shell";
+import { Button } from "@/components/ui/button";
 import { formatDateOnly, formatDollars } from "@/lib/apply/format";
+import { createDemoState } from "@/lib/apply/types";
 import { ListingPhotoStrip } from "@/components/listings/photos";
 import {
   STANDARD_PACKAGE_NAME,
+  STANDARD_PRICING_STORY,
   STANDARD_SCREENING_FEE,
 } from "@/lib/data/mock-data";
 
 const STANDARD_FEATURES = [
-  "Credit report and score",
+  "Experian credit report and score",
   "National criminal and eviction search",
   "Identity check",
   "AI income and bank verification",
@@ -21,7 +23,7 @@ const STANDARD_FEATURES = [
   "Apply to as many homes as you want",
 ];
 
-export function StepStart({ state, patch, property }: StepProps) {
+export function StepStart({ state, patch, property, embedded }: StepProps) {
   useEffect(() => {
     if (state.screeningPackage !== "standard") {
       patch({ screeningPackage: "standard" });
@@ -29,12 +31,30 @@ export function StepStart({ state, patch, property }: StepProps) {
   }, [patch, state.screeningPackage]);
 
   return (
-    <StepBody>
-      <StepHeading lead="Start your application for" tone={property.address.split(",")[0]} />
-      <p className="max-w-xl text-[15px] font-medium leading-[21px] tracking-[-0.16px] text-mute">
-        It takes about ten minutes. Your progress saves in this browser, so you can stop and pick it
-        back up.
-      </p>
+    <StepChrome
+      embedded={embedded}
+      lead="Start your application for"
+      tone={property.address.split(",")[0]}
+    >
+      {!embedded ? (
+        <p className="max-w-xl text-[15px] font-medium leading-[21px] tracking-[-0.16px] text-mute">
+          It takes about ten minutes. Your progress saves in this browser, so you can stop and pick it
+          back up.
+        </p>
+      ) : null}
+      <div>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => patch(createDemoState(property.id, "standard"))}
+        >
+          Fill demo
+        </Button>
+        <p className="mt-1.5 text-[12px] font-medium text-mute">
+          Optional: load Jane Doe&apos;s fictional details to preview the flow.
+        </p>
+      </div>
 
       <Panel>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -120,8 +140,8 @@ export function StepStart({ state, patch, property }: StepProps) {
       </section>
 
       <Note tone="blue">
-        Experian stays $0 extra for the landlord. Your ${STANDARD_SCREENING_FEE.toFixed(2)} Standard
-        fee includes everything — credit, background, ID, and AI income and bank verification.
+        {STANDARD_PRICING_STORY} The Standard fee also includes background, ID, and AI income and
+        bank verification.
       </Note>
 
       <Panel title="What you'll need" description="Have these ready before you start.">
@@ -139,6 +159,6 @@ export function StepStart({ state, patch, property }: StepProps) {
           ))}
         </ul>
       </Panel>
-    </StepBody>
+    </StepChrome>
   );
 }

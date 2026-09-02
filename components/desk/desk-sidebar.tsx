@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Calendar, CreditCard, Home, Inbox, LayoutGrid, ScrollText } from "lucide-react";
+import { Home, LayoutGrid, ScrollText } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -10,8 +10,7 @@ const NAV = [
     href: "/dashboard",
     label: "Pipeline",
     icon: LayoutGrid,
-    match: (path: string) =>
-      path === "/dashboard" || path.startsWith("/dashboard/leases"),
+    match: (path: string) => path === "/dashboard",
   },
   {
     href: "/dashboard/applications",
@@ -20,35 +19,16 @@ const NAV = [
     match: (path: string) => path.startsWith("/dashboard/applications"),
   },
   {
-    href: "/dashboard/leads",
-    label: "Leads",
-    icon: Inbox,
-    match: (path: string) =>
-      path.startsWith("/dashboard/leads") || path.startsWith("/dashboard/messages"),
-  },
-  {
-    href: "/dashboard/showings",
-    label: "Showings",
-    icon: Calendar,
-    match: (path: string) => path.startsWith("/dashboard/showings"),
-  },
-  {
     href: "/dashboard/listings",
     label: "Properties",
     icon: Home,
     match: (path: string) => path.startsWith("/dashboard/listings"),
   },
-  {
-    href: "/dashboard/payments",
-    label: "Payments",
-    icon: CreditCard,
-    match: (path: string) => path.startsWith("/dashboard/payments"),
-  },
 ] as const;
 
 export type DeskNavLabel = (typeof NAV)[number]["label"];
 
-const PREVIEW_NAV = NAV.filter((item) => item.label !== "Payments");
+const PREVIEW_NAV = NAV;
 
 export function DeskSidebar({
   staticActive,

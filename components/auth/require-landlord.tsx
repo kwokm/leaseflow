@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState, useSyncExternalStore } from "react";
-import { usePathname, useRouter } from "next/navigation";
 import {
-  LANDLORD_AUTH_HREF,
+  MOCK_GOOGLE_LANDLORD,
   getLandlordSession,
+  signInLandlord,
   subscribeLandlordSession,
 } from "@/lib/auth/landlord";
 import { PageWash } from "@/components/page-wash";
@@ -14,8 +14,6 @@ function useLandlordSession() {
 }
 
 export function RequireLandlord({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
-  const pathname = usePathname();
   const session = useLandlordSession();
   const [ready, setReady] = useState(false);
 
@@ -25,9 +23,8 @@ export function RequireLandlord({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!ready || session) return;
-    const next = pathname && pathname !== "/" ? `?next=${encodeURIComponent(pathname)}` : "";
-    router.replace(`${LANDLORD_AUTH_HREF}${next}`);
-  }, [pathname, ready, router, session]);
+    signInLandlord(MOCK_GOOGLE_LANDLORD, "google");
+  }, [ready, session]);
 
   if (!ready || !session) {
     return (

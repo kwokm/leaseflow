@@ -5,7 +5,8 @@ import type {
   ExperianPull,
   ScreeningReport,
 } from "@/lib/data/mock-data";
-import { getPropertyById } from "@/lib/data/mock-data";
+import { ensureHouseholdDemo, type AiIncomeScreen } from "@/lib/data/household-model";
+import { getApplicantsByProperty, getPropertyById } from "@/lib/data/mock-data";
 import { formatFileSize, ssnLast4 } from "./format";
 import type { ApplyState, LocalFile } from "./types";
 
@@ -35,6 +36,7 @@ function toDocument(
     docType,
     uploadedAt: file.addedAt,
     sizeLabel: formatFileSize(file.size),
+    previewAvailable: Boolean(file.url),
   };
 }
 
@@ -51,6 +53,58 @@ export function submissionDocuments(state: ApplyState): ApplicationDocument[] {
   return documents;
 }
 
+function normalizeName(value: string): string {
+  return value.trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+/** Attach an existing household when an occupant name matches a co-tenant on this listing. */
+export function householdIdFromOccupants(state: ApplyState): string | undefined {
+  ensureHouseholdDemo();
+  const self = normalizeName(`${state.personal.firstName} ${state.personal.lastName}`);
+  const wanted = new Set(
+    state.household.occupants
+      .map((row) => normalizeName(row.name))
+      .filter((name) => name && name !== self),
+  );
+  if (!wanted.size) return undefined;
+
+  const match = getApplicantsByProperty(state.listingId).find((row) =>
+    wanted.has(normalizeName(`${row.firstName} ${row.lastName}`)),
+  );
+  return match?.householdId;
+}
+
+export function applyingWithNames(state: ApplyState): string[] {
+  const self = normalizeName(`${state.personal.firstName} ${state.personal.lastName}`);
+  const fromForm = state.household.occupants
+    .map((row) => row.name.trim())
+    .filter((name) => name && normalizeName(name) !== self);
+  const matched = getApplicantsByProperty(state.listingId)
+    .filter((row) =>
+      fromForm.some((name) => normalizeName(name) === normalizeName(`${row.firstName} ${row.lastName}`)),
+    )
+    .map((row) => `${row.firstName} ${row.lastName}`);
+  return matched.length ? matched : fromForm;
+}
+
+function mockAiIncome(state: ApplyState, monthlyIncome: number): AiIncomeScreen | undefined {
+  if (!state.paystubs.length && !monthlyIncome) return undefined;
+  const documents = state.paystubs.map((file) => ({
+    name: file.name,
+    kind: "paystub" as const,
+    extractedMonthly: monthlyIncome,
+    note: monthlyIncome
+      ? `Period gross scaled to $${monthlyIncome.toLocaleString()} / mo`
+      : "Gross monthly read from the paystub",
+  }));
+  return {
+    grossMonthly: monthlyIncome,
+    source: "paystub",
+    documents,
+    verified: state.paystubs.length >= 1 && Boolean(state.personal.firstName),
+  };
+}
+
 export function submissionApplicant(state: ApplyState): Applicant {
   return {
     id: localApplicantId(state.confirmationId ?? "draft"),
@@ -63,6 +117,7 @@ export function submissionApplicant(state: ApplyState): Applicant {
     appliedAt: state.submittedAt ?? new Date().toISOString(),
     completedAt: state.submittedAt,
     leaseScore: state.experian.score,
+    householdId: householdIdFromOccupants(state),
   };
 }
 
@@ -76,6 +131,7 @@ export function submissionDetails(state: ApplyState): ApplicationDetails {
   ]
     .filter(Boolean)
     .join(", ");
+  const selfName = `${state.personal.firstName} ${state.personal.lastName}`.trim() || "Applicant";
 
   return {
     applicantId: localApplicantId(state.confirmationId ?? "draft"),
@@ -98,11 +154,16 @@ export function submissionDetails(state: ApplyState): ApplicationDetails {
       supervisorPhone: state.rental?.currentEmployer.supervisorPhone || "Not provided",
       monthlyIncome: Number(state.income.monthlyIncome.replace(/[^0-9.]/g, "")) || 0,
     },
-    occupants: state.household.occupants.map((occupant) => ({
-      name: occupant.name,
-      relationship: occupant.relationship,
-      age: Number(occupant.age) || 0,
-    })),
+    occupants: [
+      { name: selfName, relationship: "Applicant", age: 0 },
+      ...state.household.occupants.map((occupant) => ({
+        name: occupant.name,
+        relationship: householdIdFromOccupants(state)
+          ? "Co-tenant"
+          : occupant.relationship.trim() || "Occupant",
+        age: Number(occupant.age) || 0,
+      })),
+    ],
     pets: state.household.pets.map((pet) => ({
       type: pet.type,
       breed: pet.breed,
@@ -181,6 +242,7 @@ export function submissionReport(state: ApplyState): ScreeningReport | undefined
       monthlyIncome,
       verified: state.paystubs.length >= 2,
     },
+    aiIncome: mockAiIncome(state, monthlyIncome),
     residentialHistory: [],
   };
 }

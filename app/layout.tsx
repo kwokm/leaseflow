@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import "./desk-household.css";
 
 // Variable Inter so the optical-size axis (14–32) is available to headings.
 const inter = Inter({

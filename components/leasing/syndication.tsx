@@ -13,7 +13,7 @@ export function SyndicationTiles({ listingId }: { listingId: string }) {
             One listing, several boards. Demo sync — no live marketplace API.
           </p>
         </div>
-        <span className="desk-pill is-on">{live ? "Anaheim seeded live" : "Pending"}</span>
+        <span className="desk-pill is-on">{live ? "Irvine seeded live" : "Pending"}</span>
       </div>
       <ul className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
         {MARKETPLACES.map((board) => {

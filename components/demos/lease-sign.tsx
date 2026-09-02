@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
 import { DemoPlay } from "@/components/demos/shell";
 
-const STEPS = [
+const STEPS: readonly { label: string; note: string; active?: boolean }[] = [
   { label: "Approved", note: "Packet decided" },
   { label: "Lease generated", note: "Same PacketWindow" },
   { label: "E-sign pending", note: "Dummy sign", active: true },
   { label: "Deposit queued", note: "ACH · demo" },
-] as const;
+];
 
 export function LeaseSignDemo() {
   return (
     <DemoPlay>
-      <p className="text-[12px] font-medium text-mute">Jane Doe · 510 S Resh St</p>
+      <p className="text-[12px] font-medium text-mute">Jane Doe · 170 Chorus</p>
       <ol className="mt-3 space-y-2">
         {STEPS.map((step, index) => (
           <li

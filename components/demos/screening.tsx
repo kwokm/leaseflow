@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
 import { DemoPlay } from "@/components/demos/shell";
 
 const CHECKS = [
   { label: "Photo ID", note: "Name matches the applicant", retick: "1s" },
   { label: "Experian", note: "Demo pull · landlord not charged", retick: "1.5s" },
-  { label: "AI income check", note: "Name match · last two months", retick: "2s" },
+  { label: "AI income check", note: "Gross monthly from paystubs / W-2", retick: "2s" },
   { label: "Background", note: "Mock public-records note", retick: "2.5s" },
 ] as const;
 
 export function ScreeningDemo() {
   return (
     <DemoPlay>
-      <p className="text-[12px] font-medium text-mute">Jane Doe · 510 S Resh St</p>
+      <p className="text-[12px] font-medium text-mute">Jane Doe · 170 Chorus</p>
       <ul className="mt-3 space-y-2">
         {CHECKS.map((row, index) => (
           <li

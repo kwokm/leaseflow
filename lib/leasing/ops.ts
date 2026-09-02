@@ -28,10 +28,10 @@ export type PipelineUnit = {
 export const PIPELINE_UNITS: PipelineUnit[] = [
   {
     id: FEATURED_LISTING_ID,
-    address: "510 S Resh St, Anaheim, CA 92805",
-    rent: 4700,
-    beds: 3,
-    baths: 2,
+    address: "170 Chorus, Irvine, CA 92618",
+    rent: 6500,
+    beds: 4,
+    baths: 3.5,
     status: "application_review",
     leads: 6,
     pricing: "market_fit",
@@ -39,10 +39,10 @@ export const PIPELINE_UNITS: PipelineUnit[] = [
   },
   {
     id: "prop-1",
-    address: "742 Evergreen Terrace, Springfield, IL 62701",
-    rent: 2400,
-    beds: 3,
-    baths: 2,
+    address: "14 Modesto, Irvine, CA 92602",
+    rent: 7000,
+    beds: 5,
+    baths: 4,
     status: "ready_to_tour",
     leads: 3,
     pricing: "market_fit",
@@ -50,10 +50,10 @@ export const PIPELINE_UNITS: PipelineUnit[] = [
   },
   {
     id: "prop-2",
-    address: "123 Main Street, Unit 4B, Chicago, IL 60601",
-    rent: 1850,
-    beds: 2,
-    baths: 1,
+    address: "66 Diamond Flats, Irvine, CA 92602",
+    rent: 6950,
+    beds: 4,
+    baths: 3.5,
     status: "ready_to_tour",
     leads: 8,
     pricing: "under",
@@ -61,10 +61,10 @@ export const PIPELINE_UNITS: PipelineUnit[] = [
   },
   {
     id: "prop-3",
-    address: "456 Oak Avenue, Austin, TX 78701",
-    rent: 3200,
-    beds: 4,
-    baths: 3,
+    address: "141 Dolores, Irvine, CA 92618",
+    rent: 6498,
+    beds: 6,
+    baths: 4,
     status: "pricing_updated",
     leads: 2,
     pricing: "over",
@@ -103,18 +103,18 @@ export const LEAD_THREADS: LeadThread[] = [
     name: "Maria Santos",
     channel: "sms",
     listingId: FEATURED_LISTING_ID,
-    subject: "510 S Resh St inquiry",
+    subject: "170 Chorus inquiry",
     messages: [
       {
         id: "m1",
         from: "lead",
-        body: "Hi — is 510 S Resh St still available? Saw it on Zillow.",
+        body: "Hi - is 170 Chorus still available? Saw it on Zillow.",
         at: "2026-08-15T23:47:00.000Z",
       },
       {
         id: "m2",
         from: "agent",
-        body: "Yes. 3 bed, 2 bath, $4,700/mo, September 1. Want a showing Tuesday in Anaheim?",
+        body: "Yes. 4 bed, 3.5 bath, $6,500/mo, September 1. Want a showing Tuesday in Irvine?",
         at: "2026-08-15T23:47:18.000Z",
       },
       {
@@ -126,7 +126,7 @@ export const LEAD_THREADS: LeadThread[] = [
       {
         id: "m4",
         from: "agent",
-        body: "Booked Tuesday 10:30 at 510 S Resh St. You’ll get a confirmation text. Demo sync — not a live carrier.",
+        body: "Booked Tuesday 10:30 at 170 Chorus. Demo sync - not a live carrier.",
         at: "2026-08-15T23:52:12.000Z",
       },
     ],
@@ -141,13 +141,13 @@ export const LEAD_THREADS: LeadThread[] = [
       {
         id: "j1",
         from: "lead",
-        body: "I started an application for 510 S Resh. Can I tour this week?",
+        body: "I started an application for 170 Chorus. Can I tour this week?",
         at: "2026-08-10T16:05:00.000Z",
       },
       {
         id: "j2",
         from: "agent",
-        body: "Yes — Tuesday 2:00 is open, or finish the packet and we’ll hold a slot.",
+        body: "Yes - Tuesday 2:00 is open, or finish the packet and we will hold a slot.",
         at: "2026-08-10T16:05:16.000Z",
       },
     ],
@@ -162,7 +162,7 @@ export const LEAD_THREADS: LeadThread[] = [
       {
         id: "f1",
         from: "lead",
-        body: "Still available? What’s the move-in?",
+        body: "Still available? What is the move-in?",
         at: "2026-08-13T23:52:00.000Z",
       },
       {
@@ -190,8 +190,8 @@ export const TUESDAY_ROUTE: ShowingSlot[] = [
   {
     id: "slot-900",
     time: "9:00 AM",
-    listingId: "nearby-colony",
-    address: "318 W Broadway, Anaheim",
+    listingId: "prop-1",
+    address: "14 Modesto, Irvine",
     status: "no_show",
     who: "Alex Kim",
   },
@@ -199,15 +199,15 @@ export const TUESDAY_ROUTE: ShowingSlot[] = [
     id: "slot-1030",
     time: "10:30 AM",
     listingId: FEATURED_LISTING_ID,
-    address: "510 S Resh St",
+    address: "170 Chorus",
     status: "confirmed",
     who: "Maria Santos",
   },
   {
     id: "slot-1200",
     time: "12:00 PM",
-    listingId: "nearby-center",
-    address: "201 S Anaheim Blvd",
+    listingId: "prop-2",
+    address: "66 Diamond Flats, Irvine",
     status: "confirmed",
     who: "Priya Shah",
   },
@@ -215,7 +215,7 @@ export const TUESDAY_ROUTE: ShowingSlot[] = [
     id: "slot-1400",
     time: "2:00 PM",
     listingId: FEATURED_LISTING_ID,
-    address: "510 S Resh St",
+    address: "170 Chorus",
     status: "available",
   },
 ];
@@ -223,11 +223,11 @@ export const TUESDAY_ROUTE: ShowingSlot[] = [
 export const PHONE_TRANSCRIPT = [
   {
     from: "caller" as const,
-    body: "Hi, I saw your listing on Zillow — is 510 S Resh St still available?",
+    body: "Hi, I saw your listing on Zillow - is 170 Chorus still available?",
   },
   {
     from: "agent" as const,
-    body: "Yes. It’s a 3-bed, 2-bath house at $4,700 a month, available September 1. Want to book a showing?",
+    body: "Yes. It is a 4-bed, 3.5-bath house at $6,500 a month, available September 1. Want to book a showing?",
   },
   {
     from: "caller" as const,
@@ -235,7 +235,7 @@ export const PHONE_TRANSCRIPT = [
   },
   {
     from: "agent" as const,
-    body: "Booked Tuesday at 2:00 at 510 S Resh St. You’ll get a confirmation text. This is a demo transcript — not a live dialer.",
+    body: "Booked Tuesday at 2:00 at 170 Chorus. You will get a confirmation text. This is a demo transcript - not a live dialer.",
   },
 ];
 

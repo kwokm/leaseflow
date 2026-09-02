@@ -5,6 +5,10 @@ function isRemote(src: string): boolean {
   return /^https?:\/\//i.test(src);
 }
 
+function usesNextImage(src: string): boolean {
+  return /zillowstatic\.com|d36xftgacqn2p\.cloudfront\.net/i.test(src);
+}
+
 function Photo({
   src,
   alt,
@@ -16,7 +20,7 @@ function Photo({
   sizes: string;
   className?: string;
 }) {
-  if (isRemote(src) && !/zillowstatic\.com/i.test(src)) {
+  if (isRemote(src) && !usesNextImage(src)) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img src={src} alt={alt} className={cn("h-full w-full object-cover", className)} />

@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
 import Image from "next/image";
 import { DemoPlay } from "@/components/demos/shell";
-import { ANAHEIM_PHOTOS } from "@/lib/data/mock-data";
+import { FEATURED_PHOTOS } from "@/lib/data/mock-data";
 
 const STATUSES = [
   { cls: "d-status-a", label: "Scanning room", last: false },
@@ -26,15 +26,15 @@ export function PhotoEnhanceDemo() {
       </div>
       <div className="relative aspect-[16/9] overflow-hidden rounded-md border border-line bg-mist">
         <Image
-          src={ANAHEIM_PHOTOS[2]}
-          alt="510 S Resh St living room"
+          src={FEATURED_PHOTOS[2]}
+          alt="170 Chorus living room"
           fill
           sizes="(min-width: 768px) 520px, 100vw"
           className="object-cover"
         />
         <div className="absolute inset-0">
           <Image
-            src={ANAHEIM_PHOTOS[2]}
+            src={FEATURED_PHOTOS[2]}
             alt=""
             fill
             sizes="(min-width: 768px) 520px, 100vw"

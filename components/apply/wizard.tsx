@@ -10,18 +10,24 @@ import { SpatialMount, SpatialOrigin } from "@/components/motion/spatial";
 import { PageWash } from "@/components/page-wash";
 import { Button } from "@/components/ui/button";
 import { shortAddress } from "@/lib/desk/display";
-import { StepStart } from "@/components/apply/step-start";
-import { StepYou } from "@/components/apply/step-you";
-import { StepBank, StepIncome, StepPhotoId } from "@/components/apply/step-uploads";
+import { StageYou } from "@/components/apply/stage-you";
+import { StageProof } from "@/components/apply/stage-proof";
 import { StepCredit } from "@/components/apply/step-credit";
-import { StepHousehold } from "@/components/apply/step-household";
 import { StepReview } from "@/components/apply/step-review";
 import { StepDone } from "@/components/apply/step-done";
 import { StepTransition } from "@/components/apply/motion";
 import type { StepProps } from "@/components/apply/step-shell";
 import { clearDraft, loadDraft, saveDraft, saveSubmission } from "@/lib/apply/storage";
-import { APPLY_STEPS, TOTAL_STEPS, createDemoState, type ApplyState } from "@/lib/apply/types";
+import { localApplicantId } from "@/lib/apply/to-packet";
+import {
+  APPLY_STEP,
+  APPLY_STEPPER,
+  TOTAL_STEPS,
+  createInitialState,
+  type ApplyState,
+} from "@/lib/apply/types";
 import type { StepErrors } from "@/lib/apply/validate";
+import { firstErrorKey, validateStep } from "@/lib/apply/validate";
 import type { Property } from "@/lib/data/mock-data";
 import { cn } from "@/lib/utils";
 
@@ -35,20 +41,16 @@ function newConfirmationId(): string {
 }
 
 const STEP_COMPONENTS: Record<number, (props: StepProps) => React.ReactElement> = {
-  1: StepStart,
-  2: StepYou,
-  3: StepPhotoId,
-  4: StepIncome,
-  5: StepBank,
-  6: StepCredit,
-  7: StepHousehold,
-  8: StepReview,
-  9: StepDone,
+  [APPLY_STEP.you]: StageYou,
+  [APPLY_STEP.proof]: StageProof,
+  [APPLY_STEP.credit]: StepCredit,
+  [APPLY_STEP.pay]: StepReview,
+  [APPLY_STEP.done]: StepDone,
 };
 
 export function ApplyWizard({ property }: { property: Property }) {
   const [state, setState] = React.useState<ApplyState>(() =>
-    createDemoState(property.id, property.screeningPackage)
+    createInitialState(property.id, property.screeningPackage)
   );
   const [errors, setErrors] = React.useState<StepErrors>({});
   const [hydrated, setHydrated] = React.useState(false);
@@ -99,8 +101,8 @@ export function ApplyWizard({ property }: { property: Property }) {
       submittedAt: now,
       confirmationId,
       consent: { ...state.consent, acceptedAt: now },
-      step: 9,
-      furthestStep: 9,
+      step: APPLY_STEP.done,
+      furthestStep: APPLY_STEP.done,
     };
 
     setDirection(1);
@@ -112,9 +114,17 @@ export function ApplyWizard({ property }: { property: Property }) {
   };
 
   const goNext = () => {
-    // Prototype: never gate on validation. Jane Doe is prefilled so every
-    // step is browseable with Back / Next or the rail.
-    if (step === 8) {
+    const nextErrors = validateStep(step, state);
+    if (Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors);
+      const first = firstErrorKey(nextErrors);
+      if (first) {
+        window.requestAnimationFrame(() => document.getElementById(first)?.focus());
+      }
+      return;
+    }
+
+    if (step === APPLY_STEP.pay) {
       submit();
       return;
     }
@@ -123,6 +133,7 @@ export function ApplyWizard({ property }: { property: Property }) {
 
   const goTo = (target: number) => {
     if (target < 1 || target > TOTAL_STEPS) return;
+    if (target > state.furthestStep) return;
     moveTo(target);
   };
 
@@ -163,16 +174,21 @@ export function ApplyWizard({ property }: { property: Property }) {
           >
           <div className="desk apply-desk">
         <nav aria-label="Application steps" className="desk-rail print:hidden">
-          {APPLY_STEPS.map((entry) => {
-            const current = entry.id === step;
+          {APPLY_STEPPER.map((entry) => {
+            const current = entry.id === step || (step === APPLY_STEP.done && entry.id === APPLY_STEP.pay);
 
             return (
               <button
                 key={entry.id}
                 type="button"
                 aria-current={current ? "step" : undefined}
+                disabled={entry.id > state.furthestStep}
                 onClick={() => goTo(entry.id)}
-                className={cn("rail-item", current && "is-active")}
+                className={cn(
+                  "rail-item",
+                  current && "is-active",
+                  entry.id > state.furthestStep && "cursor-not-allowed opacity-45"
+                )}
               >
                 {entry.name}
               </button>
@@ -215,14 +231,16 @@ export function ApplyWizard({ property }: { property: Property }) {
                 <span className="hidden sm:block" />
               )}
 
-              {step < 9 ? (
+              {step < APPLY_STEP.done ? (
                 <Button type="button" size="touch" onClick={goNext} className="sm:min-w-[168px]">
-                  {step === 8 ? "Pay and submit" : "Continue"}
+                  {step === APPLY_STEP.pay ? "Pay and submit" : "Continue"}
                   <ArrowRight className="h-4 w-4" aria-hidden />
                 </Button>
               ) : (
                 <Button asChild size="touch" className="sm:min-w-[168px]">
-                  <Link href="/tenant">Open tenant desk</Link>
+                  <Link href={`/packet/${localApplicantId(state.confirmationId ?? "")}`}>
+                    Open renter packet
+                  </Link>
                 </Button>
               )}
             </div>

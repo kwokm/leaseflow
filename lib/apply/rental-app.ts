@@ -10,7 +10,8 @@ import {
   type Property,
 } from "@/lib/data/mock-data";
 import { loadDraft, loadSubmissions } from "@/lib/apply/storage";
-import { isLocalApplicantId, confirmationIdFromApplicantId } from "@/lib/apply/to-packet";
+import { householdIdFromOccupants, isLocalApplicantId, confirmationIdFromApplicantId } from "@/lib/apply/to-packet";
+import { getHousehold } from "@/lib/data/household-model";
 import { maskSsn } from "@/lib/apply/format";
 import {
   createDemoState,
@@ -21,7 +22,8 @@ import {
   type ResidenceRecord,
   type RentalProfile,
 } from "@/lib/apply/types";
-import { TENANT_APPLICANT_ID } from "@/lib/tenant/session";
+
+const DEMO_APPLICANT_ID = "app-jane";
 
 export type RentalApplication = {
   id: string;
@@ -62,8 +64,8 @@ export type RentalApplication = {
   screeningFee: {
     packageLabel: string;
     amount: string;
-    status: string;
     note: string;
+    status: string;
   };
   ssnDisplay: string;
   noticeTitle: string;
@@ -118,6 +120,14 @@ function filledAt(state?: ApplyState, details?: ApplicationDetails): string {
   );
 }
 
+function householdSize(applicant: Applicant): number {
+  if (!applicant.householdId) return 1;
+  const members = getHousehold(applicant.householdId).filter(
+    (row) => row.propertyId === applicant.propertyId,
+  );
+  return Math.max(members.length, 1);
+}
+
 export function buildRentalApplication(input: {
   id: string;
   applicant: Applicant;
@@ -155,7 +165,7 @@ export function buildRentalApplication(input: {
     listingId: property.id,
     generatedAt: new Date().toISOString(),
     completingAs: "tenant",
-    totalApplicants: rental.totalApplicants || 1,
+    totalApplicants: Math.max(rental.totalApplicants || 1, householdSize(applicant)),
     premises: {
       address: property.address,
       rent: property.rent,
@@ -240,7 +250,7 @@ function syncCurrentEmployer(
 
 export function rentalApplicationFromState(state: ApplyState, property: Property): RentalApplication {
   const applicant: Applicant = {
-    id: state.confirmationId ? `local-${state.confirmationId}` : TENANT_APPLICANT_ID,
+    id: state.confirmationId ? `local-${state.confirmationId}` : DEMO_APPLICANT_ID,
     propertyId: property.id,
     status: state.submittedAt ? "completed" : "in_progress",
     firstName: state.personal.firstName,
@@ -248,6 +258,7 @@ export function rentalApplicationFromState(state: ApplyState, property: Property
     email: state.personal.email,
     phone: state.personal.phone,
     appliedAt: state.submittedAt ?? new Date().toISOString(),
+    householdId: householdIdFromOccupants(state),
   };
   return buildRentalApplication({
     id: applicant.id,
@@ -265,7 +276,7 @@ export function resolveRentalPacket(id: string): {
   state?: ApplyState;
 } | null {
   const listingAlias = id === "resh-510" || id === FEATURED_LISTING_ID || id === "jane";
-  const applicantId = listingAlias ? TENANT_APPLICANT_ID : id;
+  const applicantId = listingAlias ? DEMO_APPLICANT_ID : id;
 
   if (isLocalApplicantId(applicantId) && typeof window !== "undefined") {
     const submission = loadSubmissions().find(
@@ -285,6 +296,7 @@ export function resolveRentalPacket(id: string): {
           email: submission.personal.email,
           phone: submission.personal.phone,
           appliedAt: submission.submittedAt ?? new Date().toISOString(),
+          householdId: householdIdFromOccupants(submission),
         },
         property,
         state: submission,
@@ -292,7 +304,7 @@ export function resolveRentalPacket(id: string): {
     }
   }
 
-  const applicant = getApplicantById(applicantId) ?? getApplicantById(TENANT_APPLICANT_ID);
+  const applicant = getApplicantById(applicantId) ?? getApplicantById(DEMO_APPLICANT_ID);
   if (!applicant) return null;
   const property = getPropertyById(applicant.propertyId) ?? getPropertyById(FEATURED_LISTING_ID);
   if (!property) return null;
@@ -300,7 +312,7 @@ export function resolveRentalPacket(id: string): {
   const report = getReportByApplicant(applicant.id);
 
   let state: ApplyState | undefined;
-  if (typeof window !== "undefined" && applicant.id === TENANT_APPLICANT_ID) {
+  if (typeof window !== "undefined" && applicant.id === DEMO_APPLICANT_ID) {
     state = loadDraft(property.id, property.screeningPackage);
   }
 

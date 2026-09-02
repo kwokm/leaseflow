@@ -78,7 +78,7 @@ export function ShowingsCalendar() {
         {booked.length > 0 ? (
           <div>
             <p className="text-[12px] font-medium uppercase tracking-[0.06em] text-mute-2">
-              Tenant desk bookings
+              Renter bookings
             </p>
             <ul className="mt-2 space-y-2">
               {booked.map((row) => (

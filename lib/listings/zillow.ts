@@ -1,13 +1,20 @@
 import {
-  ANAHEIM_PHOTOS,
   FEATURED_LISTING_ID,
+  FEATURED_PHOTOS,
+  getPropertyById,
   type Property,
   type ScreeningPackage,
 } from "@/lib/data/mock-data";
 
+/** Legacy Anaheim zpid — old 510 S Resh pastes still seed the featured listing. */
 export const SEEDED_ZPID = "25128456";
 export const SEEDED_ZILLOW_URL =
+  "https://www.zillow.com/homes/170-Chorus,-Irvine,-CA-92618_rb/";
+export const LEGACY_SEEDED_ZILLOW_URL =
   "https://www.zillow.com/homedetails/510-S-Resh-St-Anaheim-CA-92805/25128456_zpid/";
+export const SEEDED_COMPASS_URL =
+  "https://www.compass.com/homedetails/170-Chorus-Irvine-CA-92618/2162455193399296537_lid/";
+export const SEEDED_MLS = "PW26166675";
 
 export type ZillowImport = {
   source: "seed" | "live";
@@ -42,24 +49,35 @@ export function parseZillowUrl(raw: string): { url: string; zpid?: string } | nu
 }
 
 export function isSeededZillow(url: string, zpid?: string): boolean {
-  return zpid === SEEDED_ZPID || url.includes(`${SEEDED_ZPID}_zpid`) || url.includes("510-S-Resh-St");
+  const hay = url.toLowerCase();
+  return (
+    zpid === SEEDED_ZPID ||
+    url.includes(`${SEEDED_ZPID}_zpid`) ||
+    hay.includes("510-s-resh") ||
+    hay.includes("510 s resh") ||
+    hay.includes("170-chorus") ||
+    hay.includes("170 chorus") ||
+    hay.includes("pw26166675") ||
+    hay.includes("2162455193399296537") ||
+    hay.includes("compass.com/homedetails/170-chorus")
+  );
 }
 
 export function seededZillowImport(): ZillowImport {
+  const featured = getPropertyById(FEATURED_LISTING_ID);
   return {
     source: "seed",
     id: FEATURED_LISTING_ID,
-    zpid: SEEDED_ZPID,
-    zillowUrl: SEEDED_ZILLOW_URL,
-    address: "510 S Resh St, Anaheim, CA 92805",
-    rent: 4700,
-    bedrooms: 3,
-    bathrooms: 2,
-    sqft: 1594,
-    photos: [...ANAHEIM_PHOTOS],
-    neighborhood: "The Colony / central Anaheim",
-    propertyType: "House for rent",
-    title: "510 S Resh St, Anaheim, CA 92805",
+    zillowUrl: featured?.zillowUrl ?? SEEDED_ZILLOW_URL,
+    address: featured?.address ?? "170 Chorus, Irvine, CA 92618",
+    rent: featured?.rent ?? 6500,
+    bedrooms: featured?.bedrooms ?? 4,
+    bathrooms: featured?.bathrooms ?? 3.5,
+    sqft: featured?.sqft ?? 3010,
+    photos: [...FEATURED_PHOTOS],
+    neighborhood: featured?.neighborhood ?? "Rise Park",
+    propertyType: featured?.propertyType ?? "House",
+    title: featured?.address ?? "170 Chorus, Irvine, CA 92618",
   };
 }
 
