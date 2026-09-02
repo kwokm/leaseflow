@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
 import Image from "next/image";
 import { DemoPlay } from "@/components/demos/shell";
 import { PacketWindow } from "@/components/desk/packet-window";
-import { ANAHEIM_PHOTOS } from "@/lib/data/mock-data";
+import { FEATURED_PHOTOS } from "@/lib/data/mock-data";
 import { cn } from "@/lib/utils";
 
 const EXPERIAN_CHECKS = [
@@ -18,7 +18,7 @@ export function PillarExperian() {
       <PacketWindow title="Experian · Jane Doe" meta="Demo pull">
         <div className="px-3.5 py-3 sm:px-4">
           <div className="flex items-center justify-between gap-2">
-            <p className="text-[12px] font-medium text-mute">Jane Doe · 510 S Resh St</p>
+            <p className="text-[12px] font-medium text-mute">Jane Doe · 170 Chorus</p>
             <span className="pillar-pill">Included · $0 landlord extra</span>
           </div>
           <div className="d p-score mt-3 flex items-end justify-between gap-3 rounded-md bg-wash px-3 py-2.5">
@@ -120,14 +120,14 @@ export function PillarPacket() {
         <div className="px-3.5 py-3 sm:px-4">
           <div className="d p-chip-a relative h-16 overflow-hidden rounded-md border border-line bg-mist">
             <Image
-              src={ANAHEIM_PHOTOS[0]}
+              src={FEATURED_PHOTOS[0]}
               alt=""
               fill
               sizes="280px"
               className="object-cover"
             />
           </div>
-          <p className="mt-2 text-[12px] font-semibold tracking-[-0.14px] text-ink">510 S Resh St</p>
+          <p className="mt-2 text-[12px] font-semibold tracking-[-0.14px] text-ink">170 Chorus</p>
           <div className="mt-2 flex flex-wrap gap-1.5">
             <span className="d p-chip-b pillar-chip">Experian 724</span>
             <span className="d p-chip-c pillar-chip">Income · match</span>
