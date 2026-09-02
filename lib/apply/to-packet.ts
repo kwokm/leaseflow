@@ -4,8 +4,8 @@ import type {
   ApplicationDocument,
   ExperianPull,
   ScreeningReport,
-  AiIncomeScreen,
 } from "@/lib/data/mock-data";
+import type { AiIncomeScreen } from "@/lib/data/household-model";
 import { getApplicantsByProperty, getPropertyById } from "@/lib/data/mock-data";
 import { formatFileSize, ssnLast4 } from "./format";
 import type { ApplyState, LocalFile } from "./types";
