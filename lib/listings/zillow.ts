@@ -1,7 +1,7 @@
 import {
   FEATURED_LISTING_ID,
   FEATURED_PHOTOS,
-  getPropertyById,
+  demoPropertyById,
   type Property,
   type ScreeningPackage,
 } from "@/lib/data/mock-data";
@@ -64,7 +64,7 @@ export function isSeededZillow(url: string, zpid?: string): boolean {
 }
 
 export function seededZillowImport(): ZillowImport {
-  const featured = getPropertyById(FEATURED_LISTING_ID);
+  const featured = demoPropertyById(FEATURED_LISTING_ID);
   return {
     source: "seed",
     id: FEATURED_LISTING_ID,

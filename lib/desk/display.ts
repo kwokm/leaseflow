@@ -1,6 +1,6 @@
 import {
   getExperianPull,
-  getPropertyById,
+  demoPropertyById,
   getReportByApplicant,
   mockApplicants,
   type Applicant,
@@ -68,7 +68,7 @@ export function statusClass(status: ApplicationStatus): string {
 export function incomeMultiple(applicant: Applicant): number | undefined {
   const screen = getAiIncome(applicant.id);
   const report = getReportByApplicant(applicant.id);
-  const property = getPropertyById(applicant.propertyId);
+  const property = demoPropertyById(applicant.propertyId);
   const monthly = screen?.grossMonthly ?? report?.income.monthlyIncome;
   if (!monthly || !property?.rent) return undefined;
   return monthly / property.rent;

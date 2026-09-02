@@ -10,7 +10,7 @@ export function StageProof(props: StepProps) {
     <StepBody>
       <StepHeading lead="Proof." tone="Photo ID, income, and bank statements." />
       <p className="max-w-xl text-[15px] font-medium leading-[21px] tracking-[-0.16px] text-mute">
-        Files stay on your device in this prototype. Images and PDFs both work.
+        Files upload to Leaseproof&rsquo;s private document storage. Images and PDFs both work.
       </p>
       <StageSection label="Photo ID">
         <StepPhotoId {...props} embedded />

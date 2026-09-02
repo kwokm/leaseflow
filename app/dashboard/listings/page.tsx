@@ -1,27 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { DeskPill, DeskToolbar } from "@/components/desk/packet-window";
 import { StatusPill } from "@/components/desk/status-pill";
 import { ListingThumb } from "@/components/listings/photos";
-import { getAllProperties, type Applicant } from "@/lib/data/mock-data";
 import { listingThumb } from "@/lib/listings/store";
-import { loadDeskApplicants, listingRollup } from "@/lib/desk/queue";
+import { useProperties } from "@/lib/listings/use-property";
+import { useDeskApplicants } from "@/lib/desk/use-desk-applicants";
+import { listingRollup } from "@/lib/desk/queue";
 import { shortAddress } from "@/lib/desk/display";
 import { Reveal } from "@/components/motion/reveal";
 
 export default function ListingsPage() {
   const router = useRouter();
-  const [applicants, setApplicants] = useState<Applicant[]>([]);
-  const [properties, setProperties] = useState(getAllProperties());
-
-  useEffect(() => {
-    setApplicants(loadDeskApplicants());
-    setProperties(getAllProperties());
-  }, []);
+  const { properties } = useProperties();
+  const { applicants } = useDeskApplicants();
 
   return (
     <Reveal>

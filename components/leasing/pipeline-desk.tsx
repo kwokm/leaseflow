@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { DeskToolbar } from "@/components/desk/packet-window";
@@ -13,13 +13,12 @@ import { Button } from "@/components/ui/button";
 import {
   FEATURED_LISTING_ID,
   getAllApplications,
-  getAllProperties,
-  loadDemoData,
   mockProperties,
   type Applicant,
   type Property,
 } from "@/lib/data/mock-data";
-import { loadDeskApplicants } from "@/lib/desk/queue";
+import { useProperties } from "@/lib/listings/use-property";
+import { useDeskApplicants } from "@/lib/desk/use-desk-applicants";
 import { shortAddress } from "@/lib/desk/display";
 import { householdTotals, householdsFirst } from "@/lib/desk/household";
 import { SCREENING_TASKS, screeningChecks } from "@/lib/desk/screening";
@@ -118,23 +117,18 @@ function ApplicantRow({
 }
 
 export function PipelineDesk({ preview = false }: { preview?: boolean }) {
-  const [properties, setProperties] = useState<Property[]>(() => mockProperties);
-  const [applicants, setApplicants] = useState<Applicant[]>(() =>
-    preview ? getAllApplications() : []
-  );
+  // `preview` is the static marketing pipeline on the landing page. The real
+  // desk reads listings and the queue from the server, which decides whether
+  // the seeded homes are included (LEASEPROOF_DEMO).
+  const { properties, ready: propertiesReady, unavailable } = useProperties();
+  const { applicants: deskApplicants } = useDeskApplicants();
 
-  useEffect(() => {
-    setApplicants(preview ? getAllApplications() : loadDeskApplicants());
-    setProperties(preview ? mockProperties : getAllProperties());
-  }, [preview]);
+  const source: Property[] = preview ? mockProperties : properties;
+  const applicants: Applicant[] = preview ? getAllApplications() : deskApplicants;
+  const homes = useMemo(() => sortHomes(source), [source]);
 
-  const homes = useMemo(() => sortHomes(properties), [properties]);
-
-  function loadDemo() {
-    loadDemoData();
-    setApplicants(loadDeskApplicants(true));
-    setProperties(getAllProperties());
-  }
+  // Do not flash the empty state while the first fetch is still in flight.
+  const showEmpty = homes.length === 0 && (preview || propertiesReady);
 
   return (
     <Reveal>
@@ -142,7 +136,24 @@ export function PipelineDesk({ preview = false }: { preview?: boolean }) {
         <span className="desk-pill is-on">Pipeline</span>
       </DeskToolbar>
 
-      {homes.length === 0 ? (
+      {homes.length === 0 && !showEmpty ? null : showEmpty && unavailable ? (
+        <section className="px-5 py-12 sm:px-6">
+          <p className="text-[12px] font-medium uppercase tracking-[0.06em] text-mute-2">
+            Pipeline
+          </p>
+          <h1 className="mt-2 text-[24px] font-semibold tracking-[-0.5px] text-ink">
+            We can&rsquo;t load your listings right now.
+          </h1>
+          <p className="mt-2 max-w-xl text-[14px] font-medium leading-5 text-mute">
+            Nothing has been lost — the pipeline just isn&rsquo;t answering. Reload in a moment.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-2">
+            <Button type="button" onClick={() => window.location.reload()}>
+              Reload
+            </Button>
+          </div>
+        </section>
+      ) : showEmpty ? (
         <section className="px-5 py-12 sm:px-6">
           <p className="text-[12px] font-medium uppercase tracking-[0.06em] text-mute-2">
             Step 1
@@ -157,9 +168,6 @@ export function PipelineDesk({ preview = false }: { preview?: boolean }) {
           <div className="mt-5 flex flex-wrap gap-2">
             <Button asChild>
               <Link href="/dashboard/listings/new">Create listing + get apply link</Link>
-            </Button>
-            <Button type="button" variant="ghost" onClick={loadDemo}>
-              Load demo
             </Button>
           </div>
         </section>

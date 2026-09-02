@@ -2,25 +2,25 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { CreditCard, Pencil } from "lucide-react";
+import { CreditCard, Lock, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AiDocCheck } from "@/components/docs/ai-check";
 import { SAMPLE_MISMATCH, checkApplyState } from "@/lib/docs/ai-check";
-import { Checkbox, Field, MaskedField } from "@/components/apply/field";
+import { Checkbox, Field } from "@/components/apply/field";
 import { StepBody } from "@/components/apply/motion";
 import { Note, StepHeading, SummaryRow } from "@/components/apply/step-shell";
 import type { StepProps } from "@/components/apply/step-shell";
-import {
-  formatCardNumber,
-  formatDateTime,
-  formatExpiry,
-  formatMoney,
-  maskCardNumber,
-  maskDob,
-  maskSsn,
-} from "@/lib/apply/format";
+import { useRuntimeConfig } from "@/components/config/runtime-config";
+import { formatDateTime, formatMoney, maskDob, maskSsn } from "@/lib/apply/format";
 import { getScreeningFee } from "@/lib/data/mock-data";
-import { APPLY_STEP, type ConsentInfo, type PaymentInfo } from "@/lib/apply/types";
+import {
+  CONSENT_BACKGROUND_CHECKBOX,
+  CONSENT_FCRA_CHECKBOX,
+  CREDIT_DISCLOSURE_HEADING,
+  FCRA_PLACEHOLDER_NOTICE,
+  creditDisclosureParagraphs,
+} from "@/lib/legal/fcra";
+import { APPLY_STEP, type ConsentInfo } from "@/lib/apply/types";
 
 function ReviewBlock({
   title,
@@ -49,6 +49,7 @@ function ReviewBlock({
 
 export function StepReview({ state, patch, errors, property, goTo }: StepProps) {
   const [showSample, setShowSample] = useState(false);
+  const config = useRuntimeConfig();
   const docCheck = useMemo(
     () => checkApplyState(state, showSample ? [SAMPLE_MISMATCH] : []),
     [state, showSample],
@@ -57,8 +58,6 @@ export function StepReview({ state, patch, errors, property, goTo }: StepProps) 
   const p = state.personal;
   const setConsent = (partial: Partial<ConsentInfo>) =>
     patch({ consent: { ...state.consent, ...partial } });
-  const setPayment = (partial: Partial<PaymentInfo>) =>
-    patch({ payment: { ...state.payment, ...partial } });
 
   const address = [p.street, p.unit, p.city, [p.state, p.zip].filter(Boolean).join(" ")]
     .filter(Boolean)
@@ -141,9 +140,19 @@ export function StepReview({ state, patch, errors, property, goTo }: StepProps) 
       </section>
 
       <ReviewBlock title="Credit report" step={APPLY_STEP.credit} goTo={goTo}>
-        <SummaryRow label="Source" value="Experian (demo)" />
-        <SummaryRow label="Score" value={state.experian.score ?? "Not connected"} />
-        <SummaryRow label="Pulled" value={formatDateTime(state.experian.pulledAt)} />
+        <SummaryRow label="Source" value="Experian Connect" />
+        <SummaryRow
+          label="Status"
+          value={
+            state.experian.status === "connected"
+              ? "Shared"
+              : state.experian.status === "authorized"
+                ? "Authorized — runs after payment"
+                : "Not authorized"
+          }
+        />
+        <SummaryRow label="Score" value={state.experian.score ?? "—"} />
+        <SummaryRow label="Shared" value={formatDateTime(state.experian.pulledAt)} />
         <SummaryRow label="Extra Experian fee" value="$0.00" />
       </ReviewBlock>
 
@@ -176,31 +185,13 @@ export function StepReview({ state, patch, errors, property, goTo }: StepProps) 
           Authorization and disclosure
         </h2>
         <div className="mt-3 max-h-56 overflow-y-auto rounded-btn border border-line bg-mist p-4 text-[13px] font-medium leading-5 text-mute">
-          <p className="font-semibold text-ink-2">
-            Disclosure regarding consumer reports and investigative consumer reports
-          </p>
-          <p className="mt-2">
-            In connection with your rental application for {property.address}, a consumer report
-            and/or investigative consumer report may be obtained about you. These reports may
-            include information about your credit history, rental history, eviction records, and
-            criminal records, obtained from consumer reporting agencies.
-          </p>
-          <p className="mt-2">
-            Under the Fair Credit Reporting Act you have the right to request disclosure of the
-            nature and scope of any investigative consumer report, to know whether a report was
-            obtained, and to receive a free copy of any report that results in an adverse decision.
-            You also have the right to dispute the accuracy or completeness of any information in
-            your file.
-          </p>
-          <p className="mt-2">
-            If your application is declined based in whole or in part on information in a consumer
-            report, you will receive an adverse action notice identifying the reporting agency and
-            explaining your rights.
-          </p>
-          <p className="mt-2 font-semibold text-ink-2">
-            This is prototype text for a demo application. No consumer reporting agency is used, no
-            report is obtained, and nothing you enter here is transmitted or stored off your device.
-          </p>
+          <p className="font-semibold text-ink-2">{CREDIT_DISCLOSURE_HEADING}</p>
+          {creditDisclosureParagraphs(property.address).map((paragraph) => (
+            <p key={paragraph.slice(0, 48)} className="mt-2">
+              {paragraph}
+            </p>
+          ))}
+          <p className="mt-2 font-semibold text-ink-2">{FCRA_PLACEHOLDER_NOTICE}</p>
         </div>
 
         <div className="mt-4 space-y-1">
@@ -210,8 +201,7 @@ export function StepReview({ state, patch, errors, property, goTo }: StepProps) 
             error={errors.fcra}
             onChange={(checked) => setConsent({ fcra: checked })}
           >
-            I have read the disclosure and authorize Leaseproof to obtain consumer reports about me
-            for this rental application.
+            {CONSENT_FCRA_CHECKBOX}
           </Checkbox>
           <Checkbox
             id="backgroundAck"
@@ -219,8 +209,7 @@ export function StepReview({ state, patch, errors, property, goTo }: StepProps) 
             error={errors.backgroundAck}
             onChange={(checked) => setConsent({ backgroundAck: checked })}
           >
-            I understand a public-records background search is part of this screening, and that in
-            this prototype it is a mock note only.
+            {CONSENT_BACKGROUND_CHECKBOX}
           </Checkbox>
         </div>
 
@@ -238,7 +227,7 @@ export function StepReview({ state, patch, errors, property, goTo }: StepProps) 
         </div>
       </section>
 
-      {/* Mock payment */}
+      {/* Stripe Checkout hand-off — card details are entered on Stripe, not here. */}
       <section className="rounded-lg border border-line bg-paper p-5 shadow-window">
         <div className="flex items-center gap-2">
           <CreditCard className="h-5 w-5 text-mute" aria-hidden />
@@ -246,10 +235,7 @@ export function StepReview({ state, patch, errors, property, goTo }: StepProps) 
         </div>
 
         <dl className="mt-4 rounded-btn border border-line bg-mist px-4 py-2">
-          <SummaryRow
-            label="Standard screening"
-            value={formatMoney(fee)}
-          />
+          <SummaryRow label="Standard screening" value={formatMoney(fee)} />
           <SummaryRow label="Experian — included" value="$0 extra" />
           <SummaryRow
             label="Total due today"
@@ -257,70 +243,20 @@ export function StepReview({ state, patch, errors, property, goTo }: StepProps) 
           />
         </dl>
 
-        <div className="mt-4 space-y-4">
-          <Field
-            id="cardName"
-            label="Name on card"
-            autoComplete="off"
-            value={state.payment.cardName}
-            error={errors.cardName}
-            onChange={(event) => setPayment({ cardName: event.target.value })}
-          />
-          <MaskedField
-            id="cardNumber"
-            label="Card number"
-            inputMode="numeric"
-            autoComplete="off"
-            placeholder="4242 4242 4242 4242"
-            maskedValue={maskCardNumber(state.payment.cardNumber)}
-            value={state.payment.cardNumber}
-            error={errors.cardNumber}
-            hint="Demo checkout — no card is charged. Any 16 digits will do."
-            onChange={(event) => setPayment({ cardNumber: formatCardNumber(event.target.value) })}
-          />
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <Field
-              id="expiry"
-              label="Expiry"
-              inputMode="numeric"
-              placeholder="MM/YY"
-              autoComplete="off"
-              value={state.payment.expiry}
-              error={errors.expiry}
-              onChange={(event) => setPayment({ expiry: formatExpiry(event.target.value) })}
-            />
-            <MaskedField
-              id="cvc"
-              label="Security code"
-              inputMode="numeric"
-              autoComplete="off"
-              maskedValue="•••"
-              maxLength={4}
-              value={state.payment.cvc}
-              error={errors.cvc}
-              onChange={(event) =>
-                setPayment({ cvc: event.target.value.replace(/\D/g, "").slice(0, 4) })
-              }
-            />
-            <Field
-              id="billingZip"
-              label="Billing ZIP"
-              inputMode="numeric"
-              autoComplete="off"
-              maxLength={5}
-              value={state.payment.billingZip}
-              error={errors.billingZip}
-              onChange={(event) =>
-                setPayment({ billingZip: event.target.value.replace(/\D/g, "").slice(0, 5) })
-              }
-            />
-          </div>
-        </div>
+        <p className="mt-4 flex items-start gap-2 text-[14px] font-medium leading-5 text-mute">
+          <Lock className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+          {config.stripe
+            ? "Continue to Stripe to pay. Your card details are entered on Stripe's secure page and never reach Leaseproof. Your credit report is requested only after this payment clears."
+            : config.demo
+              ? "Demo deployment — checkout is skipped and no card is charged."
+              : "Payments are not configured on this deployment yet."}
+        </p>
       </section>
 
       <Note>
-        Card details are never saved, not even in this prototype&apos;s local draft. Submitting
-        records a mock payment only.
+        {config.stripe
+          ? "You pay $24.99 once. The landlord pays nothing extra, and Experian is included."
+          : "No charge is made on this deployment."}
       </Note>
     </StepBody>
   );

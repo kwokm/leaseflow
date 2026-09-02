@@ -1,6 +1,6 @@
 import Link from "next/link";
-import type { Applicant, AiIncomeScreen } from "@/lib/data/mock-data";
-import { getAiIncome } from "@/lib/data/mock-data";
+import type { Applicant } from "@/lib/data/mock-data";
+import { getAiIncome, type AiIncomeScreen } from "@/lib/data/household-model";
 import {
   aiIncomeSourceLabel,
   formatAiIncomeLine,

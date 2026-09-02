@@ -2,27 +2,21 @@
 
 import * as React from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { Check, Loader2, RotateCcw, ShieldCheck } from "lucide-react";
+import { Check, Loader2, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FieldError } from "@/components/apply/field";
 import { StepBody } from "@/components/apply/motion";
 import { Note, StepHeading, SummaryRow, WindowPanel } from "@/components/apply/step-shell";
 import type { StepProps } from "@/components/apply/step-shell";
+import { useRuntimeConfig } from "@/components/config/runtime-config";
 import { DURATION, EASE_OUT } from "@/lib/apply/motion";
 import { buildMockExperianPull, scoreBand } from "@/lib/apply/experian-mock";
 import { formatDateTime } from "@/lib/apply/format";
-import { cn } from "@/lib/utils";
-
-const PULL_STAGES = [
-  "Matching your file",
-  "Reading tradelines",
-  "Calculating your score",
-];
-
-function prefersReducedMotion(): boolean {
-  if (typeof window === "undefined" || !window.matchMedia) return false;
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
+import {
+  CONNECT_BULLETS,
+  CONNECT_INQUIRY_LINE,
+  FCRA_PLACEHOLDER_NOTICE,
+} from "@/lib/legal/fcra";
 
 function useCountUp(target: number | undefined) {
   const reduced = useReducedMotion();
@@ -55,16 +49,18 @@ function useCountUp(target: number | undefined) {
 }
 
 /**
- * Demo authorization chrome. It is explicitly labelled "Experian (demo)",
- * collects nothing, and no network request is made — the entire pull is
- * fabricated in `lib/apply/experian-mock.ts`.
+ * Experian Connect consent. The applicant authenticates with Experian and
+ * Experian shares the report with the landlord — Leaseproof never asks for
+ * bureau credentials and never handles the report itself.
  */
-function DemoAuthorizationDialog({
+function ConnectDialog({
   onAuthorize,
   onCancel,
+  busy,
 }: {
   onAuthorize: () => void;
   onCancel: () => void;
+  busy: boolean;
 }) {
   const dialogRef = React.useRef<HTMLDivElement>(null);
   const confirmRef = React.useRef<HTMLButtonElement>(null);
@@ -80,7 +76,7 @@ function DemoAuthorizationDialog({
       }
       if (event.key !== "Tab") return;
 
-      // Keep focus inside the demo dialog.
+      // Keep focus inside the dialog.
       const focusable = dialogRef.current?.querySelectorAll<HTMLElement>(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
       );
@@ -113,7 +109,7 @@ function DemoAuthorizationDialog({
         ref={dialogRef}
         role="dialog"
         aria-modal="true"
-        aria-labelledby="experian-demo-title"
+        aria-labelledby="experian-connect-title"
         className="w-full max-w-lg overflow-hidden rounded-t-lg border border-line bg-paper shadow-window sm:rounded-lg"
         initial={reduced ? false : { opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -121,28 +117,24 @@ function DemoAuthorizationDialog({
         transition={{ duration: DURATION.step, ease: EASE_OUT }}
       >
         <div className="card-head">
-          <span className="card-head-title">Experian (demo)</span>
-          <span className="card-head-meta">Does not affect your score</span>
+          <span className="card-head-title">Experian Connect</span>
+          <span className="card-head-meta">Soft inquiry</span>
         </div>
 
         <div className="p-5">
           <h2
-            id="experian-demo-title"
+            id="experian-connect-title"
             className="text-[20px] font-semibold tracking-[-0.4px] text-ink"
           >
-            Authorize Leaseproof to view your credit report
+            Share your credit report with this landlord
           </h2>
           <p className="mt-2 text-[14px] font-medium leading-5 tracking-[-0.14px] text-mute">
-            This is simulated authorization chrome for a prototype. No credit bureau is contacted
-            and no sign-in details are requested or collected.
+            Experian verifies your identity and releases the report. Leaseproof never asks for your
+            Experian username or password.
           </p>
 
           <ul className="mt-4 space-y-2.5 rounded-btn border border-line bg-mist p-4">
-            {[
-              "A soft inquiry that never affects your score",
-              "Score and summary shared with the landlord for this listing only",
-              "Access ends when the application is decided",
-            ].map((item) => (
+            {CONNECT_BULLETS.map((item) => (
               <li
                 key={item}
                 className="flex items-start gap-2 text-[14px] font-medium leading-5 tracking-[-0.14px] text-ink-2"
@@ -154,16 +146,15 @@ function DemoAuthorizationDialog({
           </ul>
 
           <p className="mt-4 text-[13px] font-medium leading-5 text-mute">
-            Experian is named here only to describe the simulated flow. This prototype is not
-            affiliated with, endorsed by, or connected to any credit bureau.
+            {FCRA_PLACEHOLDER_NOTICE}
           </p>
 
           <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-            <Button type="button" variant="outline" size="touch" onClick={onCancel}>
+            <Button type="button" variant="outline" size="touch" onClick={onCancel} disabled={busy}>
               Cancel
             </Button>
-            <Button ref={confirmRef} type="button" size="touch" onClick={onAuthorize}>
-              Authorize (demo)
+            <Button ref={confirmRef} type="button" size="touch" onClick={onAuthorize} disabled={busy}>
+              {busy ? "Authorizing…" : "Authorize share"}
             </Button>
           </div>
         </div>
@@ -190,59 +181,83 @@ function ScoreReveal({ score }: { score: number }) {
 
 export function StepCredit({ state, patch, errors }: StepProps) {
   const experian = state.experian;
-  const [stage, setStage] = React.useState(0);
-  const timers = React.useRef<ReturnType<typeof setTimeout>[]>([]);
+  const config = useRuntimeConfig();
+  const [busy, setBusy] = React.useState(false);
+  const [failure, setFailure] = React.useState<string | null>(null);
+  const reduced = useReducedMotion();
 
-  React.useEffect(() => {
-    const pending = timers.current;
-    return () => {
-      pending.forEach(clearTimeout);
-    };
-  }, []);
+  const authorize = async () => {
+    setBusy(true);
+    setFailure(null);
 
-  const seed = `${state.personal.email}${state.personal.lastName}`.toLowerCase();
+    try {
+      const response = await fetch("/api/screening/authorize", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          listingId: state.listingId,
+          firstName: state.personal.firstName,
+          lastName: state.personal.lastName,
+          email: state.personal.email,
+        }),
+      });
 
-  const runPull = () => {
-    patch({ experian: { status: "pulling" } });
-    setStage(0);
+      const payload = (await response.json().catch(() => ({}))) as {
+        shareReference?: string;
+        previewAvailable?: boolean;
+        error?: string;
+      };
 
-    const finish = () => {
-      patch({ experian: buildMockExperianPull(seed, new Date().toISOString()) });
-    };
+      if (!response.ok || !payload.shareReference) {
+        setFailure(payload.error ?? "Could not reach Experian Connect. Try again.");
+        patch({ experian: { status: "idle" } });
+        return;
+      }
 
-    if (prefersReducedMotion()) {
-      setStage(PULL_STAGES.length - 1);
-      finish();
-      return;
+      // Demo deployments reveal the fabricated summary right away. Everywhere
+      // else the share stays authorized and the report is only requested once
+      // the fee is captured.
+      if (payload.previewAvailable) {
+        patch({
+          experian: {
+            ...buildMockExperianPull(
+              `${state.personal.email}${state.personal.lastName}`.toLowerCase(),
+              new Date().toISOString()
+            ),
+            shareReference: payload.shareReference,
+          },
+        });
+        return;
+      }
+
+      patch({
+        experian: { status: "authorized", shareReference: payload.shareReference },
+      });
+    } catch {
+      setFailure("Could not reach Experian Connect. Try again.");
+      patch({ experian: { status: "idle" } });
+    } finally {
+      setBusy(false);
     }
-
-    timers.current.forEach(clearTimeout);
-    timers.current = [
-      setTimeout(() => setStage(1), 1100),
-      setTimeout(() => setStage(2), 2200),
-      setTimeout(finish, 3400),
-    ];
   };
 
   const band = experian.score ? scoreBand(experian.score) : undefined;
-  const pullProgress = ((stage + 1) / PULL_STAGES.length) * 100;
-  const reduced = useReducedMotion();
 
   return (
     <StepBody>
       <StepHeading lead="Credit report." tone="Included in the $24.99 Standard fee." />
       <p className="max-w-xl text-[15px] font-medium leading-[21px] tracking-[-0.16px] text-mute">
-        Connect your report once and it travels with this application. The landlord sees your score
-        and a summary — never your full account numbers.
+        Authorize once and your report travels with this application. The landlord sees your score
+        and a summary — never your account numbers.
       </p>
 
       {experian.status === "connected" && experian.score ? (
-        <WindowPanel label="Experian (demo)">
+        <WindowPanel label="Experian Connect">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <span className="inline-flex items-center gap-1 text-[13px] font-medium text-ok">
                 <ShieldCheck className="h-4 w-4" aria-hidden />
-                Connected
+                Shared
               </span>
               <ScoreReveal score={experian.score} />
               <p className="mt-2 text-[15px] font-medium tracking-[-0.16px] text-mute">
@@ -261,7 +276,7 @@ export function StepCredit({ state, patch, errors }: StepProps) {
               <SummaryRow label="Oldest account" value={`${experian.oldestAccountYears} years`} />
               <SummaryRow label="Recent inquiries" value={experian.recentInquiries} />
               <SummaryRow label="Public records" value={experian.publicRecords} />
-              <SummaryRow label="Pulled" value={formatDateTime(experian.pulledAt)} />
+              <SummaryRow label="Shared" value={formatDateTime(experian.pulledAt)} />
               <SummaryRow label="Extra Experian fee" value="$0.00" />
             </motion.dl>
           </div>
@@ -285,23 +300,34 @@ export function StepCredit({ state, patch, errors }: StepProps) {
             </motion.ul>
           ) : null}
 
-          <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-line pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              size="touch"
-              onClick={() => patch({ experian: { status: "idle" } })}
-            >
-              <RotateCcw className="h-4 w-4" aria-hidden />
-              Pull again
-            </Button>
-            <p className="text-[13px] font-medium text-mute">
-              Mock data — generated locally for this demo.
+          {config.demo ? (
+            <p className="mt-5 border-t border-line pt-4 text-[13px] font-medium text-mute">
+              Demo summary — generated locally, no consumer reporting agency was contacted.
             </p>
+          ) : null}
+        </WindowPanel>
+      ) : experian.status === "authorized" ? (
+        <WindowPanel label="Experian Connect">
+          <div className="flex items-start gap-3">
+            <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-ok" aria-hidden />
+            <div className="min-w-0">
+              <p className="text-[17px] font-semibold tracking-[-0.3px] text-ink">
+                Share authorized
+              </p>
+              <p className="mt-1 text-[14px] font-medium leading-5 text-mute">
+                Your report is requested after you pay the $24.99 screening fee on the next step —
+                not before. {CONNECT_INQUIRY_LINE}
+              </p>
+            </div>
           </div>
+          <dl className="mt-4 border-t border-line pt-4">
+            <SummaryRow label="Provider" value="Experian Connect" />
+            <SummaryRow label="Inquiry" value="Soft" />
+            <SummaryRow label="Extra Experian fee" value="$0.00" />
+          </dl>
         </WindowPanel>
       ) : experian.status === "pulling" ? (
-        <WindowPanel label="Experian (demo)">
+        <WindowPanel label="Experian Connect">
           <div className="flex items-center gap-3">
             <Loader2 className="h-5 w-5 animate-spin text-mute" aria-hidden />
             <p
@@ -309,51 +335,19 @@ export function StepCredit({ state, patch, errors }: StepProps) {
               role="status"
               aria-live="polite"
             >
-              Pulling your report — {PULL_STAGES[stage]}…
+              Contacting Experian Connect…
             </p>
           </div>
-          <div className="relative mt-5 h-1 overflow-hidden rounded-full bg-line">
-            <div
-              className="h-full bg-ink transition-transform duration-240 ease-premium"
-              style={{ transform: `translateX(-${100 - pullProgress}%)` }}
-            />
-          </div>
-          <ol className="mt-5 space-y-3">
-            {PULL_STAGES.map((label, index) => (
-              <li
-                key={label}
-                className={cn(
-                  "flex min-h-[44px] items-center gap-2.5 text-[14px] font-medium tracking-[-0.14px] transition-colors duration-200 ease-premium",
-                  index < stage ? "text-ink-2" : index === stage ? "text-ink" : "text-mute-2"
-                )}
-              >
-                <span
-                  aria-hidden
-                  className={cn(
-                    "flex h-5 w-5 items-center justify-center rounded-full border transition-[background-color,border-color,color] duration-200 ease-premium",
-                    index < stage
-                      ? "border-ok bg-ok text-paper"
-                      : index === stage
-                        ? "border-ink"
-                        : "border-line-2"
-                  )}
-                >
-                  {index < stage && <Check className="h-3 w-3" strokeWidth={3} />}
-                </span>
-                {label}
-              </li>
-            ))}
-          </ol>
         </WindowPanel>
       ) : (
-        <WindowPanel label="Experian (demo)">
+        <WindowPanel label="Experian Connect">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
               <p className="text-[17px] font-semibold tracking-[-0.3px] text-ink">
-                Connect your credit report
+                Share your credit report
               </p>
               <p className="mt-1 text-[14px] font-medium leading-5 text-mute">
-                Soft inquiry. It will not affect your score.
+                {CONNECT_INQUIRY_LINE} You pay before anything is requested.
               </p>
             </div>
             <Button
@@ -365,19 +359,19 @@ export function StepCredit({ state, patch, errors }: StepProps) {
               Continue with Experian
             </Button>
           </div>
-          <FieldError id="experian-error" message={errors.experian} />
+          <FieldError id="experian-error" message={failure ?? errors.experian} />
         </WindowPanel>
       )}
 
       <Note tone="warn">
-        Demo only. Leaseproof never asks for your bureau username or password, and this prototype
-        does not contact Experian or any other consumer reporting agency.
+        {FCRA_PLACEHOLDER_NOTICE} Leaseproof never asks for your Experian username or password.
       </Note>
 
       <AnimatePresence>
         {experian.status === "authorizing" && (
-          <DemoAuthorizationDialog
-            onAuthorize={runPull}
+          <ConnectDialog
+            busy={busy}
+            onAuthorize={authorize}
             onCancel={() => patch({ experian: { status: "idle" } })}
           />
         )}

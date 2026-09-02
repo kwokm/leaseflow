@@ -87,7 +87,7 @@ export function AiDocCheck({
           {report.passed ? "Income docs verified" : "Income docs need a look"}
         </p>
         <p className="mt-0.5 text-[12px] text-mute">
-          Prototype check · name match / last 2 months
+          Mock check · name match / last 2 months
         </p>
       </div>
     );
@@ -98,7 +98,7 @@ export function AiDocCheck({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-[12px] font-medium uppercase tracking-[0.06em] text-mute-2">
-            Prototype AI check
+            AI document check
           </p>
           <h2 className="mt-1 text-[17px] font-semibold tracking-[-0.3px] text-ink">
             Income documents

@@ -11,7 +11,7 @@ export function StepPhotoId({ state, patch, errors, embedded }: StepProps) {
     <StepChrome embedded={embedded} lead="Photo ID." tone="Front and back, please.">
       <p className="max-w-xl text-[15px] font-medium leading-[21px] tracking-[-0.16px] text-mute">
         A driver&apos;s licence, state ID, or passport works. Images and PDFs are both fine. Files
-        stay on your device in this prototype.
+        upload to private storage — never a public link.
       </p>
 
       <Panel className="shadow-window">
@@ -19,6 +19,7 @@ export function StepPhotoId({ state, patch, errors, embedded }: StepProps) {
           <FileSlot
             id="id-front"
             label="Front of ID"
+            kind="photo_id_front"
             file={state.idFront}
             error={errors.idFront}
             onChange={(file) => patch({ idFront: file })}
@@ -26,6 +27,7 @@ export function StepPhotoId({ state, patch, errors, embedded }: StepProps) {
           <FileSlot
             id="id-back"
             label="Back of ID"
+            kind="photo_id_back"
             file={state.idBack}
             error={errors.idBack}
             onChange={(file) => patch({ idBack: file })}
@@ -104,6 +106,7 @@ export function StepIncome({ state, patch, errors, embedded }: StepProps) {
         <FileStack
           id="paystubs"
           label="Pay stubs"
+          kind="paystub"
           max={2}
           files={state.paystubs}
           error={errors.paystubs}
@@ -152,6 +155,7 @@ export function StepBank({ state, patch, errors, embedded }: StepProps) {
         <FileStack
           id="statements"
           label="Bank statements"
+          kind="bank_statement"
           max={3}
           files={state.statements}
           error={errors.statements}

@@ -12,14 +12,17 @@ import { cn } from "@/lib/utils";
 
 export const FILE_ACCEPT = "image/png,image/jpeg,image/heic,image/webp,application/pdf";
 
+/** Blob document type; also the folder the upload lands in. */
+export type UploadKind = "photo_id_front" | "photo_id_back" | "paystub" | "bank_statement";
+
 function newId(): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) return crypto.randomUUID();
   return `f-${Math.random().toString(36).slice(2)}`;
 }
 
 /**
- * Files never leave the browser. We hold an object URL for the preview and
- * revoke it as soon as the file is replaced or removed.
+ * The object URL gives an instant preview while the upload is in flight; the
+ * durable copy lands in `storedUrl` once Blob storage accepts it.
  */
 export function toLocalFile(file: File): LocalFile {
   return {
@@ -32,6 +35,31 @@ export function toLocalFile(file: File): LocalFile {
   };
 }
 
+/**
+ * Uploads to Blob and returns the file with its durable URL attached. If
+ * storage is not configured the local preview is kept as-is, so the wizard
+ * still works — the packet just records no stored document.
+ */
+export async function uploadLocalFile(
+  local: LocalFile,
+  source: File,
+  kind: UploadKind
+): Promise<LocalFile> {
+  const body = new FormData();
+  body.append("file", source);
+  body.append("kind", kind);
+
+  try {
+    const response = await fetch("/api/uploads", { method: "POST", body });
+    if (!response.ok) return local;
+    const payload = (await response.json()) as { url?: string; pathname?: string };
+    if (!payload.url) return local;
+    return { ...local, storedUrl: payload.url, pathname: payload.pathname };
+  } catch {
+    return local;
+  }
+}
+
 export function releaseLocalFile(file: LocalFile | null | undefined): void {
   if (file?.url) URL.revokeObjectURL(file.url);
 }
@@ -41,11 +69,14 @@ function isImage(file: LocalFile): boolean {
 }
 
 function FilePreview({ file }: { file: LocalFile }) {
-  if (isImage(file) && file.url) {
+  // Object URL first (instant, no round trip), then the stored copy after reload.
+  const src = file.url ?? file.storedUrl;
+
+  if (isImage(file) && src) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
-        src={file.url}
+        src={src}
         alt={`Preview of ${file.name}`}
         className="h-14 w-14 shrink-0 rounded-md border border-line object-cover"
       />
@@ -77,7 +108,7 @@ function FileRow({
         <p className="truncate text-[14px] font-medium tracking-[-0.14px] text-ink">{file.name}</p>
         <p className="mt-0.5 text-[13px] font-medium text-mute">
           {formatFileSize(file.size)}
-          {file.url ? "" : " · preview cleared on reload"}
+          {file.storedUrl ? " · saved" : file.url ? "" : " · preview cleared on reload"}
         </p>
       </div>
       {onReplace && (
@@ -146,6 +177,7 @@ function useDropzone() {
 interface FileSlotProps {
   id: string;
   label: string;
+  kind: UploadKind;
   hint?: string;
   error?: string;
   file: LocalFile | null;
@@ -153,7 +185,7 @@ interface FileSlotProps {
 }
 
 /** Single-file slot — used for the front and back of a photo ID. */
-export function FileSlot({ id, label, hint, error, file, onChange }: FileSlotProps) {
+export function FileSlot({ id, label, kind, hint, error, file, onChange }: FileSlotProps) {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const errorId = error ? `${id}-error` : undefined;
   const drop = useDropzone();
@@ -162,7 +194,10 @@ export function FileSlot({ id, label, hint, error, file, onChange }: FileSlotPro
     const picked = files?.[0];
     if (!picked) return;
     releaseLocalFile(file);
-    onChange(toLocalFile(picked));
+    const local = toLocalFile(picked);
+    // Show it immediately, then swap in the stored copy when the upload lands.
+    onChange(local);
+    void uploadLocalFile(local, picked, kind).then((stored) => onChange(stored));
   };
 
   return (
@@ -226,6 +261,7 @@ export function FileSlot({ id, label, hint, error, file, onChange }: FileSlotPro
 interface FileStackProps {
   id: string;
   label: string;
+  kind: UploadKind;
   hint?: string;
   error?: string;
   files: LocalFile[];
@@ -234,18 +270,30 @@ interface FileStackProps {
 }
 
 /** Multi-file list with a hard cap — pay stubs (2) and bank statements (1–3). */
-export function FileStack({ id, label, hint, error, files, max, onChange }: FileStackProps) {
+export function FileStack({ id, label, kind, hint, error, files, max, onChange }: FileStackProps) {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const errorId = error ? `${id}-error` : undefined;
   const full = files.length >= max;
   const drop = useDropzone();
+  // Uploads resolve out of order, so each one patches the list by id rather
+  // than rebuilding it from a captured `files`.
+  const latest = React.useRef(files);
+  latest.current = files;
 
   const handleFiles = (list: FileList | null) => {
     if (!list?.length) return;
     const room = max - files.length;
-    const added = Array.from(list).slice(0, room).map(toLocalFile);
+    const sources = Array.from(list).slice(0, room);
+    const added = sources.map(toLocalFile);
     onChange([...files, ...added]);
     if (inputRef.current) inputRef.current.value = "";
+
+    sources.forEach((source, index) => {
+      const local = added[index];
+      void uploadLocalFile(local, source, kind).then((stored) => {
+        onChange(latest.current.map((entry) => (entry.id === local.id ? stored : entry)));
+      });
+    });
   };
 
   return (

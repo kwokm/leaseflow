@@ -1,7 +1,7 @@
 import type { ExperianState } from "./types";
 
 /*
- * Everything in this file is fabricated in the browser. The prototype never
+ * Everything in this file is fabricated in the browser. Leaseproof never
  * calls a consumer reporting agency, never collects bureau credentials, and the
  * "authorization" screen is demo chrome only.
  */

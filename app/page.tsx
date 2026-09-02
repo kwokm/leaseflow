@@ -11,8 +11,8 @@ import { SplitWords } from "@/components/motion/split-words";
 import { Button } from "@/components/ui/button";
 import { ListingPhotoStrip } from "@/components/listings/photos";
 import { PillarExperian, PillarIncome, PillarPacket } from "@/components/demos/pillar-demos";
-import { LANDLORD_AUTH_HREF } from "@/lib/auth/landlord";
-import { FEATURED_LISTING_ID, getPropertyById } from "@/lib/data/mock-data";
+import { LANDLORD_SIGN_IN_HREF } from "@/lib/auth/roles";
+import { FEATURED_LISTING_ID, demoPropertyById } from "@/lib/data/mock-data";
 
 const APPLY_HREF = `/apply/${FEATURED_LISTING_ID}`;
 
@@ -36,7 +36,7 @@ const STEPS = [
 ];
 
 export default function Home() {
-  const property = getPropertyById(FEATURED_LISTING_ID)!;
+  const property = demoPropertyById(FEATURED_LISTING_ID)!;
 
   return (
     <div className="min-h-screen bg-white">
@@ -72,7 +72,7 @@ export default function Home() {
 
           <div className="ml-auto flex items-center gap-2">
             <Button asChild variant="ghost">
-              <Link href={LANDLORD_AUTH_HREF}>Sign in / Sign up</Link>
+              <Link href={LANDLORD_SIGN_IN_HREF}>Sign in / Sign up</Link>
             </Button>
           </div>
         </div>
@@ -280,9 +280,10 @@ export default function Home() {
             <BrandWord />
           </div>
           <p className="max-w-xl text-[12px] font-medium leading-5 text-mute">
-            Screening reports are consumer reports under the FCRA. This site is a prototype — names,
-            scores, and tradelines are mock data, and no consumer reporting agency is used. Leaseproof
-            is a working name, not a live trademark claim.
+            Screening reports are consumer reports under the FCRA. Credit, background, and score
+            data shown in Leaseproof today is mock — names, scores, and tradelines are fabricated and
+            no consumer reporting agency is used. Leaseproof is a working name, not a live trademark
+            claim.
           </p>
         </Reveal>
       </footer>

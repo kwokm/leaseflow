@@ -4,6 +4,7 @@ import {
   type ApplyState,
   type LocalFile,
 } from "./types";
+import { ssnLast4 } from "./format";
 import type { ScreeningPackage } from "@/lib/data/mock-data";
 
 const DRAFT_PREFIX = "leaseflow:apply:";
@@ -83,7 +84,7 @@ export function loadDraft(listingId: string, pkg: ScreeningPackage): ApplyState 
 export function saveDraft(state: ApplyState): void {
   if (typeof window === "undefined") return;
   try {
-    // Card details are deliberately never persisted, even in the prototype.
+    // Card details are deliberately never persisted.
     const persisted = withoutPayment(state);
     window.localStorage.setItem(draftKey(state.listingId), JSON.stringify(persisted));
   } catch {
@@ -101,8 +102,12 @@ export function clearDraft(listingId: string): void {
 }
 
 /**
- * Applications submitted from this browser. The dashboard reads these so a
- * freshly submitted application shows up alongside the seeded mock ones.
+ * The applicant's own copy of what they submitted, so their receipt and packet
+ * link keep working in this browser.
+ *
+ * This is NOT the record of the application — that lives in Neon and is what
+ * the landlord's desk reads. Because this copy lingers on a shared device, the
+ * full SSN is reduced to its last four digits before it is written.
  */
 export function loadSubmissions(): ApplyState[] {
   if (typeof window === "undefined") return [];
@@ -127,6 +132,9 @@ export function saveSubmission(state: ApplyState): void {
   if (typeof window === "undefined") return;
   try {
     const persisted = JSON.parse(JSON.stringify(withoutPayment(state))) as ApplyState;
+    // Last four only: enough to render "•••-••-1234" on the packet, and the
+    // full number is not needed again — Experian Connect brokers the share.
+    persisted.personal = { ...persisted.personal, ssn: ssnLast4(state.personal.ssn) };
     stripUrls([
       persisted.idFront,
       persisted.idBack,

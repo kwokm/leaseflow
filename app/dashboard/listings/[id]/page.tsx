@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { use } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ApplicationDesk } from "@/components/desk/application-desk";
@@ -8,8 +8,10 @@ import { DeskToolbar } from "@/components/desk/packet-window";
 import { ListingGallery } from "@/components/listings/photos";
 import { ApplyLinkActions } from "@/components/listings/apply-link-actions";
 import { Button } from "@/components/ui/button";
-import { getPropertyById, type Applicant } from "@/lib/data/mock-data";
-import { loadDeskApplicantsForListing, listingRollup } from "@/lib/desk/queue";
+import type { Applicant } from "@/lib/data/mock-data";
+import { useProperty } from "@/lib/listings/use-property";
+import { useDeskApplicantsForListing } from "@/lib/desk/use-desk-applicants";
+import { listingRollup } from "@/lib/desk/queue";
 import { shortAddress } from "@/lib/desk/display";
 import { Reveal } from "@/components/motion/reveal";
 
@@ -19,15 +21,8 @@ export default function ListingDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const [property, setProperty] = useState(() => getPropertyById(id));
-  const [applicants, setApplicants] = useState<Applicant[]>([]);
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    setProperty(getPropertyById(id));
-    setApplicants(loadDeskApplicantsForListing(id));
-    setReady(true);
-  }, [id]);
+  const { property, ready } = useProperty(id);
+  const { applicants }: { applicants: Applicant[] } = useDeskApplicantsForListing(id);
 
   if (ready && !property) notFound();
   if (!property) return null;

@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { ArrowLeft, ArrowRight, Lock } from "lucide-react";
 import { BrandMark, BrandWord } from "@/components/brand";
 import { PacketWindow } from "@/components/desk/packet-window";
@@ -20,6 +21,11 @@ import type { StepProps } from "@/components/apply/step-shell";
 import { clearDraft, loadDraft, saveDraft, saveSubmission } from "@/lib/apply/storage";
 import { localApplicantId } from "@/lib/apply/to-packet";
 import {
+  fetchApplicationStatus,
+  submitApplication,
+  type SubmitOutcome,
+} from "@/lib/apply/submit";
+import {
   APPLY_STEP,
   APPLY_STEPPER,
   TOTAL_STEPS,
@@ -30,15 +36,6 @@ import type { StepErrors } from "@/lib/apply/validate";
 import { firstErrorKey, validateStep } from "@/lib/apply/validate";
 import type { Property } from "@/lib/data/mock-data";
 import { cn } from "@/lib/utils";
-
-function newConfirmationId(): string {
-  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let suffix = "";
-  for (let i = 0; i < 6; i += 1) {
-    suffix += alphabet[Math.floor(Math.random() * alphabet.length)];
-  }
-  return `LP-${suffix}`;
-}
 
 const STEP_COMPONENTS: Record<number, (props: StepProps) => React.ReactElement> = {
   [APPLY_STEP.you]: StageYou,
@@ -55,7 +52,12 @@ export function ApplyWizard({ property }: { property: Property }) {
   const [errors, setErrors] = React.useState<StepErrors>({});
   const [hydrated, setHydrated] = React.useState(false);
   const [direction, setDirection] = React.useState(1);
+  const [submitting, setSubmitting] = React.useState(false);
+  const [submitError, setSubmitError] = React.useState<string | null>(null);
   const headingRef = React.useRef<HTMLDivElement>(null);
+  const searchParams = useSearchParams();
+  const checkout = searchParams.get("checkout");
+  const returnedApplicationId = searchParams.get("application");
 
   // Draft lives in localStorage; load it once the component is on the client.
   React.useEffect(() => {
@@ -93,24 +95,97 @@ export function ApplyWizard({ property }: { property: Property }) {
     if (hydrated) headingRef.current?.focus();
   }, [step, hydrated]);
 
-  const submit = () => {
-    const now = new Date().toISOString();
-    const confirmationId = newConfirmationId();
-    const submitted: ApplyState = {
-      ...state,
-      submittedAt: now,
-      confirmationId,
-      consent: { ...state.consent, acceptedAt: now },
-      step: APPLY_STEP.done,
-      furthestStep: APPLY_STEP.done,
+  /** Shows the receipt once payment is settled (or skipped in demo). */
+  const finish = React.useCallback(
+    (applicationId: string, confirmationId: string, demoSkipped: boolean) => {
+      const now = new Date().toISOString();
+      setDirection(1);
+      setState((current) => {
+        const submitted: ApplyState = {
+          ...current,
+          applicationId,
+          confirmationId,
+          submittedAt: current.submittedAt ?? now,
+          consent: { ...current.consent, acceptedAt: current.consent.acceptedAt ?? now },
+          payment: { stage: "paid", paidAt: now, demoSkipped },
+          step: APPLY_STEP.done,
+          furthestStep: APPLY_STEP.done,
+        };
+        // The applicant's own copy, so their receipt and packet link survive a
+        // reload. Neon holds the record the landlord sees.
+        saveSubmission(submitted);
+        return submitted;
+      });
+      clearDraft(property.id);
+      setErrors({});
+      if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "auto" });
+    },
+    [property.id]
+  );
+
+  /**
+   * Returning from Stripe. The redirect is not proof of payment, so the receipt
+   * is only shown once the server confirms the webhook marked it paid.
+   */
+  React.useEffect(() => {
+    if (!hydrated || checkout !== "success" || !returnedApplicationId) return;
+
+    let active = true;
+    let attempts = 0;
+
+    const poll = async () => {
+      const status = await fetchApplicationStatus(returnedApplicationId);
+      if (!active) return;
+
+      if (status?.paid) {
+        finish(returnedApplicationId, status.confirmationId, false);
+        return;
+      }
+
+      attempts += 1;
+      if (attempts < 10) {
+        window.setTimeout(poll, 1000);
+      } else if (status) {
+        // Paid at Stripe but the webhook has not arrived. Say so rather than
+        // showing a receipt we cannot stand behind.
+        setSubmitError(
+          "Your payment went through, but we are still confirming it. Refresh in a moment."
+        );
+      }
     };
 
-    setDirection(1);
-    setState(submitted);
-    saveSubmission(submitted);
-    clearDraft(property.id);
-    setErrors({});
-    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "auto" });
+    void poll();
+    return () => {
+      active = false;
+    };
+  }, [checkout, returnedApplicationId, hydrated, finish]);
+
+  React.useEffect(() => {
+    if (checkout === "cancelled") {
+      setSubmitError("Checkout was cancelled — nothing was charged.");
+    }
+  }, [checkout]);
+
+  const submit = async () => {
+    setSubmitting(true);
+    setSubmitError(null);
+
+    const outcome: SubmitOutcome = await submitApplication(state);
+
+    if (outcome.kind === "error") {
+      setSubmitError(outcome.message);
+      setSubmitting(false);
+      return;
+    }
+
+    if (outcome.kind === "checkout") {
+      // Leaves the app; the draft stays put in case the applicant comes back.
+      window.location.assign(outcome.url);
+      return;
+    }
+
+    finish(outcome.applicationId, outcome.confirmationId, true);
+    setSubmitting(false);
   };
 
   const goNext = () => {
@@ -125,7 +200,7 @@ export function ApplyWizard({ property }: { property: Property }) {
     }
 
     if (step === APPLY_STEP.pay) {
-      submit();
+      void submit();
       return;
     }
     moveTo(Math.min(step + 1, TOTAL_STEPS));
@@ -161,7 +236,7 @@ export function ApplyWizard({ property }: { property: Property }) {
 
           <p className="ml-auto hidden items-center gap-1.5 text-[13px] font-medium text-mute sm:flex">
             <Lock className="h-3.5 w-3.5" aria-hidden />
-            Saved in this browser
+            Your draft is saved as you go
           </p>
         </div>
       </header>
@@ -209,6 +284,15 @@ export function ApplyWizard({ property }: { property: Property }) {
               </div>
             )}
 
+            {submitError && (
+              <div
+                role="alert"
+                className="mb-5 rounded-btn border border-no bg-no-bg px-4 py-3 text-[14px] font-medium leading-5 tracking-[-0.14px] text-no"
+              >
+                {submitError}
+              </div>
+            )}
+
             <StepTransition step={step} direction={direction}>
               <StepComponent
                 state={state}
@@ -232,8 +316,18 @@ export function ApplyWizard({ property }: { property: Property }) {
               )}
 
               {step < APPLY_STEP.done ? (
-                <Button type="button" size="touch" onClick={goNext} className="sm:min-w-[168px]">
-                  {step === APPLY_STEP.pay ? "Pay and submit" : "Continue"}
+                <Button
+                  type="button"
+                  size="touch"
+                  onClick={goNext}
+                  disabled={submitting}
+                  className="sm:min-w-[168px]"
+                >
+                  {step === APPLY_STEP.pay
+                    ? submitting
+                      ? "Opening checkout…"
+                      : "Pay and submit"
+                    : "Continue"}
                   <ArrowRight className="h-4 w-4" aria-hidden />
                 </Button>
               ) : (
@@ -253,7 +347,7 @@ export function ApplyWizard({ property }: { property: Property }) {
 
       <footer className="relative z-10 print:hidden">
         <Reveal className="mx-auto flex max-w-shell flex-wrap items-center justify-between gap-3 px-5 py-6 text-[13px] font-medium text-mute sm:px-8">
-          <p>Demo prototype · mock data only, no consumer reporting agency is used.</p>
+          <p>Credit sharing is handled by Experian Connect. Payment is handled by Stripe.</p>
           <Link href="/" className="text-ink-2 transition-colors duration-240 ease-premium hover:text-ink">
             Back to Leaseproof
           </Link>

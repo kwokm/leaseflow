@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   getAllApplications,
   type Applicant,
   type ApplicationStatus,
 } from "@/lib/data/mock-data";
-import { loadDeskApplicants } from "@/lib/desk/queue";
+import { useDeskApplicants } from "@/lib/desk/use-desk-applicants";
 import { ApplicationTable } from "@/components/desk/application-table";
 import { DeskPill, DeskToolbar } from "@/components/desk/packet-window";
 import { ScreeningDemo } from "@/components/demos/screening";
@@ -27,12 +27,11 @@ export function ApplicationDesk({
   selectedId?: string;
   preview?: boolean;
 }) {
-  const [rows, setRows] = useState<Applicant[]>(() => (preview ? getAllApplications() : []));
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
-
-  useEffect(() => {
-    setRows(preview ? getAllApplications() : loadDeskApplicants());
-  }, [preview]);
+  // `preview` is the marketing screenshot on the landing page, which is always
+  // the seeded catalogue; the real desk reads the queue from Neon.
+  const { applicants } = useDeskApplicants();
+  const rows: Applicant[] = preview ? getAllApplications() : applicants;
 
   const scoped = useMemo(() => {
     return rows.filter((row) => {

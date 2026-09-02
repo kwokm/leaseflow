@@ -13,8 +13,7 @@ export function StepYou({ state, patch, errors, embedded }: StepProps) {
   return (
     <StepChrome embedded={embedded} lead="About you." tone="Sensitive fields stay masked.">
       <p className="max-w-xl text-[15px] font-medium leading-[21px] tracking-[-0.16px] text-mute">
-        This is a prototype — do not enter real personal details. Anything you type stays in this
-        browser.
+        Nothing reaches the landlord until you submit. Until then your draft stays in this browser.
       </p>
 
       <Panel title="Your name and contact">
