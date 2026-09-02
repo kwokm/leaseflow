@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -98,7 +98,7 @@ export default function NewListingPage() {
 
       applyListing(payload.listing, payload.note ?? "Listing pulled.");
     } catch {
-      setPullError("Could not reach the import. Try the seeded Anaheim URL, or fill the fields by hand.");
+      setPullError("Could not reach the import. Try the seeded Irvine listing, or fill the fields by hand.");
     } finally {
       setPulling(false);
     }
@@ -150,7 +150,7 @@ export default function NewListingPage() {
               <CardHeader>
                 <CardTitle>Paste a Zillow link</CardTitle>
                 <CardDescription>
-                  Homedetails URLs only. The seeded Anaheim listing always fills even if Zillow blocks a live pull.
+                  Homedetails URLs only. The seeded Irvine listing always fills even if Zillow blocks a live pull.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -189,7 +189,7 @@ export default function NewListingPage() {
                       void pullListing(SEEDED_ZILLOW_URL);
                     }}
                   >
-                    Use the seeded Anaheim listing
+                    Use the seeded Irvine listing
                   </button>
                 </div>
 
@@ -235,7 +235,7 @@ export default function NewListingPage() {
                       id="bedrooms"
                       type="number"
                       min="0"
-                      placeholder="3"
+                      placeholder="4"
                       value={formData.bedrooms}
                       onChange={(e) => setFormData({ ...formData, bedrooms: e.target.value })}
                       required
@@ -248,7 +248,7 @@ export default function NewListingPage() {
                       type="number"
                       min="0"
                       step="0.5"
-                      placeholder="2"
+                      placeholder="3.5"
                       value={formData.bathrooms}
                       onChange={(e) => setFormData({ ...formData, bathrooms: e.target.value })}
                       required
@@ -260,7 +260,7 @@ export default function NewListingPage() {
                       id="sqft"
                       type="number"
                       min="0"
-                      placeholder="1594"
+                      placeholder="3010"
                       value={formData.sqft}
                       onChange={(e) => setFormData({ ...formData, sqft: e.target.value })}
                     />
@@ -271,7 +271,7 @@ export default function NewListingPage() {
                       id="rent"
                       type="number"
                       min="0"
-                      placeholder="4700"
+                      placeholder="6500"
                       value={formData.rent}
                       onChange={(e) => setFormData({ ...formData, rent: e.target.value })}
                       required
