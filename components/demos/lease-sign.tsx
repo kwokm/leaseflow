@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { DemoPlay } from "@/components/demos/shell";
 
@@ -12,7 +12,7 @@ const STEPS: readonly { label: string; note: string; active?: boolean }[] = [
 export function LeaseSignDemo() {
   return (
     <DemoPlay>
-      <p className="text-[12px] font-medium text-mute">Jane Doe · 510 S Resh St</p>
+      <p className="text-[12px] font-medium text-mute">Jane Doe · 170 Chorus</p>
       <ol className="mt-3 space-y-2">
         {STEPS.map((step, index) => (
           <li
