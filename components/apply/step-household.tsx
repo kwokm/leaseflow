@@ -3,8 +3,7 @@
 import { Plus, Scale, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox, Field, FieldError } from "@/components/apply/field";
-import { StepBody } from "@/components/apply/motion";
-import { Note, Panel, StepHeading } from "@/components/apply/step-shell";
+import { Note, Panel, StepChrome } from "@/components/apply/step-shell";
 import type { StepProps } from "@/components/apply/step-shell";
 import type { HouseholdInfo, OccupantEntry, PetEntry } from "@/lib/apply/types";
 
@@ -15,7 +14,7 @@ function rowId(prefix: string): string {
   return `${prefix}-${Math.random().toString(36).slice(2)}`;
 }
 
-export function StepHousehold({ state, patch, errors }: StepProps) {
+export function StepHousehold({ state, patch, errors, embedded }: StepProps) {
   const household = state.household;
   const set = (partial: Partial<HouseholdInfo>) =>
     patch({ household: { ...household, ...partial } });
@@ -31,9 +30,7 @@ export function StepHousehold({ state, patch, errors }: StepProps) {
     });
 
   return (
-    <StepBody>
-      <StepHeading lead="Household." tone="Optional, but it speeds up review." />
-
+    <StepChrome embedded={embedded} lead="Household." tone="Optional, but it speeds up review.">
       <Panel title="Pets" description="List anything that will live at the property.">
         <div className="space-y-4">
           {household.pets.length === 0 && (
@@ -223,6 +220,6 @@ export function StepHousehold({ state, patch, errors }: StepProps) {
       </Panel>
 
       <Note>You can skip everything on this step and still submit your application.</Note>
-    </StepBody>
+    </StepChrome>
   );
 }
