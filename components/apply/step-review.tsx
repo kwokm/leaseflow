@@ -20,7 +20,7 @@ import {
   maskSsn,
 } from "@/lib/apply/format";
 import { getScreeningFee } from "@/lib/data/mock-data";
-import type { ConsentInfo, PaymentInfo } from "@/lib/apply/types";
+import { APPLY_STEP, type ConsentInfo, type PaymentInfo } from "@/lib/apply/types";
 
 function ReviewBlock({
   title,
@@ -68,7 +68,7 @@ export function StepReview({ state, patch, errors, property, goTo }: StepProps) 
     <StepBody>
       <StepHeading lead="Review and pay." tone="Last look before it goes out." />
 
-      <ReviewBlock title="You" step={2} goTo={goTo}>
+      <ReviewBlock title="You" step={APPLY_STEP.you} goTo={goTo}>
         <SummaryRow label="Name" value={`${p.firstName} ${p.lastName}`.trim() || "—"} />
         <SummaryRow label="Email" value={p.email || "—"} />
         <SummaryRow label="Phone" value={p.phone || "—"} />
@@ -77,12 +77,12 @@ export function StepReview({ state, patch, errors, property, goTo }: StepProps) 
         <SummaryRow label="Address" value={address || "—"} />
       </ReviewBlock>
 
-      <ReviewBlock title="Photo ID" step={3} goTo={goTo}>
+      <ReviewBlock title="Photo ID" step={APPLY_STEP.proof} goTo={goTo}>
         <SummaryRow label="Front" value={state.idFront?.name ?? "Missing"} />
         <SummaryRow label="Back" value={state.idBack?.name ?? "Missing"} />
       </ReviewBlock>
 
-      <ReviewBlock title="Income" step={4} goTo={goTo}>
+      <ReviewBlock title="Income" step={APPLY_STEP.proof} goTo={goTo}>
         <SummaryRow label="Employer" value={state.income.employer || "—"} />
         <SummaryRow label="Position" value={state.income.position || "—"} />
         <SummaryRow
@@ -103,7 +103,7 @@ export function StepReview({ state, patch, errors, property, goTo }: StepProps) 
         />
       </ReviewBlock>
 
-      <ReviewBlock title="Bank" step={5} goTo={goTo}>
+      <ReviewBlock title="Bank" step={APPLY_STEP.proof} goTo={goTo}>
         <SummaryRow label="Bank" value={state.bank.bankName || "—"} />
         <SummaryRow
           label="Account"
@@ -140,14 +140,14 @@ export function StepReview({ state, patch, errors, property, goTo }: StepProps) 
         </div>
       </section>
 
-      <ReviewBlock title="Credit report" step={6} goTo={goTo}>
+      <ReviewBlock title="Credit report" step={APPLY_STEP.credit} goTo={goTo}>
         <SummaryRow label="Source" value="Experian (demo)" />
         <SummaryRow label="Score" value={state.experian.score ?? "Not connected"} />
         <SummaryRow label="Pulled" value={formatDateTime(state.experian.pulledAt)} />
         <SummaryRow label="Extra Experian fee" value="$0.00" />
       </ReviewBlock>
 
-      <ReviewBlock title="Household" step={7} goTo={goTo}>
+      <ReviewBlock title="Household" step={APPLY_STEP.you} goTo={goTo}>
         <SummaryRow
           label="Pets"
           value={
