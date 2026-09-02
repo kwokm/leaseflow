@@ -92,7 +92,7 @@ export default function Home() {
             </p>
             <div className="hero-ctas reveal-cta">
               <Button asChild variant="lilac" size="cta">
-                <Link href={LANDLORD_AUTH_HREF}>Screen as Landlord</Link>
+                <Link href="/dashboard">Screen as Landlord</Link>
               </Button>
               <Button asChild variant="outline" size="cta">
                 <Link href={APPLY_HREF}>Apply as renter</Link>

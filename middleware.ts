@@ -1,14 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { LANDLORD_SESSION_COOKIE } from "@/lib/auth/constants";
 
-export function middleware(request: NextRequest) {
-  if (request.cookies.has(LANDLORD_SESSION_COOKIE)) {
-    return NextResponse.next();
-  }
-
-  const signIn = new URL("/signin", request.url);
-  signIn.searchParams.set("next", `${request.nextUrl.pathname}${request.nextUrl.search}`);
-  return NextResponse.redirect(signIn);
+/** Prototype review: the desk is open without sign-in. Re-enable the session cookie check before production. */
+export function middleware(_request: NextRequest) {
+  return NextResponse.next();
 }
 
 export const config = {
