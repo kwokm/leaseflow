@@ -21,7 +21,7 @@ import {
   getApplicantById,
   getApplicationDetails,
   getExperianPull,
-  getPropertyById,
+  demoPropertyById,
   getReportByApplicant,
   groupDocuments,
 } from "@/lib/data/mock-data";
@@ -106,7 +106,7 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
   const applicant = seeded
     ? { ...withDecision(seeded), ...(statusOverride ? { status: statusOverride } : {}) }
     : undefined;
-  const property = applicant ? getPropertyById(applicant.propertyId) : undefined;
+  const property = applicant ? demoPropertyById(applicant.propertyId) : undefined;
   const report = local
     ? submission
       ? submissionReport(submission)
@@ -301,7 +301,7 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
         )}
       </Section>
 
-      <Section title="Experian (demo)">
+      <Section title="Experian Connect">
         {experian ? (
           <dl>
             <Row label="Provider" value={experian.provider} />

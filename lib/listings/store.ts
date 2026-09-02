@@ -1,32 +1,4 @@
-import {
-  FEATURED_LISTING_ID,
-  getAllProperties,
-  mockProperties,
-  type Property,
-} from "@/lib/data/mock-data";
-
-const STORED_LISTINGS_KEY = "leaseflow.listings.v2";
-
-export function loadStoredListings(): Property[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = window.localStorage.getItem(STORED_LISTINGS_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw) as Property[];
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
-
-export function saveListing(listing: Property): Property {
-  if (typeof window === "undefined") return listing;
-  const seeded = mockProperties.some((row) => row.id === listing.id);
-  if (seeded) return { ...listing };
-  const rest = loadStoredListings().filter((row) => row.id !== listing.id);
-  window.localStorage.setItem(STORED_LISTINGS_KEY, JSON.stringify([listing, ...rest]));
-  return listing;
-}
+import { FEATURED_LISTING_ID, type Property } from "@/lib/data/mock-data";
 
 export function listingThumb(listing: Property): string | undefined {
   return listing.photos?.[0];
@@ -36,4 +8,34 @@ export function featuredListingId(): string {
   return FEATURED_LISTING_ID;
 }
 
-export { getAllProperties };
+/** Persist a new listing to Neon. Throws with the server's message on failure. */
+export async function createListing(input: {
+  address: string;
+  rent: number;
+  bedrooms: number;
+  bathrooms: number;
+  sqft?: number;
+  availableDate?: string;
+  photos?: string[];
+  neighborhood?: string;
+  propertyType?: string;
+  zillowUrl?: string;
+  zpid?: string;
+}): Promise<Property> {
+  const response = await fetch("/api/listings", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(input),
+  });
+
+  const payload = (await response.json().catch(() => ({}))) as {
+    listing?: Property;
+    error?: string;
+  };
+
+  if (!response.ok || !payload.listing) {
+    throw new Error(payload.error ?? "Could not save that listing.");
+  }
+
+  return payload.listing;
+}

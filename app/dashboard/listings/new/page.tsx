@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { ArrowLeft, Check } from "lucide-react";
 import { Reveal, RevealItem, RevealStagger } from "@/components/motion/reveal";
 import { ListingPhotoStrip } from "@/components/listings/photos";
-import { saveListing } from "@/lib/listings/store";
+import { createListing } from "@/lib/listings/store";
 import { SEEDED_ZILLOW_URL } from "@/lib/listings/zillow";
 import {
   STANDARD_SCREENING_FEE,
@@ -59,6 +59,8 @@ export default function NewListingPage() {
   const [pullError, setPullError] = useState<string | null>(null);
   const [pulled, setPulled] = useState<Property | null>(null);
   const [formData, setFormData] = useState<FormState>(EMPTY_FORM);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const applyListing = (listing: Property, note: string) => {
     setPulled(listing);
@@ -104,28 +106,32 @@ export default function NewListingPage() {
     }
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    const listingId = pulled?.id ?? `listing-${Date.now()}`;
-    const listing: Property = {
-      id: listingId,
-      address: formData.address,
-      rent: Number(formData.rent) || 0,
-      bedrooms: Number(formData.bedrooms) || 0,
-      bathrooms: Number(formData.bathrooms) || 0,
-      availableDate: formData.availableDate,
-      screeningPackage: "standard",
-      applyUrl: `/apply/${listingId}`,
-      createdAt: pulled?.createdAt ?? new Date().toISOString(),
-      photos: pulled?.photos ?? [],
-      sqft: formData.sqft ? Number(formData.sqft) : pulled?.sqft,
-      zillowUrl: pulled?.zillowUrl ?? zillowUrl.trim() ?? undefined,
-      zpid: pulled?.zpid,
-      neighborhood: pulled?.neighborhood,
-      propertyType: pulled?.propertyType,
-    };
-    saveListing(listing);
-    router.push(`/dashboard/listings/${listing.id}`);
+    setSaving(true);
+    setSaveError(null);
+
+    try {
+      // The id is assigned by the database, so the apply link is only known
+      // once the row exists.
+      const listing = await createListing({
+        address: formData.address,
+        rent: Number(formData.rent) || 0,
+        bedrooms: Number(formData.bedrooms) || 0,
+        bathrooms: Number(formData.bathrooms) || 0,
+        availableDate: formData.availableDate,
+        photos: pulled?.photos ?? [],
+        sqft: formData.sqft ? Number(formData.sqft) : pulled?.sqft,
+        zillowUrl: pulled?.zillowUrl ?? zillowUrl.trim() ?? undefined,
+        zpid: pulled?.zpid,
+        neighborhood: pulled?.neighborhood,
+        propertyType: pulled?.propertyType,
+      });
+      router.push(`/dashboard/listings/${listing.id}`);
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : "Could not save that listing.");
+      setSaving(false);
+    }
   };
 
   return (
@@ -335,9 +341,17 @@ export default function NewListingPage() {
           </RevealItem>
 
           <RevealItem>
+            {saveError ? (
+              <p
+                role="alert"
+                className="mb-3 rounded-btn border border-no bg-no-bg px-4 py-3 text-[14px] font-medium leading-5 text-no"
+              >
+                {saveError}
+              </p>
+            ) : null}
             <div className="flex gap-4">
-              <Button type="submit" size="lg" className="flex-1">
-                Create Listing
+              <Button type="submit" size="lg" className="flex-1" disabled={saving}>
+                {saving ? "Creating…" : "Create Listing"}
               </Button>
               <Link href="/dashboard">
                 <Button type="button" variant="outline" size="lg">

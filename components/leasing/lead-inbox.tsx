@@ -9,7 +9,7 @@ import { LeadAgentDemo } from "@/components/demos/lead-agent";
 import { MarketplaceDemo } from "@/components/demos/marketplace";
 import { LEAD_THREADS, channelLabel, type LeadChannel } from "@/lib/leasing/ops";
 import { shortAddress } from "@/lib/desk/display";
-import { getPropertyById } from "@/lib/data/mock-data";
+import { demoPropertyById } from "@/lib/data/mock-data";
 import { cn } from "@/lib/utils";
 
 type Filter = "all" | LeadChannel;
@@ -23,7 +23,7 @@ export function LeadInbox() {
     [filter],
   );
   const active = threads.find((thread) => thread.id === activeId) ?? threads[0];
-  const property = active ? getPropertyById(active.listingId) : undefined;
+  const property = active ? demoPropertyById(active.listingId) : undefined;
 
   return (
     <Reveal>

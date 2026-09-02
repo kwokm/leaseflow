@@ -320,46 +320,22 @@ export {
 };
 
 // Helper functions
-const STORED_LISTINGS_KEY = "leaseflow.listings.v2";
-const DEMO_DATA_KEY = "leaseproof.demo.loaded";
 
-function readStoredListings(): Property[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = window.localStorage.getItem(STORED_LISTINGS_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw) as Property[];
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
+/**
+ * The sample Irvine catalogue. Real listings live in Neon and are read through
+ * lib/listings/service.ts; these are only merged in when LEASEPROOF_DEMO=1, so
+ * a new landlord sees a genuinely empty pipeline.
+ */
+export function demoProperties(): Property[] {
+  return mockProperties;
 }
 
-export function getPropertyById(id: string): Property | undefined {
-  const stored = readStoredListings().find((p) => p.id === id);
-  const seeded = mockProperties.find((p) => p.id === id);
-  return stored ?? seeded;
-}
-
-export function isDemoDataLoaded(): boolean {
-  if (typeof window === "undefined") return false;
-  return window.localStorage.getItem(DEMO_DATA_KEY) === "true";
-}
-
-export function loadDemoData(): void {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(DEMO_DATA_KEY, "true");
-}
-
-export function getAllProperties(): Property[] {
-  const byId = new Map<string, Property>();
-  const seedIds = new Set(mockProperties.map((property) => property.id));
-  for (const property of mockProperties) byId.set(property.id, property);
-  for (const row of readStoredListings()) {
-    if (seedIds.has(row.id)) continue;
-    byId.set(row.id, row);
-  }
-  return [...byId.values()];
+/**
+ * Demo-catalogue lookup. Used by the marketing surfaces and by the seeded
+ * applicant tables, which reference these ids directly.
+ */
+export function demoPropertyById(id: string): Property | undefined {
+  return mockProperties.find((p) => p.id === id);
 }
 
 export function getApplicantById(id: string): Applicant | undefined {

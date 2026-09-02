@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { StepBody } from "@/components/apply/motion";
 import { Note, Panel, StepHeading, SummaryRow } from "@/components/apply/step-shell";
 import type { StepProps } from "@/components/apply/step-shell";
-import { formatDateTime, formatMoney, maskCardNumber } from "@/lib/apply/format";
+import { formatDateTime, formatMoney } from "@/lib/apply/format";
 import { getScreeningFee } from "@/lib/data/mock-data";
 import { applyingWithNames, localApplicantId, submissionDocuments } from "@/lib/apply/to-packet";
 
@@ -61,24 +61,35 @@ export function StepDone({ state, property }: StepProps) {
             value={formatMoney(fee)}
           />
           <SummaryRow label="Experian — included" value="$0 extra" />
-          <SummaryRow label="Paid with" value={maskCardNumber(state.payment.cardNumber)} />
+          <SummaryRow
+            label="Paid with"
+            value={state.payment.demoSkipped ? "Not charged (demo)" : "Card via Stripe"}
+          />
           <SummaryRow
             label="Total paid"
-            value={<span className="num text-[16px] font-semibold">{formatMoney(fee)}</span>}
+            value={
+              <span className="num text-[16px] font-semibold">
+                {state.payment.demoSkipped ? formatMoney(0) : formatMoney(fee)}
+              </span>
+            }
           />
         </dl>
 
-        <p className="mt-4 border-t border-line pt-3 text-[12px] font-medium leading-4 text-mute">
-          Demo receipt. No card was charged and no consumer reporting agency was contacted.
-        </p>
+        {state.payment.demoSkipped ? (
+          <p className="mt-4 border-t border-line pt-3 text-[12px] font-medium leading-4 text-mute">
+            Demo receipt — no card was charged.
+          </p>
+        ) : null}
       </section>
 
       <Panel title="What the landlord received">
         <dl>
-          <SummaryRow label="Credit score" value={state.experian.score ?? "—"} />
-          <SummaryRow label="Credit source" value="Experian (demo)" />
+          <SummaryRow
+            label="Credit score"
+            value={state.experian.score ?? "Runs after payment clears"}
+          />
+          <SummaryRow label="Credit source" value="Experian Connect" />
           <SummaryRow label="Documents" value={`${documents.length} files`} />
-          <SummaryRow label="Background" value="Mock public-records note" />
           <SummaryRow label="Signed" value={state.consent.signature || "—"} />
         </dl>
 
@@ -106,7 +117,8 @@ export function StepDone({ state, property }: StepProps) {
       </div>
 
       <Note>
-        This prototype keeps your application in this browser only. Clearing site data removes it.
+        Your application has been sent to the landlord. Keep the confirmation code above — it is how
+        you and the landlord refer to this packet.
       </Note>
     </StepBody>
   );

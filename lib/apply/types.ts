@@ -1,11 +1,14 @@
 import type { ScreeningPackage } from "@/lib/data/mock-data";
 
-export const APPLY_STATE_VERSION = 6;
+export const APPLY_STATE_VERSION = 7;
 
 /**
- * A file the renter picked in the browser. `url` is an object URL that only
- * lives for the current page session — nothing is uploaded anywhere, so after a
- * reload we keep the metadata and drop the preview.
+ * A file the renter attached.
+ *
+ * `storedUrl` is the durable Blob URL and survives reloads. `url` is a local
+ * object URL used for an instant preview before the upload finishes (and as the
+ * only preview when Blob storage is not configured); it is per-session, so it is
+ * dropped when a draft is rehydrated.
  */
 export interface LocalFile {
   id: string;
@@ -13,6 +16,8 @@ export interface LocalFile {
   size: number;
   mime: string;
   url?: string;
+  storedUrl?: string;
+  pathname?: string;
   addedAt: string;
 }
 
@@ -43,10 +48,23 @@ export interface BankInfo {
   accountLast4: string;
 }
 
-export type ExperianStatus = "idle" | "authorizing" | "pulling" | "connected" | "skipped";
+/**
+ * `authorized` is the resting state under charge-then-screen: the applicant has
+ * permissioned the Experian Connect share, but the report is not requested until
+ * the $24.99 fee is captured. `connected` means a summary has come back.
+ */
+export type ExperianStatus =
+  | "idle"
+  | "authorizing"
+  | "authorized"
+  | "pulling"
+  | "connected"
+  | "skipped";
 
 export interface ExperianState {
   status: ExperianStatus;
+  /** Opaque Connect share reference. Never a credential, never the report. */
+  shareReference?: string;
   score?: number;
   scoreModel?: string;
   pulledAt?: string;
@@ -87,12 +105,19 @@ export interface ConsentInfo {
   acceptedAt?: string;
 }
 
-export interface PaymentInfo {
-  cardName: string;
-  cardNumber: string;
-  expiry: string;
-  cvc: string;
-  billingZip: string;
+/**
+ * Card details are collected by Stripe Checkout on Stripe's own page — they
+ * never touch this app, so this only tracks where the applicant is in the
+ * hand-off.
+ */
+export type PaymentStage = "unpaid" | "redirecting" | "paid";
+
+export interface PaymentState {
+  stage: PaymentStage;
+  checkoutSessionId?: string;
+  paidAt?: string;
+  /** Set when Stripe is not configured and the demo flow skipped the charge. */
+  demoSkipped?: boolean;
 }
 
 export interface LicenseInfo {
@@ -196,8 +221,10 @@ export interface ApplyState {
   experian: ExperianState;
   household: HouseholdInfo;
   consent: ConsentInfo;
-  payment: PaymentInfo;
+  payment: PaymentState;
   rental: RentalProfile;
+  /** Server-side application id, set once the packet is written to Neon. */
+  applicationId?: string;
   submittedAt?: string;
   confirmationId?: string;
 }
@@ -237,15 +264,15 @@ export const APPLY_STEPS: StepDefinition[] = [
     name: "Proof",
     title: "Proof",
     lead: "Photo ID, income, and bank",
-    tone: "uploads stay on this device.",
+    tone: "uploads are stored securely for this application.",
   },
   {
     id: APPLY_STEP.credit,
     key: "credit",
     name: "Credit",
     title: "Credit report",
-    lead: "Connect with Experian",
-    tone: "included in Standard, and it never affects your score.",
+    lead: "Share through Experian Connect",
+    tone: "included in the Standard fee.",
   },
   {
     id: APPLY_STEP.pay,
@@ -462,13 +489,7 @@ export function createInitialState(listingId: string, pkg: ScreeningPackage): Ap
       notes: "",
     },
     consent: { fcra: false, backgroundAck: false, signature: "" },
-    payment: {
-      cardName: "",
-      cardNumber: "",
-      expiry: "",
-      cvc: "",
-      billingZip: "",
-    },
+    payment: { stage: "unpaid" },
     rental: emptyRentalProfile(),
   };
 }
@@ -542,13 +563,7 @@ export function createDemoState(listingId: string, pkg: ScreeningPackage): Apply
       backgroundAck: true,
       signature: "Jane Doe",
     },
-    payment: {
-      cardName: "Jane Doe",
-      cardNumber: "4242424242424242",
-      expiry: "12/28",
-      cvc: "123",
-      billingZip: "94102",
-    },
+    payment: { stage: "unpaid" },
     rental: demoRentalProfile(),
   };
 }

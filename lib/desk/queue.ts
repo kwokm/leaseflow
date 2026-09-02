@@ -1,30 +1,9 @@
-import {
-  getAllApplications,
-  getApplicantsByProperty,
-  isDemoDataLoaded,
-  type Applicant,
-  type ApplicationStatus,
-} from "@/lib/data/mock-data";
-import { loadSubmissions } from "@/lib/apply/storage";
-import { submissionApplicant } from "@/lib/apply/to-packet";
-import { loadDecisions, withDecision } from "@/lib/desk/decisions";
-import { sortDeskFirst } from "@/lib/desk/display";
+import type { Applicant, ApplicationStatus } from "@/lib/data/mock-data";
 
-export function loadDeskApplicants(includeDemo = isDemoDataLoaded()): Applicant[] {
-  const decisions = loadDecisions();
-  const submitted = loadSubmissions().map(submissionApplicant);
-  const seeded = includeDemo ? getAllApplications() : [];
-  return sortDeskFirst([...submitted, ...seeded].map((row) => withDecision(row, decisions)));
-}
-
-export function loadDeskApplicantsForListing(propertyId: string): Applicant[] {
-  const decisions = loadDecisions();
-  const submitted = loadSubmissions()
-    .map(submissionApplicant)
-    .filter((row) => row.propertyId === propertyId);
-  const seeded = isDemoDataLoaded() ? getApplicantsByProperty(propertyId) : [];
-  return sortDeskFirst([...submitted, ...seeded].map((row) => withDecision(row, decisions)));
-}
+/**
+ * Pure rollups over a set of applicants. Fetching now lives in
+ * lib/desk/use-desk-applicants.ts — the queue itself comes from Neon.
+ */
 
 export function leadStatus(statuses: ApplicationStatus[]): ApplicationStatus | undefined {
   if (statuses.includes("approved")) return "approved";

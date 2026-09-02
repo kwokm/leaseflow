@@ -2,7 +2,7 @@ import {
   FEATURED_LISTING_ID,
   getApplicantById,
   getApplicationDetails,
-  getPropertyById,
+  demoPropertyById,
   getReportByApplicant,
   getScreeningFee,
   type Applicant,
@@ -10,6 +10,7 @@ import {
   type Property,
 } from "@/lib/data/mock-data";
 import { loadDraft, loadSubmissions } from "@/lib/apply/storage";
+import { FCRA_PLACEHOLDER_NOTICE } from "@/lib/legal/fcra";
 import { householdIdFromOccupants, isLocalApplicantId, confirmationIdFromApplicantId } from "@/lib/apply/to-packet";
 import { getHousehold } from "@/lib/data/household-model";
 import { maskSsn } from "@/lib/apply/format";
@@ -223,12 +224,11 @@ export function buildRentalApplication(input: {
       packageLabel: "Standard",
       amount: `$${fee.toFixed(2)}`,
       status: state?.submittedAt ? "Paid" : "Collected when the packet is submitted",
-      note: "Applicant pays. Landlord does not collect this fee. Prototype checkout — no card is charged.",
+      note: "Applicant pays through Stripe. The landlord does not collect this fee.",
     },
     ssnDisplay: ssn === "—" ? "Not collected on this form" : ssn,
     noticeTitle: "Background check notice",
-    noticeBody:
-      "The landlord may obtain a consumer report and a public-records background search in connection with this rental. That may include credit, eviction, and criminal-history information from a consumer reporting agency. This page is a short prototype notice — it is not a C.A.R. form and no agency is contacted in this demo. If a live report later leads to an adverse decision, the applicant would receive a notice identifying the agency and explaining dispute rights.",
+    noticeBody: `The landlord may obtain a consumer report and a public-records background search in connection with this rental. That may include credit, eviction, and criminal-history information from a consumer reporting agency. If a report leads to an adverse decision, the applicant receives a notice identifying the agency and explaining dispute rights. This is a summary notice, not a C.A.R. form. ${FCRA_PLACEHOLDER_NOTICE}`,
   };
 }
 
@@ -283,7 +283,7 @@ export function resolveRentalPacket(id: string): {
       (entry) => entry.confirmationId === confirmationIdFromApplicantId(applicantId),
     );
     if (submission) {
-      const property = getPropertyById(submission.listingId) ?? getPropertyById(FEATURED_LISTING_ID);
+      const property = demoPropertyById(submission.listingId) ?? demoPropertyById(FEATURED_LISTING_ID);
       if (!property) return null;
       return {
         application: rentalApplicationFromState(submission, property),
@@ -306,7 +306,7 @@ export function resolveRentalPacket(id: string): {
 
   const applicant = getApplicantById(applicantId) ?? getApplicantById(DEMO_APPLICANT_ID);
   if (!applicant) return null;
-  const property = getPropertyById(applicant.propertyId) ?? getPropertyById(FEATURED_LISTING_ID);
+  const property = demoPropertyById(applicant.propertyId) ?? demoPropertyById(FEATURED_LISTING_ID);
   if (!property) return null;
   const details = getApplicationDetails(applicant.id);
   const report = getReportByApplicant(applicant.id);

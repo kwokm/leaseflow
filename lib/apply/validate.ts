@@ -53,23 +53,24 @@ function validateProof(state: ApplyState, errors: StepErrors): void {
   if (state.statements.length < 1) errors.statements = "Attach at least one bank statement.";
 }
 
+/**
+ * `authorized` is enough to continue: under charge-then-screen the report is
+ * requested after payment, so the applicant has done everything they can here.
+ */
 function validateCredit(state: ApplyState, errors: StepErrors): void {
-  if (state.experian.status !== "connected") {
-    errors.experian = "Connect the demo credit report to continue.";
+  if (state.experian.status !== "connected" && state.experian.status !== "authorized") {
+    errors.experian = "Authorize the Experian Connect share to continue.";
   }
 }
 
+/**
+ * No card validation: Stripe Checkout collects payment details on its own page,
+ * so there is nothing here to check beyond the authorizations.
+ */
 function validatePay(state: ApplyState, errors: StepErrors): void {
   if (!state.consent.fcra) errors.fcra = "You must authorize the screening to continue.";
   if (!state.consent.backgroundAck) errors.backgroundAck = "Acknowledge the background notice.";
   if (!state.consent.signature.trim()) errors.signature = "Type your full name to sign.";
-  if (digits(state.payment.cardNumber).length !== 16) {
-    errors.cardNumber = "Enter a 16-digit demo card number.";
-  }
-  if (!state.payment.cardName.trim()) errors.cardName = "Enter the name on the card.";
-  if (digits(state.payment.expiry).length !== 4) errors.expiry = "Enter an expiry as MM/YY.";
-  if (digits(state.payment.cvc).length < 3) errors.cvc = "Enter the 3-digit security code.";
-  if (digits(state.payment.billingZip).length !== 5) errors.billingZip = "Enter a 5-digit ZIP.";
 }
 
 /** Per-stage required-field checks. Blocks Next and renders inline messages. */

@@ -1,35 +1,65 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FEATURED_LISTING_ID, getAllProperties, getPropertyById, type Property } from "@/lib/data/mock-data";
+import type { Property } from "@/lib/data/mock-data";
 
-export function useProperty(id: string, fallback = false) {
-  const [property, setProperty] = useState<Property | undefined>(() =>
-    typeof window === "undefined" ? getPropertyById(id) : getPropertyById(id),
-  );
+/**
+ * Listings are read over the API so the demo-seed decision is made once, on the
+ * server, from LEASEPROOF_DEMO. Nothing reads localStorage any more.
+ */
+export function useProperties(): { properties: Property[]; ready: boolean } {
+  const [properties, setProperties] = useState<Property[]>([]);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const found = getPropertyById(id) ?? (fallback ? getPropertyById(FEATURED_LISTING_ID) : undefined);
-    setProperty(found);
-    setReady(true);
-  }, [id, fallback]);
+    let active = true;
 
-  return { property, ready };
-}
+    fetch("/api/listings")
+      .then((response) => (response.ok ? response.json() : { listings: [] }))
+      .then((payload: { listings?: Property[] }) => {
+        if (!active) return;
+        setProperties(payload.listings ?? []);
+      })
+      .catch(() => {
+        if (active) setProperties([]);
+      })
+      .finally(() => {
+        if (active) setReady(true);
+      });
 
-export function useProperties() {
-  const [properties, setProperties] = useState<Property[]>(mockSafe());
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    setProperties(getAllProperties());
-    setReady(true);
+    return () => {
+      active = false;
+    };
   }, []);
 
   return { properties, ready };
 }
 
-function mockSafe(): Property[] {
-  return getAllProperties();
+export function useProperty(id: string): { property: Property | undefined; ready: boolean } {
+  const [property, setProperty] = useState<Property | undefined>(undefined);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    setReady(false);
+
+    fetch(`/api/listings/${encodeURIComponent(id)}`)
+      .then((response) => (response.ok ? response.json() : { listing: undefined }))
+      .then((payload: { listing?: Property }) => {
+        if (!active) return;
+        setProperty(payload.listing);
+      })
+      .catch(() => {
+        if (active) setProperty(undefined);
+      })
+      .finally(() => {
+        if (active) setReady(true);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [id]);
+
+  return { property, ready };
 }

@@ -3,7 +3,7 @@
 import { Fragment } from "react";
 import { useRouter } from "next/navigation";
 import type { Applicant } from "@/lib/data/mock-data";
-import { getPropertyById } from "@/lib/data/mock-data";
+import { demoPropertyById } from "@/lib/data/mock-data";
 import { getAiIncome } from "@/lib/data/household-model";
 import { creditScore, incomeMultiple, shortAddress } from "@/lib/desk/display";
 import { householdsFirst, householdTotals, fullName } from "@/lib/desk/household";
@@ -58,7 +58,7 @@ function ApplicantCells({
   showExtras: boolean;
   nested?: boolean;
 }) {
-  const property = getPropertyById(row.propertyId);
+  const property = demoPropertyById(row.propertyId);
   const multiple = incomeMultiple(row);
   const credit = creditScore(row);
   const name = fullName(row);
@@ -156,7 +156,7 @@ export function ApplicationTable({
             }
 
             const totals = householdTotals(group.members);
-            const property = getPropertyById(group.propertyId);
+            const property = demoPropertyById(group.propertyId);
             const firstCompleted =
               group.members.find((row) => row.status === "completed" || row.status === "approved") ??
               group.members[0];

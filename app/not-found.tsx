@@ -3,7 +3,7 @@ import { BrandMark, BrandWord } from "@/components/brand";
 import { SpatialMount, SpatialOrigin } from "@/components/motion/spatial";
 import { PageWash } from "@/components/page-wash";
 import { Button } from "@/components/ui/button";
-import { LANDLORD_AUTH_HREF } from "@/lib/auth/landlord";
+import { LANDLORD_SIGN_IN_HREF } from "@/lib/auth/roles";
 
 export default function NotFound() {
   return (
@@ -36,7 +36,7 @@ export default function NotFound() {
                 <Link href="/">Back to Leaseproof</Link>
               </Button>
               <Button asChild variant="outline">
-                <Link href={LANDLORD_AUTH_HREF}>Open realtor desk</Link>
+                <Link href={LANDLORD_SIGN_IN_HREF}>Open realtor desk</Link>
               </Button>
             </div>
           </section>

@@ -1,5 +1,5 @@
 import {
-  getPropertyById,
+  demoPropertyById,
   getReportByApplicant,
   type Applicant,
   type ApplicationStatus,
@@ -91,7 +91,7 @@ export interface HouseholdTotals {
 }
 
 export function householdTotals(members: Applicant[], rent?: number): HouseholdTotals {
-  const propertyRent = rent ?? getPropertyById(members[0]?.propertyId ?? "")?.rent;
+  const propertyRent = rent ?? demoPropertyById(members[0]?.propertyId ?? "")?.rent;
   const memberScores = members.map((row) => ({
     id: row.id,
     name: fullName(row),

@@ -6,7 +6,7 @@ import type {
   ScreeningReport,
 } from "@/lib/data/mock-data";
 import { ensureHouseholdDemo, type AiIncomeScreen } from "@/lib/data/household-model";
-import { getApplicantsByProperty, getPropertyById } from "@/lib/data/mock-data";
+import { getApplicantsByProperty, demoPropertyById } from "@/lib/data/mock-data";
 import { formatFileSize, ssnLast4 } from "./format";
 import type { ApplyState, LocalFile } from "./types";
 
@@ -122,7 +122,7 @@ export function submissionApplicant(state: ApplyState): Applicant {
 }
 
 export function submissionDetails(state: ApplyState): ApplicationDetails {
-  const property = getPropertyById(state.listingId);
+  const property = demoPropertyById(state.listingId);
   const address = [state.personal.street, state.personal.unit].filter(Boolean).join(" ");
   const fullAddress = [
     address,
