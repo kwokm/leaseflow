@@ -320,7 +320,7 @@ export {
 };
 
 // Helper functions
-const STORED_LISTINGS_KEY = "leaseflow.listings.v1";
+const STORED_LISTINGS_KEY = "leaseflow.listings.v2";
 const DEMO_DATA_KEY = "leaseproof.demo.loaded";
 
 function readStoredListings(): Property[] {
@@ -353,10 +353,12 @@ export function loadDemoData(): void {
 
 export function getAllProperties(): Property[] {
   const byId = new Map<string, Property>();
-  if (isDemoDataLoaded()) {
-    for (const property of mockProperties) byId.set(property.id, property);
+  const seedIds = new Set(mockProperties.map((property) => property.id));
+  for (const property of mockProperties) byId.set(property.id, property);
+  for (const row of readStoredListings()) {
+    if (seedIds.has(row.id)) continue;
+    byId.set(row.id, row);
   }
-  for (const row of readStoredListings()) byId.set(row.id, row);
   return [...byId.values()];
 }
 
