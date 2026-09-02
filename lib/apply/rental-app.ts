@@ -2,6 +2,7 @@ import {
   FEATURED_LISTING_ID,
   getApplicantById,
   getApplicationDetails,
+  getHousehold,
   getPropertyById,
   getReportByApplicant,
   getScreeningFee,
@@ -10,7 +11,7 @@ import {
   type Property,
 } from "@/lib/data/mock-data";
 import { loadDraft, loadSubmissions } from "@/lib/apply/storage";
-import { isLocalApplicantId, confirmationIdFromApplicantId } from "@/lib/apply/to-packet";
+import { householdIdFromOccupants, isLocalApplicantId, confirmationIdFromApplicantId } from "@/lib/apply/to-packet";
 import { maskSsn } from "@/lib/apply/format";
 import {
   createDemoState,
@@ -119,6 +120,14 @@ function filledAt(state?: ApplyState, details?: ApplicationDetails): string {
   );
 }
 
+function householdSize(applicant: Applicant): number {
+  if (!applicant.householdId) return 1;
+  const members = getHousehold(applicant.householdId).filter(
+    (row) => row.propertyId === applicant.propertyId,
+  );
+  return Math.max(members.length, 1);
+}
+
 export function buildRentalApplication(input: {
   id: string;
   applicant: Applicant;
@@ -156,7 +165,7 @@ export function buildRentalApplication(input: {
     listingId: property.id,
     generatedAt: new Date().toISOString(),
     completingAs: "tenant",
-    totalApplicants: rental.totalApplicants || 1,
+    totalApplicants: Math.max(rental.totalApplicants || 1, householdSize(applicant)),
     premises: {
       address: property.address,
       rent: property.rent,
@@ -249,6 +258,7 @@ export function rentalApplicationFromState(state: ApplyState, property: Property
     email: state.personal.email,
     phone: state.personal.phone,
     appliedAt: state.submittedAt ?? new Date().toISOString(),
+    householdId: householdIdFromOccupants(state),
   };
   return buildRentalApplication({
     id: applicant.id,
@@ -286,6 +296,7 @@ export function resolveRentalPacket(id: string): {
           email: submission.personal.email,
           phone: submission.personal.phone,
           appliedAt: submission.submittedAt ?? new Date().toISOString(),
+          householdId: householdIdFromOccupants(submission),
         },
         property,
         state: submission,
