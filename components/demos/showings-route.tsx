@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { DemoPlay } from "@/components/demos/shell";
 
@@ -9,17 +9,17 @@ const SLOTS: readonly {
   confirmed: boolean;
   live?: boolean;
 }[] = [
-  { time: "9:00", place: "Broadway", status: "No-show", confirmed: false },
-  { time: "10:30", place: "Resh St", status: "Confirmed", confirmed: true },
-  { time: "12:00", place: "Anaheim Blvd", status: "Confirmed", confirmed: true },
-  { time: "2:00", place: "Resh St", status: "Available", confirmed: false, live: true },
+  { time: "9:00", place: "Modesto", status: "No-show", confirmed: false },
+  { time: "10:30", place: "Chorus", status: "Confirmed", confirmed: true },
+  { time: "12:00", place: "Diamond Flats", status: "Confirmed", confirmed: true },
+  { time: "2:00", place: "Chorus", status: "Available", confirmed: false, live: true },
 ];
 
 export function ShowingsAgendaDemo() {
   return (
     <DemoPlay>
       <div className="mb-3 flex items-center justify-between gap-2">
-        <p className="text-[12px] font-medium text-mute">Tuesday · Anaheim</p>
+        <p className="text-[12px] font-medium text-mute">Tuesday · Irvine</p>
         <span className="relative desk-pill is-on">
           <span className="d d-glow pointer-events-none absolute inset-0 rounded-[inherit] border border-[#c4b8dc]" />
           Live availability

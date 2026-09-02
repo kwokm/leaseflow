@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
 import { DemoPlay } from "@/components/demos/shell";
 
 const STOPS = [
-  { delay: "0.4s", label: "510 S Resh St", note: "First stop" },
-  { delay: "1.6s", label: "318 W Broadway", note: "9:00" },
-  { delay: "2.8s", label: "201 S Anaheim Blvd", note: "12:00" },
-  { delay: "4.0s", label: "The Colony", note: "Nearby" },
+  { delay: "0.4s", label: "170 Chorus", note: "First stop" },
+  { delay: "1.6s", label: "14 Modesto", note: "9:00" },
+  { delay: "2.8s", label: "66 Diamond Flats", note: "12:00" },
+  { delay: "4.0s", label: "Rise Park", note: "Nearby" },
 ] as const;
 
 export function SmartRouteDemo() {
   return (
     <DemoPlay>
-      <p className="text-[12px] font-medium text-mute">Smart route · Anaheim</p>
+      <p className="text-[12px] font-medium text-mute">Smart route · Irvine</p>
       <svg className="mt-3 h-16 w-full" viewBox="0 0 320 64" fill="none" aria-hidden>
         <path
           className="d d-route"
