@@ -1,3 +1,7 @@
+import { mockApplicants, mockReports } from "./mock-applicants";
+import { mockApplicationDetails } from "./mock-details";
+import { mockExperianPulls, mockPayments, mockThreads } from "./mock-ledger";
+
 // Mock data for Leaseproof prototype
 
 export type ApplicationStatus = "invited" | "in_progress" | "completed" | "approved" | "declined";
@@ -305,3 +309,174 @@ export const mockProperties: Property[] = [
     propertyType: "House",
   },
 ];
+
+export {
+  mockApplicants,
+  mockReports,
+  mockApplicationDetails,
+  mockExperianPulls,
+  mockPayments,
+  mockThreads,
+};
+
+// Helper functions
+const STORED_LISTINGS_KEY = "leaseflow.listings.v1";
+const DEMO_DATA_KEY = "leaseproof.demo.loaded";
+
+function readStoredListings(): Property[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(STORED_LISTINGS_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as Property[];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+export function getPropertyById(id: string): Property | undefined {
+  const stored = readStoredListings().find((p) => p.id === id);
+  const seeded = mockProperties.find((p) => p.id === id);
+  return stored ?? seeded;
+}
+
+export function isDemoDataLoaded(): boolean {
+  if (typeof window === "undefined") return false;
+  return window.localStorage.getItem(DEMO_DATA_KEY) === "true";
+}
+
+export function loadDemoData(): void {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(DEMO_DATA_KEY, "true");
+}
+
+export function getAllProperties(): Property[] {
+  const byId = new Map<string, Property>();
+  if (isDemoDataLoaded()) {
+    for (const property of mockProperties) byId.set(property.id, property);
+  }
+  for (const row of readStoredListings()) byId.set(row.id, row);
+  return [...byId.values()];
+}
+
+export function getApplicantById(id: string): Applicant | undefined {
+  return mockApplicants.find((a) => a.id === id);
+}
+
+export function getApplicantsByProperty(propertyId: string): Applicant[] {
+  return mockApplicants.filter((a) => a.propertyId === propertyId);
+}
+
+export function getReportByApplicant(applicantId: string): ScreeningReport | undefined {
+  return mockReports[applicantId];
+}
+
+export function getStatusColor(status: ApplicationStatus): string {
+  switch (status) {
+    case "invited":
+      return "text-mute bg-rail border-line";
+    case "in_progress":
+      return "text-blue bg-blue-soft border-transparent";
+    case "completed":
+      return "text-ink-2 bg-mist border-line-2";
+    case "approved":
+      return "text-ok bg-ok-bg border-transparent";
+    case "declined":
+      return "text-no bg-no-bg border-transparent";
+  }
+}
+
+export function getStatusLabel(status: ApplicationStatus): string {
+  return status
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
+export function getApplicationDetails(applicantId: string): ApplicationDetails | undefined {
+  return mockApplicationDetails[applicantId];
+}
+
+// Applications, newest first — the default ordering for the applications table
+export function getAllApplications(): Applicant[] {
+  return [...mockApplicants].sort(
+    (a, b) => new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime()
+  );
+}
+
+export function getScoreColor(score: number): string {
+  if (score >= 750) return "text-ok";
+  if (score >= 650) return "text-ink";
+  return "text-no";
+}
+
+export function getExperianPull(applicantId: string): ExperianPull | undefined {
+  return mockExperianPulls[applicantId];
+}
+
+/** Groups an applicant's uploads by document type for the landlord packet. */
+export function groupDocuments(
+  documents: ApplicationDocument[]
+): { type: DocumentType; label: string; documents: ApplicationDocument[] }[] {
+  const order: DocumentType[] = [
+    "photo_id_front",
+    "photo_id_back",
+    "paystub",
+    "bank_statement",
+    "w2",
+    "form_1099",
+    "portfolio",
+    "investment",
+    "other",
+  ];
+
+  return order
+    .map((type) => ({
+      type,
+      label: documentTypeLabels[type],
+      documents: documents.filter((doc) => doc.docType === type),
+    }))
+    .filter((group) => group.documents.length > 0);
+}
+
+export function getScoreLabel(score: number): string {
+  if (score >= 750) return "Excellent";
+  if (score >= 650) return "Good";
+  return "Fair";
+}
+
+export function getPaymentsByApplicant(applicantId: string): Payment[] {
+  return mockPayments.filter((p) => p.applicantId === applicantId);
+}
+
+export function getPaymentStatusColor(status: PaymentStatus): string {
+  switch (status) {
+    case "paid":
+      return "text-ok bg-ok-bg border-transparent";
+    case "pending":
+      return "text-[#8a6400] bg-warn-bg border-transparent";
+    case "refunded":
+      return "text-mute bg-rail border-line";
+    case "failed":
+      return "text-no bg-no-bg border-transparent";
+  }
+}
+
+export function getThreadsByApplicant(applicantId: string): MessageThread[] {
+  return mockThreads.filter((t) => t.applicantId === applicantId);
+}
+
+export function getLastMessageAt(thread: MessageThread): string {
+  return thread.messages[thread.messages.length - 1]?.sentAt ?? "";
+}
+
+export function getScreeningFee(pkg?: ScreeningPackage): number {
+  void pkg;
+  return STANDARD_SCREENING_FEE;
+}
+
+export function screeningPackageLabel(pkg?: ScreeningPackage): string {
+  void pkg;
+  return STANDARD_PACKAGE_NAME;
+}
