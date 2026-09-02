@@ -8,12 +8,13 @@ import { Note, Panel, StepHeading, SummaryRow } from "@/components/apply/step-sh
 import type { StepProps } from "@/components/apply/step-shell";
 import { formatDateTime, formatMoney, maskCardNumber } from "@/lib/apply/format";
 import { getScreeningFee } from "@/lib/data/mock-data";
-import { localApplicantId, submissionDocuments } from "@/lib/apply/to-packet";
+import { applyingWithNames, localApplicantId, submissionDocuments } from "@/lib/apply/to-packet";
 
 export function StepDone({ state, property }: StepProps) {
   const fee = getScreeningFee(state.screeningPackage);
   const documents = submissionDocuments(state);
   const packetHref = `/packet/${localApplicantId(state.confirmationId ?? "")}`;
+  const withNames = applyingWithNames(state);
 
   return (
     <StepBody>
@@ -26,6 +27,12 @@ export function StepDone({ state, property }: StepProps) {
         Your packet for {property.address.split(",")[0]} is ready. Keep the receipt below and share
         the packet link with the landlord.
       </p>
+
+      {withNames.length ? (
+        <p className="max-w-xl text-[14px] font-medium leading-5 tracking-[-0.14px] text-ink">
+          Applying with {withNames.join(", ")}.
+        </p>
+      ) : null}
 
       {/* Renter receipt — printable */}
       <section className="print-avoid-break rounded-lg border border-line bg-paper p-5 shadow-mini">
@@ -44,6 +51,9 @@ export function StepDone({ state, property }: StepProps) {
 
         <dl className="mt-2">
           <SummaryRow label="Applicant" value={`${state.personal.firstName} ${state.personal.lastName}`.trim() || "—"} />
+          {withNames.length ? (
+            <SummaryRow label="Applying with" value={withNames.join(", ")} />
+          ) : null}
           <SummaryRow label="Property" value={property.address} />
           <SummaryRow label="Submitted" value={formatDateTime(state.submittedAt)} />
           <SummaryRow
