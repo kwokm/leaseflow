@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Avatar } from "@/components/desk/avatar";
 import { DeskPill } from "@/components/desk/packet-window";
 import { StatusPill } from "@/components/desk/status-pill";
+import { AiIncomeLine, PacketHouseholdChrome } from "@/components/desk/household-block";
 import { ApplicationToRent } from "@/components/rental-app/application-to-rent";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,6 +37,8 @@ import {
 } from "@/lib/apply/to-packet";
 import { setDecision, withDecision } from "@/lib/desk/decisions";
 import { creditScore, incomeMultiple, shortAddress } from "@/lib/desk/display";
+import { householdTotals } from "@/lib/desk/household";
+import { getHousehold } from "@/lib/data/household-model";
 import { Reveal } from "@/components/motion/reveal";
 import { AiDocCheck } from "@/components/docs/ai-check";
 import { SAMPLE_MISMATCH, checkApplicationDetails } from "@/lib/docs/ai-check";
@@ -149,6 +152,19 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
   const decided = applicant.status === "approved" || applicant.status === "declined";
   const multiple = incomeMultiple(applicant);
   const credit = creditScore(applicant);
+  const household = applicant.householdId
+    ? (() => {
+        const seededMembers = getHousehold(applicant.householdId).filter(
+          (row) => row.propertyId === applicant.propertyId,
+        );
+        const byId = new Map(seededMembers.map((row) => [row.id, row]));
+        byId.set(applicant.id, applicant);
+        return [...byId.values()];
+      })()
+    : [applicant];
+  const totals = household.length > 1 ? householdTotals(household, property.rent) : undefined;
+  const aiIncome = report?.aiIncome;
+  const monthly = aiIncome?.grossMonthly ?? report?.income.monthlyIncome;
 
   function decide(next: "approved" | "declined") {
     setDecision(id, next);
@@ -203,6 +219,8 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
       </div>
       </Reveal>
 
+      <PacketHouseholdChrome applicant={applicant} members={household} />
+
       <div className="border-b border-line px-5 py-3 print:hidden sm:px-6">
         <div className="flex flex-wrap items-center gap-1.5">
           <DeskPill active={tab === "packet"} onClick={() => setTab("packet")}>
@@ -230,6 +248,16 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
           <Row label="Date of birth" value={details?.dateOfBirth ?? "—"} />
           <Row label="SSN" value={details ? `•••-••-${details.ssnLast4}` : "—"} />
           <Row label="Current address" value={details?.currentAddress.address ?? "—"} />
+          <Row
+            label="Household"
+            value={
+              details?.occupants.length
+                ? details.occupants
+                    .map((row) => `${row.name} (${row.relationship})`)
+                    .join(", ")
+                : "—"
+            }
+          />
         </dl>
       </Section>
 
@@ -237,8 +265,31 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
         {report ? (
           <dl>
             <Row label="LeaseScore" value={<span className="score">{report.credit.leaseScore}</span>} />
+            {totals ? (
+              <Row
+                label="Household LeaseScore"
+                value={
+                  <span>
+                    {totals.memberScores
+                      .map((row) => (typeof row.score === "number" ? row.score : "—"))
+                      .join(" · ")}
+                    {typeof totals.householdScore === "number" ? (
+                      <span className="ml-2 text-mute">Household {totals.householdScore}</span>
+                    ) : null}
+                  </span>
+                }
+              />
+            ) : null}
             <Row label="Credit" value={credit ?? "—"} />
-            <Row label="Income" value={multiple ? `${multiple.toFixed(1)}× rent` : "—"} />
+            <Row
+              label="Income"
+              value={
+                monthly
+                  ? `${multiple ? `${multiple.toFixed(1)}× rent` : "—"}`
+                  : "—"
+              }
+            />
+            {totals?.vsRent ? <Row label="Household vs rent" value={totals.vsRent} /> : null}
             <Row label="Status" value={<StatusPill status={applicant.status} />} />
           </dl>
         ) : (
@@ -269,16 +320,33 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
       </Section>
 
       <Section title="Income">
+        {aiIncome ? (
+          <div className="mb-4 rounded-md border border-line bg-[#fbf9fd] p-3">
+            <AiIncomeLine screen={aiIncome} />
+            <ul className="mt-2 space-y-1">
+              {aiIncome.documents.map((doc) => (
+                <li key={doc.name} className="text-[12px] font-medium text-mute">
+                  {doc.name} · ${doc.extractedMonthly.toLocaleString()}/mo · {doc.note}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-2 text-[12px] font-medium text-mute-2">
+              {aiIncome.verified
+                ? "Verified — names on the files match this applicant. Mock extraction, not a live model."
+                : "Mock extraction, not a live model."}
+            </p>
+          </div>
+        ) : null}
         {report ? (
           <dl>
             <Row label="Employer" value={report.income.employer} />
             <Row label="Position" value={report.income.position} />
             <Row
               label="Monthly income"
-              value={`$${report.income.monthlyIncome.toLocaleString()}`}
+              value={`$${(monthly ?? report.income.monthlyIncome).toLocaleString()}`}
             />
             <Row label="Rent multiple" value={multiple ? `${multiple.toFixed(1)}×` : "—"} />
-            <Row label="Verified" value={report.income.verified ? "Yes" : "No"} />
+            <Row label="Verified" value={report.income.verified || aiIncome?.verified ? "Yes" : "No"} />
           </dl>
         ) : details ? (
           <dl>
