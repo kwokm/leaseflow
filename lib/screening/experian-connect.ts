@@ -74,7 +74,7 @@ function expiry(): Date {
 }
 
 /**
- * Local stub. In demo mode it returns the fabricated pull that the prototype has
+ * Local stub. In demo mode it returns the fabricated pull that the desk has
  * always used so the UI can be clicked through; otherwise it reports the share
  * as pending, which is the honest answer until a live client exists.
  */

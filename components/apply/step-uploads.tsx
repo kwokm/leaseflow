@@ -11,7 +11,7 @@ export function StepPhotoId({ state, patch, errors, embedded }: StepProps) {
     <StepChrome embedded={embedded} lead="Photo ID." tone="Front and back, please.">
       <p className="max-w-xl text-[15px] font-medium leading-[21px] tracking-[-0.16px] text-mute">
         A driver&apos;s licence, state ID, or passport works. Images and PDFs are both fine. Files
-        stay on your device in this prototype.
+        upload to private storage — never a public link.
       </p>
 
       <Panel className="shadow-window">

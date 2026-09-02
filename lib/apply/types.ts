@@ -495,7 +495,7 @@ export function createInitialState(listingId: string, pkg: ScreeningPackage): Ap
 }
 
 /**
- * Preloaded Jane Doe packet so the prototype can be clicked through
+ * Preloaded Jane Doe packet so the flow can be clicked through
  * without typing. Files have metadata only — previews clear on reload.
  */
 export function createDemoState(listingId: string, pkg: ScreeningPackage): ApplyState {

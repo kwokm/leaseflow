@@ -145,7 +145,7 @@ export default function NewListingPage() {
         </Link>
         <h1 className="text-[28px] font-semibold tracking-[-0.7px] text-ink">Create a listing</h1>
         <p className="text-mute mt-1">
-          Paste a Zillow link to pull address, rent, and photos. Prototype import — not a Zillow partnership.
+          Paste a Zillow link to pull address, rent, and photos. Read from the public page — not a Zillow partnership.
         </p>
       </Reveal>
 

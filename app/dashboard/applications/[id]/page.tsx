@@ -138,7 +138,7 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
         <p className="text-[15px] font-medium text-ink">Application not found</p>
         <p className="mt-1 text-[13px] text-mute">
           {local
-            ? "Applications submitted in this prototype are stored in the browser that submitted them."
+            ? "Locally submitted applications are stored in the browser that submitted them."
             : "This application is no longer available."}
         </p>
         <Button asChild className="mt-4">
@@ -435,8 +435,9 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
 
       <Section title="FCRA">
         <p className="text-[13px] font-medium leading-5 text-mute">
-          Screening reports are consumer reports under the FCRA. This packet is a prototype — names,
-          scores, and tradelines are mock data, and no consumer reporting agency is used.
+          Screening reports are consumer reports under the FCRA. Credit, background, and score data
+          on this packet is mock — names, scores, and tradelines are fabricated and no consumer
+          reporting agency is used.
         </p>
         {details ? (
           <dl className="mt-3">

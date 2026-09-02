@@ -21,12 +21,22 @@ export async function GET(request: Request) {
   if (!viewer?.user) {
     // Demo deployments have no session by design and no landlord rows to leak.
     if (isDemoMode()) return NextResponse.json({ applicants: [] });
-    return NextResponse.json({ error: "Sign in to view applications." }, { status: 401 });
+    if (!viewer) {
+      return NextResponse.json({ error: "Sign in to view applications." }, { status: 401 });
+    }
+    // Signed in, but Neon did not answer when we mirrored them.
+    return NextResponse.json({ applicants: [], unavailable: true });
   }
 
   const listingId = new URL(request.url).searchParams.get("listingId") ?? undefined;
-  const applicants = await listDeskApplicants(viewer.user.id, listingId);
-  return NextResponse.json({ applicants });
+
+  try {
+    const applicants = await listDeskApplicants(viewer.user.id, listingId);
+    return NextResponse.json({ applicants });
+  } catch (error) {
+    console.error("[applications] Could not read the desk queue.", error);
+    return NextResponse.json({ applicants: [], unavailable: true });
+  }
 }
 
 function clientIp(request: Request): string | null {

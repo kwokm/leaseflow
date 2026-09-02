@@ -2,7 +2,7 @@ import { mockApplicants, mockReports } from "./mock-applicants";
 import { mockApplicationDetails } from "./mock-details";
 import { mockExperianPulls, mockPayments, mockThreads } from "./mock-ledger";
 
-// Mock data for Leaseproof prototype
+// Mock data for Leaseproof demos and the landing-page preview
 
 export type ApplicationStatus = "invited" | "in_progress" | "completed" | "approved" | "declined";
 
@@ -83,7 +83,7 @@ export interface ScreeningReport {
 
 /**
  * Result of the mock Experian connection in the apply flow. Everything here is
- * fabricated locally — the prototype never contacts a consumer reporting agency
+ * fabricated locally — Leaseproof never contacts a consumer reporting agency
  * and never collects bureau login details.
  */
 export interface ExperianPull {

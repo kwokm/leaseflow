@@ -54,7 +54,7 @@ export function ApplicationToRent({
           Leaseproof rental application
         </h2>
         <p className="mt-1 text-[13px] font-medium text-mute">
-          Auto-filled from the apply packet. Prototype form — not a C.A.R. document.
+          Auto-filled from the apply packet. Leaseproof form — not a C.A.R. document.
         </p>
         {application.premises.photos.length ? (
           <div className="mt-3">

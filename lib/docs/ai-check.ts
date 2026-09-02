@@ -1,8 +1,8 @@
 import type { ApplicationDetails, DocumentType } from "@/lib/data/mock-data";
 import type { ApplyState } from "@/lib/apply/types";
 
-/** Prototype “today” — August 2026. Recency is measured from this date. */
-export const PROTOTYPE_TODAY = new Date("2026-08-14T12:00:00.000Z");
+/** Fixed “today” — August 2026. Document recency is measured from this date. */
+export const DOC_CHECK_TODAY = new Date("2026-08-14T12:00:00.000Z");
 export const CURRENT_TAX_YEAR = 2025;
 
 export type IncomeDocKind =
@@ -183,8 +183,8 @@ function isCurrent(kind: IncomeDocKind, year?: number, month?: number): boolean 
   if (isAnnual(kind)) return year === CURRENT_TAX_YEAR;
   if (!year || !month) return false;
   const doc = new Date(Date.UTC(year, month - 1, 1));
-  const start = new Date(Date.UTC(PROTOTYPE_TODAY.getUTCFullYear(), PROTOTYPE_TODAY.getUTCMonth() - 2, 1));
-  const end = new Date(Date.UTC(PROTOTYPE_TODAY.getUTCFullYear(), PROTOTYPE_TODAY.getUTCMonth() + 1, 1));
+  const start = new Date(Date.UTC(DOC_CHECK_TODAY.getUTCFullYear(), DOC_CHECK_TODAY.getUTCMonth() - 2, 1));
+  const end = new Date(Date.UTC(DOC_CHECK_TODAY.getUTCFullYear(), DOC_CHECK_TODAY.getUTCMonth() + 1, 1));
   return doc >= start && doc < end;
 }
 

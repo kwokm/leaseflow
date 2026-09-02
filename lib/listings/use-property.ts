@@ -7,21 +7,32 @@ import type { Property } from "@/lib/data/mock-data";
  * Listings are read over the API so the demo-seed decision is made once, on the
  * server, from LEASEPROOF_DEMO. Nothing reads localStorage any more.
  */
-export function useProperties(): { properties: Property[]; ready: boolean } {
+export function useProperties(): {
+  properties: Property[];
+  ready: boolean;
+  unavailable: boolean;
+} {
   const [properties, setProperties] = useState<Property[]>([]);
   const [ready, setReady] = useState(false);
+  const [unavailable, setUnavailable] = useState(false);
 
   useEffect(() => {
     let active = true;
 
     fetch("/api/listings")
-      .then((response) => (response.ok ? response.json() : { listings: [] }))
-      .then((payload: { listings?: Property[] }) => {
+      .then((response) =>
+        response.ok ? response.json() : { listings: [], unavailable: true }
+      )
+      .then((payload: { listings?: Property[]; unavailable?: boolean }) => {
         if (!active) return;
         setProperties(payload.listings ?? []);
+        setUnavailable(Boolean(payload.unavailable));
       })
       .catch(() => {
-        if (active) setProperties([]);
+        // An empty pipeline we cannot vouch for is not an empty pipeline.
+        if (!active) return;
+        setProperties([]);
+        setUnavailable(true);
       })
       .finally(() => {
         if (active) setReady(true);
@@ -32,7 +43,7 @@ export function useProperties(): { properties: Property[]; ready: boolean } {
     };
   }, []);
 
-  return { properties, ready };
+  return { properties, ready, unavailable };
 }
 
 export function useProperty(id: string): { property: Property | undefined; ready: boolean } {

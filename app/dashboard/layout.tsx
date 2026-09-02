@@ -11,6 +11,13 @@ import { getDeskViewer } from "@/lib/auth/current-user";
 import { clerkEnabled, isDemoMode } from "@/lib/config/env";
 import { FEATURED_LISTING_ID } from "@/lib/data/mock-data";
 
+/**
+ * The desk is per-request by definition. Without this, a build that happens to
+ * run without Clerk keys prerenders the layout — baking the signed-out redirect
+ * into a static page that a signed-in landlord would then be served.
+ */
+export const dynamic = "force-dynamic";
+
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const demo = isDemoMode();
   const viewer = await getDeskViewer();
@@ -32,9 +39,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <BrandWord />
           </Link>
           <div className="ml-auto flex items-center gap-2">
-            <Button asChild variant="outline">
-              <Link href={`/apply/${FEATURED_LISTING_ID}`}>Apply as renter</Link>
-            </Button>
+            {/* The seeded listing only exists under LEASEPROOF_DEMO, so outside
+                demo mode this button is a guaranteed 404. Real apply links come
+                off each listing. */}
+            {demo ? (
+              <Button asChild variant="outline">
+                <Link href={`/apply/${FEATURED_LISTING_ID}`}>Apply as renter</Link>
+              </Button>
+            ) : null}
             <Button asChild variant="outline">
               <Link href="/dashboard/listings/new">New listing</Link>
             </Button>

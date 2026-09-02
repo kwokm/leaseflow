@@ -98,6 +98,9 @@ Every integration is optional at build time so the app compiles without secrets,
 
 - **No Clerk** → `/dashboard` redirects to `/signin` (fail-closed) unless `LEASEPROOF_DEMO=1`.
 - **No `DATABASE_URL`** → listing and application writes return 503.
+- **Neon unreachable** → the signed-in landlord keeps their session and still lands on the desk,
+  which says it cannot load the pipeline instead of drawing an empty one. `/apply/[listingId]`
+  says the same rather than 404ing a listing that probably exists.
 - **No Stripe** → submitting returns 503, except under `LEASEPROOF_DEMO=1` where checkout is skipped and nothing is charged.
 - **No Blob token** → uploads return 503 and previews stay session-local.
 
@@ -107,9 +110,16 @@ Drizzle ORM against Neon. Schema in `lib/db/schema.ts`, migrations committed und
 
 ```bash
 npm run db:generate   # regenerate SQL after editing the schema
-npm run db:migrate    # apply migrations to DATABASE_URL
+npm run db:deploy     # apply migrations to DATABASE_URL (runs as part of `npm run build`)
+npm run db:migrate    # same, via drizzle-kit, for interactive use
 npm run db:studio     # inspect
 ```
+
+`npm run build` runs `db:deploy` first. Committed migrations are not applied by
+deploying the app, and a deploy against a database whose tables were never
+created takes down every page that queries Neon — so the build applies them, and
+fails rather than shipping against a schema it cannot use. Without `DATABASE_URL`
+the step is a no-op, so a checkout with no secrets still builds.
 
 Tables: `users`, `listings`, `households`, `applications`, `documents`, `consents`, `payments`, `credit_shares`.
 

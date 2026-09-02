@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getProperty } from "@/lib/listings/service";
+import { findProperty } from "@/lib/listings/service";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +12,17 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const listing = await getProperty(id);
-  if (!listing) return NextResponse.json({ error: "Listing not found." }, { status: 404 });
-  return NextResponse.json({ listing });
+  const lookup = await findProperty(id);
+
+  if (lookup.status === "missing") {
+    return NextResponse.json({ error: "Listing not found." }, { status: 404 });
+  }
+  if (lookup.status === "unavailable") {
+    return NextResponse.json(
+      { error: "We can't reach the listing store right now." },
+      { status: 503 }
+    );
+  }
+
+  return NextResponse.json({ listing: lookup.property });
 }

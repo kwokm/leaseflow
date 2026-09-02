@@ -71,6 +71,39 @@ export async function getProperty(id: string): Promise<Property | undefined> {
   return isDemoMode() ? demoPropertyById(id) : undefined;
 }
 
+/**
+ * "We looked and it is not there" and "we could not look" are different answers
+ * and the renter deserves different pages for them. An unknown id is a 404; a
+ * database that will not answer is not.
+ */
+export type PropertyLookup =
+  | { status: "found"; property: Property }
+  | { status: "missing" }
+  | { status: "unavailable" };
+
+export async function findProperty(id: string): Promise<PropertyLookup> {
+  try {
+    const property = await getProperty(id);
+    return property ? { status: "found", property } : { status: "missing" };
+  } catch (error) {
+    console.error(`[listings] Could not read listing ${id}.`, error);
+    return { status: "unavailable" };
+  }
+}
+
+/** Listings for a desk that must render whether or not Neon answers. */
+export async function listPropertiesSafely(
+  ownerId: string | null
+): Promise<{ properties: Property[]; unavailable: boolean }> {
+  try {
+    const properties = ownerId ? await listProperties(ownerId) : demoOnlyProperties();
+    return { properties, unavailable: false };
+  } catch (error) {
+    console.error("[listings] Could not read the pipeline.", error);
+    return { properties: [], unavailable: true };
+  }
+}
+
 export type ListingInput = {
   address: string;
   rent: number;

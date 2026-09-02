@@ -120,7 +120,7 @@ export function PipelineDesk({ preview = false }: { preview?: boolean }) {
   // `preview` is the static marketing pipeline on the landing page. The real
   // desk reads listings and the queue from the server, which decides whether
   // the seeded homes are included (LEASEPROOF_DEMO).
-  const { properties, ready: propertiesReady } = useProperties();
+  const { properties, ready: propertiesReady, unavailable } = useProperties();
   const { applicants: deskApplicants } = useDeskApplicants();
 
   const source: Property[] = preview ? mockProperties : properties;
@@ -136,7 +136,24 @@ export function PipelineDesk({ preview = false }: { preview?: boolean }) {
         <span className="desk-pill is-on">Pipeline</span>
       </DeskToolbar>
 
-      {homes.length === 0 && !showEmpty ? null : showEmpty ? (
+      {homes.length === 0 && !showEmpty ? null : showEmpty && unavailable ? (
+        <section className="px-5 py-12 sm:px-6">
+          <p className="text-[12px] font-medium uppercase tracking-[0.06em] text-mute-2">
+            Pipeline
+          </p>
+          <h1 className="mt-2 text-[24px] font-semibold tracking-[-0.5px] text-ink">
+            We can&rsquo;t load your listings right now.
+          </h1>
+          <p className="mt-2 max-w-xl text-[14px] font-medium leading-5 text-mute">
+            Nothing has been lost — the pipeline just isn&rsquo;t answering. Reload in a moment.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-2">
+            <Button type="button" onClick={() => window.location.reload()}>
+              Reload
+            </Button>
+          </div>
+        </section>
+      ) : showEmpty ? (
         <section className="px-5 py-12 sm:px-6">
           <p className="text-[12px] font-medium uppercase tracking-[0.06em] text-mute-2">
             Step 1

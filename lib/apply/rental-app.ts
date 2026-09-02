@@ -214,7 +214,7 @@ export function buildRentalApplication(input: {
     references: rental.references.map((row) => [row.name, joinContact({ ...row, name: "" }).replace(/^ · /, "")]),
     relatives: rental.relatives.map((row) => [row.name, joinContact({ ...row, name: "" }).replace(/^ · /, "")]),
     acknowledgments: [
-      "Applicant-pays screening through Leaseproof (prototype).",
+      "Applicant-pays screening through Leaseproof.",
       "Background-check notice acknowledged.",
       "Information is true and complete to the best of the applicant’s knowledge.",
     ],

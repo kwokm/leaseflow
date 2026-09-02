@@ -20,7 +20,7 @@ export interface AiIncomeDocument {
   note: string;
 }
 
-/** Mock AI read of paystubs / W-2s. Prototype only — no live OCR or bureau. */
+/** Mock AI read of paystubs / W-2s — no live OCR or bureau. */
 export interface AiIncomeScreen {
   grossMonthly: number;
   source: AiIncomeSource;

@@ -14,8 +14,14 @@ export type Viewer = {
   role: Role;
   firstName: string | null;
   lastName: string | null;
-  /** Null when Neon is not configured — the identity is still valid. */
+  /** Null when Neon is not configured or would not answer — the identity is still valid. */
   user: UserRow | null;
+  /**
+   * True when `user` is null because Neon failed, as opposed to not being
+   * configured. Callers use it to say "we could not look" instead of drawing an
+   * empty desk the signed-in landlord would read as "you have nothing".
+   */
+  storageUnavailable: boolean;
 };
 
 /**
@@ -58,9 +64,19 @@ export async function getViewer(defaultRole: Role = "renter"): Promise<Viewer | 
     firstName: clerk.firstName,
     lastName: clerk.lastName,
     user: null,
+    storageUnavailable: false,
   };
 
-  viewer.user = await syncUser(viewer);
+  // The identity is Clerk's; Neon only mirrors it. A database failure here must
+  // not cost the landlord their session — it leaves `user` null, which the
+  // callers already treat as "nothing to scope a query by".
+  try {
+    viewer.user = await syncUser(viewer);
+  } catch (error) {
+    console.error("[auth] Could not mirror the Clerk user into Neon.", error);
+    viewer.storageUnavailable = true;
+  }
+
   return viewer;
 }
 

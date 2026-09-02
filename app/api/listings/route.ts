@@ -1,12 +1,7 @@
 import { NextResponse } from "next/server";
 import { getViewer } from "@/lib/auth/current-user";
 import { databaseEnabled, isDemoMode } from "@/lib/config/env";
-import {
-  createListing,
-  demoOnlyProperties,
-  listProperties,
-  type ListingInput,
-} from "@/lib/listings/service";
+import { createListing, listPropertiesSafely, type ListingInput } from "@/lib/listings/service";
 
 export const dynamic = "force-dynamic";
 
@@ -14,13 +9,21 @@ export const dynamic = "force-dynamic";
  * Landlords see their own listings, and only their own. Without a session there
  * is nothing to scope by, so the response is the demo catalogue (empty unless
  * LEASEPROOF_DEMO=1) rather than every landlord's listings.
+ *
+ * A read failure returns `unavailable` rather than an error status: the desk
+ * needs to render either way, and an empty pipeline it cannot vouch for should
+ * not be drawn as "you have no listings".
  */
 export async function GET() {
   const viewer = await getViewer("landlord");
-  const properties = viewer?.user
-    ? await listProperties(viewer.user.id)
-    : demoOnlyProperties();
-  return NextResponse.json({ listings: properties, demo: isDemoMode() });
+
+  // Signed in, but we never got as far as their row — do not answer "no listings".
+  if (viewer?.storageUnavailable) {
+    return NextResponse.json({ listings: [], demo: isDemoMode(), unavailable: true });
+  }
+
+  const { properties, unavailable } = await listPropertiesSafely(viewer?.user?.id ?? null);
+  return NextResponse.json({ listings: properties, demo: isDemoMode(), unavailable });
 }
 
 function toNumber(value: unknown): number {
@@ -37,10 +40,19 @@ export async function POST(request: Request) {
   }
 
   // Require the mirrored user row, not just a Clerk session: a listing with no
-  // owner would be invisible to every desk, including its creator's.
+  // owner would be invisible to every desk, including its creator's. Missing
+  // for want of a session and missing because Neon would not answer are two
+  // different problems, and telling a signed-in landlord to sign in is a lie.
   const viewer = await getViewer("landlord");
-  if (!viewer?.user) {
+  if (!viewer) {
     return NextResponse.json({ error: "Sign in to create a listing." }, { status: 401 });
+  }
+  if (!viewer.user) {
+    console.error("[listings] Signed-in landlord has no mirrored user row; refusing to save.");
+    return NextResponse.json(
+      { error: "We can't reach the listing store right now. Try again in a moment." },
+      { status: 503 }
+    );
   }
 
   const body = (await request.json().catch(() => null)) as Partial<ListingInput> | null;

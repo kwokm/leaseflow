@@ -213,7 +213,7 @@ export function StepHousehold({ state, patch, errors, embedded }: StepProps) {
           <Scale className="mt-0.5 h-5 w-5 shrink-0 text-mute" aria-hidden />
           <p className="text-[14px] font-medium leading-5 tracking-[-0.14px] text-ink-2">
             A public-records search runs after you submit and covers criminal, eviction, and
-            registry sources. In this prototype it is a mock note only — no records are searched and
+            registry sources. Background results are a mock note today — no records are searched and
             no data is retrieved.
           </p>
         </div>

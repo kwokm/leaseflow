@@ -2,7 +2,8 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ApplyWizard } from "@/components/apply/wizard";
-import { getProperty } from "@/lib/listings/service";
+import { ListingUnavailable } from "@/components/apply/listing-unavailable";
+import { findProperty } from "@/lib/listings/service";
 
 export const metadata: Metadata = {
   title: "Apply — Leaseproof",
@@ -11,7 +12,8 @@ export const metadata: Metadata = {
 
 /**
  * Resolved on the server so a bad listing id 404s before the wizard mounts,
- * rather than flashing an empty packet while the client looks it up.
+ * rather than flashing an empty packet while the client looks it up. A listing
+ * store that cannot be read is a third case, and it is not a 404.
  */
 export default async function ApplyPage({
   params,
@@ -19,12 +21,14 @@ export default async function ApplyPage({
   params: Promise<{ listingId: string }>;
 }) {
   const { listingId } = await params;
-  const property = await getProperty(listingId);
-  if (!property) notFound();
+  const lookup = await findProperty(listingId);
+
+  if (lookup.status === "missing") notFound();
+  if (lookup.status === "unavailable") return <ListingUnavailable />;
 
   return (
     <Suspense fallback={null}>
-      <ApplyWizard property={property} />
+      <ApplyWizard property={lookup.property} />
     </Suspense>
   );
 }

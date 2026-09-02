@@ -28,7 +28,7 @@ export async function POST(request: Request) {
   if (isSeededZillow(url, parsed?.zpid)) {
     return NextResponse.json({
       source: "seeded",
-      note: "Prototype import. Seeded 170 Chorus, Irvine so the demo always has address, rent, and photos.",
+      note: "Loaded the sample 170 Chorus, Irvine listing, so address, rent, and photos are filled.",
       listing: importToProperty(seededZillowImport()),
     });
   }
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
   if (live) {
     return NextResponse.json({
       source: "live",
-      note: "Pulled from the page. Prototype import — not a Zillow partnership.",
+      note: "Pulled from the public page — not a Zillow partnership.",
       listing: importToProperty(live),
     });
   }

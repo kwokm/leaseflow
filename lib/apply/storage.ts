@@ -84,7 +84,7 @@ export function loadDraft(listingId: string, pkg: ScreeningPackage): ApplyState 
 export function saveDraft(state: ApplyState): void {
   if (typeof window === "undefined") return;
   try {
-    // Card details are deliberately never persisted, even in the prototype.
+    // Card details are deliberately never persisted.
     const persisted = withoutPayment(state);
     window.localStorage.setItem(draftKey(state.listingId), JSON.stringify(persisted));
   } catch {
