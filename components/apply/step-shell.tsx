@@ -4,6 +4,7 @@ import * as React from "react";
 import type { Property } from "@/lib/data/mock-data";
 import type { StepErrors } from "@/lib/apply/validate";
 import type { ApplyState } from "@/lib/apply/types";
+import { StepBody } from "@/components/apply/motion";
 import { cn } from "@/lib/utils";
 
 export interface StepProps {
@@ -12,6 +13,8 @@ export interface StepProps {
   errors: StepErrors;
   property: Property;
   goTo: (step: number) => void;
+  /** When true, omit the stage heading/stagger — parent stage composes this as a section. */
+  embedded?: boolean;
 }
 
 /** Two-tone heading: the lead stays ink, the continuation drops to mute. */
@@ -21,6 +24,46 @@ export function StepHeading({ lead, tone }: { lead: string; tone: string }) {
       {lead}{" "}
       <span className="tone font-semibold">{tone}</span>
     </h1>
+  );
+}
+
+/** Wraps a step for solo use or as a composed section inside a four-stage screen. */
+export function StepChrome({
+  embedded,
+  lead,
+  tone,
+  children,
+}: {
+  embedded?: boolean;
+  lead: string;
+  tone: string;
+  children: React.ReactNode;
+}) {
+  if (embedded) {
+    return <div className="space-y-5">{children}</div>;
+  }
+
+  return (
+    <StepBody>
+      <StepHeading lead={lead} tone={tone} />
+      {children}
+    </StepBody>
+  );
+}
+
+/** Label for a composed section inside a four-stage screen. */
+export function StageSection({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="space-y-5">
+      <p className="text-[13px] font-medium tracking-[-0.13px] text-mute">{label}</p>
+      {children}
+    </section>
   );
 }
 
