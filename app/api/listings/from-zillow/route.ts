@@ -23,20 +23,21 @@ export async function POST(request: Request) {
   }
 
   const parsed = parseZillowUrl(url);
+
+  // Seeded 170 Chorus listing (and legacy 510 S Resh pastes) always return resh-510.
+  if (isSeededZillow(url, parsed?.zpid)) {
+    return NextResponse.json({
+      source: "seeded",
+      note: "Prototype import. Seeded 170 Chorus, Irvine so the demo always has address, rent, and photos.",
+      listing: importToProperty(seededZillowImport()),
+    });
+  }
+
   if (!parsed) {
     return NextResponse.json(
       { error: "Use a zillow.com/homedetails/ link. Other sites are not imported." },
       { status: 400 },
     );
-  }
-
-  // Seeded Anaheim listing always returns the guaranteed demo payload.
-  if (isSeededZillow(parsed.url, parsed.zpid)) {
-    return NextResponse.json({
-      source: "seeded",
-      note: "Prototype import. Seeded 510 S Resh St so the demo always has address, rent, and photos.",
-      listing: importToProperty(seededZillowImport()),
-    });
   }
 
   const live = await fetchLiveZillow(parsed.url);
@@ -51,7 +52,7 @@ export async function POST(request: Request) {
   return NextResponse.json(
     {
       error:
-        "Zillow blocked the live pull. Paste the seeded Anaheim listing to load the demo property, or fill the fields by hand.",
+        "Zillow blocked the live pull. Paste the seeded Irvine listing to load the demo property, or fill the fields by hand.",
       seededUrl: seededZillowImport().zillowUrl,
     },
     { status: 422 },
