@@ -10,6 +10,7 @@ import { ListingThumb } from "@/components/listings/photos";
 import { PipelineDesk } from "@/components/leasing/pipeline-desk";
 import { getApplicantsByProperty, mockProperties } from "@/lib/data/mock-data";
 import { shortAddress } from "@/lib/desk/display";
+import { cn } from "@/lib/utils";
 
 const TOUR: { label: DeskNavLabel; title: string }[] = [
   { label: "Pipeline", title: "Pipeline • 510 S Resh St" },
@@ -51,20 +52,21 @@ function PropertiesPreview() {
   );
 }
 
-export function HeroDesk() {
+/** Screening-only desk crop. Auto-tours unless `quiet` (Platform section). No dashboard links. */
+export function HeroDesk({ quiet = false }: { quiet?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
   const reduceMotion = useReducedMotion();
   const reduce = reduceMotion === true;
   const [inView, setInView] = useState(true);
   const [tab, setTab] = useState(0);
-  const [touring, setTouring] = useState(true);
+  const [touring, setTouring] = useState(!quiet);
 
   useEffect(() => {
-    if (reduce) {
+    if (reduce || quiet) {
       setTouring(false);
       setTab(0);
     }
-  }, [reduce]);
+  }, [reduce, quiet]);
 
   useEffect(() => {
     const el = ref.current;
@@ -78,12 +80,12 @@ export function HeroDesk() {
   }, []);
 
   useEffect(() => {
-    if (!touring || !inView || reduce) return;
+    if (!touring || !inView || reduce || quiet) return;
     const id = window.setTimeout(() => {
       setTab((current) => (current + 1) % TOUR.length);
     }, DWELL_MS);
     return () => window.clearTimeout(id);
-  }, [touring, inView, reduce, tab]);
+  }, [touring, inView, reduce, quiet, tab]);
 
   const active = TOUR[tab] ?? TOUR[0];
 
@@ -109,7 +111,7 @@ export function HeroDesk() {
   return (
     <div
       ref={ref}
-      className="hero-desk"
+      className={cn("hero-desk", quiet && "is-quiet")}
       data-tab={active.label}
       onClickCapture={keepPreviewInPlace}
     >
@@ -122,7 +124,7 @@ export function HeroDesk() {
                 onSelect: selectTab,
               }}
             />
-            {!touring && !reduce ? (
+            {!quiet && !touring && !reduce ? (
               <button type="button" className="hero-replay" onClick={replayTour}>
                 Replay tour
               </button>

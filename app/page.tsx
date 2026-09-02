@@ -1,7 +1,9 @@
 import Link from "next/link";
+import "../components/desk/landing-stage.css";
 import { BrandMark, BrandWord } from "@/components/brand";
 import { PacketWindow } from "@/components/desk/packet-window";
 import { HeroDesk } from "@/components/desk/hero-desk";
+import { HeroPacket } from "@/components/desk/hero-packet";
 import { InView } from "@/components/motion/in-view";
 import { Reveal } from "@/components/motion/reveal";
 import { SectionHeadline } from "@/components/motion/section-headline";
@@ -98,8 +100,8 @@ export default function Home() {
             </div>
           </InView>
 
-          <div className="stage-wrap" id="desk">
-            <HeroDesk />
+          <div className="stage-wrap" id="packet">
+            <HeroPacket />
           </div>
         </section>
 
@@ -165,35 +167,8 @@ export default function Home() {
               className="max-w-[28ch]"
             />
           </InView>
-          <InView
-            as="ul"
-            className="reveal-stagger mx-auto mt-10 grid max-w-shell grid-cols-1 gap-5 px-5 sm:px-8 lg:grid-cols-3"
-          >
-            {[
-              {
-                title: "Desk",
-                meta: "One queue",
-                copy: "Properties and applicants stay together, with the next screening task visible.",
-              },
-              {
-                title: "Screening",
-                meta: "Standard · $24.99",
-                copy: "Experian, background, identity, and AI income checks arrive in one review flow.",
-              },
-              {
-                title: "Packet",
-                meta: "One share",
-                copy: "Application, evidence, checks, and decision status stay in one renter packet.",
-              },
-            ].map((item) => (
-              <li key={item.title} className="reveal-spatial">
-                <PacketWindow title={item.title} meta={item.meta}>
-                  <p className="px-5 py-6 text-[14px] font-medium leading-5 text-mute">
-                    {item.copy}
-                  </p>
-                </PacketWindow>
-              </li>
-            ))}
+          <InView className="platform-desk mt-10">
+            <HeroDesk quiet />
           </InView>
         </section>
 
