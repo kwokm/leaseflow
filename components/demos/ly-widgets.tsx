@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
 import Image from "next/image";
 import { DemoPlay } from "@/components/demos/shell";
-import { ANAHEIM_PHOTOS } from "@/lib/data/mock-data";
+import { FEATURED_PHOTOS } from "@/lib/data/mock-data";
 import { cn } from "@/lib/utils";
 
 const BOARDS = [
@@ -20,9 +20,9 @@ export function LySyndication() {
         One listing
       </p>
       <div className="d d-breathe mt-3 rounded-2xl bg-white px-4 py-3 text-[color:var(--ly-ink)]">
-        <p className="text-[15px] font-semibold">510 S Resh St</p>
+        <p className="text-[15px] font-semibold">170 Chorus</p>
         <p className="mt-0.5 text-[12px] font-medium text-[#6b7280]">
-          Anaheim · 3 bed · $4,700/mo · synced instantly
+          Irvine · 4 bed · $6,500/mo · synced instantly
         </p>
       </div>
       <ul className="mt-5 flex flex-wrap justify-center gap-3">
@@ -52,7 +52,7 @@ export function LyLeadStory() {
       </h4>
       <div className="ly-lead-note is-before">
         <p>✘ Before</p>
-        <p>You reply the next morning. Maria has already signed 510 S Resh elsewhere.</p>
+        <p>You reply the next morning. Maria has already signed 170 Chorus elsewhere.</p>
       </div>
       <div className="ly-lead-note is-with">
         <p>✓ With Leaseproof</p>
@@ -150,10 +150,10 @@ const SLOTS: readonly {
   confirmed?: boolean;
   live?: boolean;
 }[] = [
-  { time: "9:00am", place: "Broadway", status: "no-show", pill: "ly-pill-red" },
-  { time: "10:30am", place: "Resh St", status: "confirmed", pill: "ly-live", confirmed: true },
-  { time: "12:00pm", place: "Anaheim Blvd", status: "confirmed", pill: "ly-live", confirmed: true },
-  { time: "2:00pm", place: "Resh St", status: "available", pill: "ly-pill-mint", live: true },
+  { time: "9:00am", place: "Modesto", status: "no-show", pill: "ly-pill-red" },
+  { time: "10:30am", place: "Chorus", status: "confirmed", pill: "ly-live", confirmed: true },
+  { time: "12:00pm", place: "Diamond Flats", status: "confirmed", pill: "ly-live", confirmed: true },
+  { time: "2:00pm", place: "Chorus", status: "available", pill: "ly-pill-mint", live: true },
 ];
 
 export function LyShowings() {
@@ -261,7 +261,7 @@ export function LyLease() {
   return (
     <DemoPlay flush className="ly ly-card ly-light ly-pad">
       <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#6b7280]">
-        Jane Doe · 510 S Resh St
+        Jane Doe · 170 Chorus
       </p>
       <ol className="mt-4 space-y-2">
         {LEASE_STEPS.map((step, index) => (
@@ -309,18 +309,18 @@ const PHONE_LINES = [
   {
     delay: "0s",
     from: "caller" as const,
-    body: "Hi, I saw your listing on Zillow — is 510 S Resh St still available?",
+    body: "Hi, I saw your listing on Zillow — is 170 Chorus still available?",
   },
   {
     delay: "1.35s",
     from: "agent" as const,
-    body: "Yes. 3-bed, 2-bath, $4,700/mo, September 1. Want to book a showing?",
+    body: "Yes. 4-bed, 3.5-bath, $6,500/mo, September 1. Want to book a showing?",
   },
   { delay: "2.7s", from: "caller" as const, body: "Tuesday at 2pm works." },
   {
     delay: "4.05s",
     from: "agent" as const,
-    body: "Perfect — I’ve booked you in for Tuesday at 2pm at 510 S Resh St. You’ll get a confirmation text shortly.",
+    body: "Perfect — I’ve booked you in for Tuesday at 2pm at 170 Chorus. You’ll get a confirmation text shortly.",
   },
 ];
 
@@ -356,9 +356,9 @@ export function LyPhone() {
 }
 
 const FB_LINES = [
-  { delay: "0.15s", from: "lead" as const, body: "Is 510 S Resh still available? What’s the move-in?", at: "11:52 PM" },
-  { delay: "1.25s", from: "agent" as const, body: "Yes! Anaheim, September 1, $4,700/mo. Tuesday or Thursday?", at: "11:52 PM" },
-  { delay: "2.35s", from: "lead" as const, body: "Tuesday 10:30. See you on Resh St.", at: "11:54 PM" },
+  { delay: "0.15s", from: "lead" as const, body: "Is 170 Chorus still available? What’s the move-in?", at: "11:52 PM" },
+  { delay: "1.25s", from: "agent" as const, body: "Yes! Irvine, September 1, $6,500/mo. Tuesday or Thursday?", at: "11:52 PM" },
+  { delay: "2.35s", from: "lead" as const, body: "Tuesday 10:30. See you on Chorus.", at: "11:54 PM" },
 ];
 
 export function LyFacebook() {
@@ -402,9 +402,9 @@ export function LyFacebook() {
 }
 
 const CL_POSTS = [
-  { delay: "0.15s", title: "510 S Resh St", note: "Posted automatically · $4,700/mo" },
-  { delay: "1.25s", title: "The Colony house", note: "Lead captured instantly" },
-  { delay: "2.35s", title: "Resh St follow-up", note: "AI follow-up sent" },
+  { delay: "0.15s", title: "170 Chorus", note: "Posted automatically · $6,500/mo" },
+  { delay: "1.25s", title: "Rise Park house", note: "Lead captured instantly" },
+  { delay: "2.35s", title: "Chorus follow-up", note: "AI follow-up sent" },
 ] as const;
 
 export function LyCraigslist() {
@@ -434,17 +434,17 @@ export function LyCraigslist() {
 }
 
 const STOPS = [
-  { delay: "0.4s", label: "510 S Resh St", note: "First stop", price: "$4,700", fit: "Market fit", tone: "ly-live" },
-  { delay: "1.6s", label: "318 W Broadway", note: "9:00", price: "$2,100", fit: "Under market", tone: "ly-pill-mint" },
-  { delay: "2.8s", label: "201 S Anaheim Blvd", note: "12:00", price: "$2,300", fit: "Competitive", tone: "ly-pill-amber" },
-  { delay: "4.0s", label: "The Colony", note: "Nearby", price: "$2,650", fit: "Overpriced", tone: "ly-pill-red" },
+  { delay: "0.4s", label: "170 Chorus", note: "First stop", price: "$6,500", fit: "Market fit", tone: "ly-live" },
+  { delay: "1.6s", label: "14 Modesto", note: "9:00", price: "$7,000", fit: "Under market", tone: "ly-pill-mint" },
+  { delay: "2.8s", label: "66 Diamond Flats", note: "12:00", price: "$6,950", fit: "Competitive", tone: "ly-pill-amber" },
+  { delay: "4.0s", label: "Rise Park", note: "Nearby", price: "$6,498", fit: "Overpriced", tone: "ly-pill-red" },
 ] as const;
 
 export function LyRoute() {
   return (
     <DemoPlay flush className="ly ly-card ly-dark ly-pad">
       <p className="text-[15px] font-semibold">Smart route planner</p>
-      <p className="mt-1 text-[12px] font-medium text-[color:var(--ly-mute)]">Tuesday · Anaheim</p>
+      <p className="mt-1 text-[12px] font-medium text-[color:var(--ly-mute)]">Tuesday · Irvine</p>
       <div className="ly-map mt-4 px-2 py-3">
         <svg className="h-16 w-full" viewBox="0 0 320 64" fill="none" aria-hidden>
           <path
@@ -511,15 +511,15 @@ export function LyPhoto() {
       </div>
       <div className="relative aspect-[16/9] overflow-hidden rounded-xl bg-[color:var(--ly-bg-2)]">
         <Image
-          src={ANAHEIM_PHOTOS[2]}
-          alt="510 S Resh St living room"
+          src={FEATURED_PHOTOS[2]}
+          alt="170 Chorus living room"
           fill
           sizes="(min-width: 768px) 520px, 100vw"
           className="object-cover"
         />
         <div className="absolute inset-0">
           <Image
-            src={ANAHEIM_PHOTOS[2]}
+            src={FEATURED_PHOTOS[2]}
             alt=""
             fill
             sizes="(min-width: 768px) 520px, 100vw"
