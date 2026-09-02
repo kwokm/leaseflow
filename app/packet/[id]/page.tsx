@@ -13,7 +13,8 @@ import { ApplicationToRent } from "@/components/rental-app/application-to-rent";
 import { Button } from "@/components/ui/button";
 import { checkApplicationDetails, checkApplyState } from "@/lib/docs/ai-check";
 import { resolveRentalPacket } from "@/lib/apply/rental-app";
-import { getHousehold, getReportByApplicant } from "@/lib/data/mock-data";
+import { getReportByApplicant } from "@/lib/data/mock-data";
+import { getHousehold } from "@/lib/data/household-model";
 import { shortAddress } from "@/lib/desk/display";
 import { householdTotals } from "@/lib/desk/household";
 

@@ -3,7 +3,8 @@
 import { Fragment } from "react";
 import { useRouter } from "next/navigation";
 import type { Applicant } from "@/lib/data/mock-data";
-import { getAiIncome, getPropertyById } from "@/lib/data/mock-data";
+import { getPropertyById } from "@/lib/data/mock-data";
+import { getAiIncome } from "@/lib/data/household-model";
 import { creditScore, incomeMultiple, shortAddress } from "@/lib/desk/display";
 import { householdsFirst, householdTotals, fullName } from "@/lib/desk/household";
 import { AiIncomeLine } from "@/components/desk/household-block";
