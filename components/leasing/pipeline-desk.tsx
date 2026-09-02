@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
@@ -46,7 +46,7 @@ function HomePhoto({ property }: { property: Property }) {
     );
   }
 
-  const remote = /^https?:\/\//i.test(src) && !/zillowstatic\.com/i.test(src);
+  const remote = /^https?:\/\//i.test(src) && !/zillowstatic\.com|d36xftgacqn2p\.cloudfront\.net/i.test(src);
 
   return (
     <div className="pipe-photo">
@@ -118,9 +118,7 @@ function ApplicantRow({
 }
 
 export function PipelineDesk({ preview = false }: { preview?: boolean }) {
-  const [properties, setProperties] = useState<Property[]>(() =>
-    preview ? mockProperties : getAllProperties()
-  );
+  const [properties, setProperties] = useState<Property[]>(() => mockProperties);
   const [applicants, setApplicants] = useState<Applicant[]>(() =>
     preview ? getAllApplications() : []
   );
