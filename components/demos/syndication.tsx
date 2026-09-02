@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { DemoPlay } from "@/components/demos/shell";
 
@@ -16,7 +16,7 @@ export function SyndicationDemo() {
       <div className="d d-breathe rounded-md border border-line px-3 py-3">
         <p className="text-[14px] font-semibold tracking-[-0.2px] text-ink">One listing</p>
         <p className="mt-0.5 text-[12px] font-medium text-mute">
-          510 S Resh St · synced · Demo sync
+          170 Chorus · synced · Demo sync
         </p>
       </div>
       <ul className="mt-3 grid grid-cols-5 gap-1.5">

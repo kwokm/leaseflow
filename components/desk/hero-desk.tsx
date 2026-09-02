@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useEffect, useRef, useState } from "react";
 import type { MouseEvent } from "react";
@@ -13,8 +13,8 @@ import { shortAddress } from "@/lib/desk/display";
 import { cn } from "@/lib/utils";
 
 const TOUR: { label: DeskNavLabel; title: string }[] = [
-  { label: "Pipeline", title: "Pipeline • 510 S Resh St" },
-  { label: "Applications", title: "Applications • 510 S Resh St" },
+  { label: "Pipeline", title: "Pipeline • 170 Chorus" },
+  { label: "Applications", title: "Applications • 170 Chorus" },
   { label: "Properties", title: "Properties" },
 ];
 

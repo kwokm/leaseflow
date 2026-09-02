@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
 import Image from "next/image";
 import { DemoPlay } from "@/components/demos/shell";
 import { PacketWindow } from "@/components/desk/packet-window";
-import { ANAHEIM_PHOTOS } from "@/lib/data/mock-data";
+import { FEATURED_PHOTOS } from "@/lib/data/mock-data";
 import { cn } from "@/lib/utils";
 
 const ID_CHECKS = [
@@ -27,7 +27,7 @@ export function HeroPacket() {
           <div className="px-3.5 py-3 sm:px-4 sm:py-4">
             <div className="d p-chip-a relative h-20 overflow-hidden rounded-md border border-line bg-mist sm:h-24">
               <Image
-                src={ANAHEIM_PHOTOS[0]}
+                src={FEATURED_PHOTOS[0]}
                 alt=""
                 fill
                 sizes="520px"
@@ -38,7 +38,7 @@ export function HeroPacket() {
             <div className="mt-3 flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <p className="text-[13px] font-semibold tracking-[-0.16px] text-ink">
-                  Jane Doe · 510 S Resh St
+                  Jane Doe · 170 Chorus
                 </p>
                 <p className="mt-0.5 text-[12px] font-medium text-mute">
                   Standard · applicants pay $24.99
