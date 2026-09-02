@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
 import { DemoPlay } from "@/components/demos/shell";
 
 const POSTS = [
-  { delay: "0.15s", title: "510 S Resh St", note: "3BR · $4,700/mo · Anaheim" },
-  { delay: "1.25s", title: "The Colony house", note: "Posted automatically · Demo sync" },
-  { delay: "2.35s", title: "Resh St follow-up", note: "Lead captured · AI reply queued" },
+  { delay: "0.15s", title: "170 Chorus", note: "4BR · $6,500/mo · Irvine" },
+  { delay: "1.25s", title: "Rise Park house", note: "Posted automatically · Demo sync" },
+  { delay: "2.35s", title: "Chorus follow-up", note: "Lead captured · AI reply queued" },
 ] as const;
 
 export function CraigslistDemo() {
