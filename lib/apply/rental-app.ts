@@ -2,7 +2,6 @@ import {
   FEATURED_LISTING_ID,
   getApplicantById,
   getApplicationDetails,
-  getHousehold,
   getPropertyById,
   getReportByApplicant,
   getScreeningFee,
@@ -12,6 +11,7 @@ import {
 } from "@/lib/data/mock-data";
 import { loadDraft, loadSubmissions } from "@/lib/apply/storage";
 import { householdIdFromOccupants, isLocalApplicantId, confirmationIdFromApplicantId } from "@/lib/apply/to-packet";
+import { getHousehold } from "@/lib/data/household-model";
 import { maskSsn } from "@/lib/apply/format";
 import {
   createDemoState,
@@ -64,8 +64,8 @@ export type RentalApplication = {
   screeningFee: {
     packageLabel: string;
     amount: string;
-    status: string;
     note: string;
+    status: string;
   };
   ssnDisplay: string;
   noticeTitle: string;
