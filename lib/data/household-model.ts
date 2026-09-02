@@ -8,6 +8,7 @@ import {
   type ScreeningReport,
 } from "@/lib/data/mock-data";
 
+/** Featured listing is 170 Chorus; id stays resh-510 so apply/pipeline wiring does not break. */
 export const DEMO_HOUSEHOLD_ID = "hh-resh-510-sarah-jessica";
 
 export type AiIncomeSource = "paystub" | "w2" | "paystub+w2";
