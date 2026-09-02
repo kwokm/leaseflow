@@ -1,5 +1,4 @@
 import {
-  getAiIncome,
   getExperianPull,
   getPropertyById,
   getReportByApplicant,
@@ -7,6 +6,7 @@ import {
   type Applicant,
   type ApplicationStatus,
 } from "@/lib/data/mock-data";
+import { getAiIncome } from "@/lib/data/household-model";
 
 /** The three rows from the locked landing screenshot, in that order. */
 export const DESK_HERO_IDS = ["app-1", "app-6", "app-4"] as const;

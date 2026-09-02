@@ -1,14 +1,16 @@
 import {
-  getAiIncome,
-  getHousehold,
   getPropertyById,
   getReportByApplicant,
-  groupApplicantsByHousehold,
   type Applicant,
-  type AiIncomeScreen,
   type ApplicationStatus,
-  type HouseholdGroup,
 } from "@/lib/data/mock-data";
+import {
+  getAiIncome,
+  getHousehold,
+  groupApplicantsByHousehold,
+  type AiIncomeScreen,
+  type HouseholdGroup,
+} from "@/lib/data/household-model";
 
 export type { HouseholdGroup };
 
