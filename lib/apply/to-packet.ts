@@ -5,7 +5,7 @@ import type {
   ExperianPull,
   ScreeningReport,
 } from "@/lib/data/mock-data";
-import type { AiIncomeScreen } from "@/lib/data/household-model";
+import { ensureHouseholdDemo, type AiIncomeScreen } from "@/lib/data/household-model";
 import { getApplicantsByProperty, getPropertyById } from "@/lib/data/mock-data";
 import { formatFileSize, ssnLast4 } from "./format";
 import type { ApplyState, LocalFile } from "./types";
@@ -59,6 +59,7 @@ function normalizeName(value: string): string {
 
 /** Attach an existing household when an occupant name matches a co-tenant on this listing. */
 export function householdIdFromOccupants(state: ApplyState): string | undefined {
+  ensureHouseholdDemo();
   const self = normalizeName(`${state.personal.firstName} ${state.personal.lastName}`);
   const wanted = new Set(
     state.household.occupants
