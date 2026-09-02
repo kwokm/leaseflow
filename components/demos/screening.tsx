@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { DemoPlay } from "@/components/demos/shell";
 
@@ -12,7 +12,7 @@ const CHECKS = [
 export function ScreeningDemo() {
   return (
     <DemoPlay>
-      <p className="text-[12px] font-medium text-mute">Jane Doe · 510 S Resh St</p>
+      <p className="text-[12px] font-medium text-mute">Jane Doe · 170 Chorus</p>
       <ul className="mt-3 space-y-2">
         {CHECKS.map((row, index) => (
           <li

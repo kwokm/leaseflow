@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { DemoPlay } from "@/components/demos/shell";
 import { PIPELINE_COUNTS } from "@/lib/leasing/ops";
@@ -46,8 +46,8 @@ export function PipelineFunnelDemo() {
       </svg>
       <div className="d d-bob mt-1 flex flex-wrap items-center justify-between gap-2 rounded-md border border-line px-3 py-3">
         <div>
-          <p className="text-[14px] font-semibold tracking-[-0.2px] text-ink">510 S Resh St</p>
-          <p className="mt-0.5 text-[12px] font-medium text-mute">3 bed · $4,700/mo · Anaheim</p>
+          <p className="text-[14px] font-semibold tracking-[-0.2px] text-ink">170 Chorus</p>
+          <p className="mt-0.5 text-[12px] font-medium text-mute">4 bed · $6,500/mo · Irvine</p>
         </div>
         <span className="desk-pill is-on">Application review</span>
       </div>
