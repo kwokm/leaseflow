@@ -2,8 +2,7 @@
 
 import { useEffect } from "react";
 import { BedDouble, Bath, CalendarDays, Check } from "lucide-react";
-import { StepBody } from "@/components/apply/motion";
-import { Note, Panel, StepHeading } from "@/components/apply/step-shell";
+import { Note, Panel, StepChrome } from "@/components/apply/step-shell";
 import type { StepProps } from "@/components/apply/step-shell";
 import { Button } from "@/components/ui/button";
 import { formatDateOnly, formatDollars } from "@/lib/apply/format";
@@ -24,7 +23,7 @@ const STANDARD_FEATURES = [
   "Apply to as many homes as you want",
 ];
 
-export function StepStart({ state, patch, property }: StepProps) {
+export function StepStart({ state, patch, property, embedded }: StepProps) {
   useEffect(() => {
     if (state.screeningPackage !== "standard") {
       patch({ screeningPackage: "standard" });
@@ -32,12 +31,17 @@ export function StepStart({ state, patch, property }: StepProps) {
   }, [patch, state.screeningPackage]);
 
   return (
-    <StepBody>
-      <StepHeading lead="Start your application for" tone={property.address.split(",")[0]} />
-      <p className="max-w-xl text-[15px] font-medium leading-[21px] tracking-[-0.16px] text-mute">
-        It takes about ten minutes. Your progress saves in this browser, so you can stop and pick it
-        back up.
-      </p>
+    <StepChrome
+      embedded={embedded}
+      lead="Start your application for"
+      tone={property.address.split(",")[0]}
+    >
+      {!embedded ? (
+        <p className="max-w-xl text-[15px] font-medium leading-[21px] tracking-[-0.16px] text-mute">
+          It takes about ten minutes. Your progress saves in this browser, so you can stop and pick it
+          back up.
+        </p>
+      ) : null}
       <div>
         <Button
           type="button"
@@ -155,6 +159,6 @@ export function StepStart({ state, patch, property }: StepProps) {
           ))}
         </ul>
       </Panel>
-    </StepBody>
+    </StepChrome>
   );
 }
