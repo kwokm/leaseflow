@@ -8,8 +8,6 @@ import { DeskSidebar, type DeskNavLabel } from "@/components/desk/desk-sidebar";
 import { PacketWindow } from "@/components/desk/packet-window";
 import { ListingThumb } from "@/components/listings/photos";
 import { PipelineDesk } from "@/components/leasing/pipeline-desk";
-import { LeadInbox } from "@/components/leasing/lead-inbox";
-import { ShowingsCalendar } from "@/components/leasing/showings-calendar";
 import { getApplicantsByProperty, mockProperties } from "@/lib/data/mock-data";
 import { shortAddress } from "@/lib/desk/display";
 
@@ -17,8 +15,6 @@ const TOUR: { label: DeskNavLabel; title: string }[] = [
   { label: "Pipeline", title: "Pipeline • 510 S Resh St" },
   { label: "Applications", title: "Applications • 510 S Resh St" },
   { label: "Properties", title: "Properties" },
-  { label: "Leads", title: "Lead inbox" },
-  { label: "Showings", title: "Showings • Tuesday Anaheim" },
 ];
 
 const DWELL_MS = 3000;
@@ -136,8 +132,6 @@ export function HeroDesk() {
             <div key={active.label} className="hero-panel is-on">
               {active.label === "Pipeline" ? <PipelineDesk preview /> : null}
               {active.label === "Applications" ? <ApplicationDesk preview /> : null}
-              {active.label === "Leads" ? <LeadInbox /> : null}
-              {active.label === "Showings" ? <ShowingsCalendar /> : null}
               {active.label === "Properties" ? <PropertiesPreview /> : null}
             </div>
           </div>

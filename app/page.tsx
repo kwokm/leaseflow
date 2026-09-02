@@ -2,16 +2,6 @@ import Link from "next/link";
 import { BrandMark, BrandWord } from "@/components/brand";
 import { PacketWindow } from "@/components/desk/packet-window";
 import { HeroDesk } from "@/components/desk/hero-desk";
-import {
-  LyCraigslist,
-  LyFacebook,
-  LyLead,
-  LyLeadStory,
-  LyLease,
-  LyPhone,
-  LyScreening,
-  LyShowings,
-} from "@/components/demos/ly-widgets";
 import { InView } from "@/components/motion/in-view";
 import { Reveal } from "@/components/motion/reveal";
 import { SectionHeadline } from "@/components/motion/section-headline";
@@ -42,81 +32,6 @@ const STEPS = [
     tone: "The packet lands scored. Approve or decline from the row.",
   },
 ];
-
-const FLOW_PAIRS = [
-  {
-    id: "demo-pair-1",
-    items: [
-      {
-        id: "demo-leads",
-        title: "Lead management",
-        caption: "Maria inquires on 510 S Resh. Without a reply she is gone; the agent books Monday.",
-        Demo: LyLeadStory,
-      },
-      {
-        id: "demo-leads-widget",
-        Demo: LyLead,
-      },
-    ],
-  },
-  {
-    id: "demo-pair-phone",
-    wide: true,
-    items: [
-      {
-        id: "demo-phone",
-        title: "AI phone transcript",
-        caption: "Caller asks if 510 S Resh is available. Agent books Tuesday 2pm.",
-        Demo: LyPhone,
-      },
-    ],
-  },
-  {
-    id: "demo-pair-2",
-    items: [
-      {
-        id: "demo-showings",
-        title: "Showing agenda",
-        caption: "Tuesday slots fill. Live availability stays on.",
-        Demo: LyShowings,
-      },
-      {
-        id: "demo-screen",
-        title: "Applicant screening",
-        caption: "ID, Experian, income (name + two months), background.",
-        Demo: LyScreening,
-      },
-    ],
-  },
-  {
-    id: "demo-pair-3",
-    items: [
-      {
-        id: "demo-lease",
-        title: "Lease signing",
-        caption: "Approved → generated → e-sign → deposit queued.",
-        Demo: LyLease,
-      },
-    ],
-  },
-  {
-    id: "demo-pair-4",
-    items: [
-      {
-        id: "demo-facebook",
-        title: "Facebook Marketplace chat",
-        caption: "Maria on Messenger. Instant reply, Anaheim copy.",
-        Demo: LyFacebook,
-      },
-      {
-        id: "demo-craigslist",
-        title: "Craigslist auto-post",
-        caption: "Three listing rows go live. Demo sync.",
-        Demo: LyCraigslist,
-      },
-    ],
-  },
-] as const;
 
 export default function Home() {
   const property = getPropertyById(FEATURED_LISTING_ID)!;
@@ -235,47 +150,6 @@ export default function Home() {
                 </li>
               ))}
             </InView>
-          </div>
-        </section>
-
-        <section id="flow" className="bg-white pb-16 sm:pb-28" aria-labelledby="flow-title">
-          <div className="mx-auto max-w-shell px-5 sm:px-8">
-            <InView>
-              <h2
-                id="flow-title"
-                className="text-[30px] font-medium leading-[1.08] tracking-[-0.6px] text-ink sm:text-[40px] sm:leading-[44px] sm:tracking-[-0.4px]"
-              >
-                <SplitWords>Vacant unit to signed lease.</SplitWords>
-              </h2>
-              <p className="reveal-tone mt-3 max-w-[46ch] text-[15px] font-medium leading-6 tracking-[-0.16px] text-mute">
-                Reply, show, screen, sign. Each pair is one scroll beat. Screening in the middle is
-                ours — Experian, AI income, one packet.
-              </p>
-            </InView>
-
-            {FLOW_PAIRS.map((pair) => (
-              <InView key={pair.id} id={pair.id} className="ly-beat">
-                <div className="pillar-spatial">
-                  <div
-                    className={`ly-pair${pair.items.length === 1 ? " is-single" : ""}${
-                      "wide" in pair && pair.wide ? " is-wide" : ""
-                    }`}
-                  >
-                    {pair.items.map((item) => (
-                      <article key={item.id} id={item.id} className="scroll-mt-24">
-                        {"title" in item && item.title ? (
-                          <div className="ly-kicker">
-                            <h3>{item.title}</h3>
-                            {item.caption ? <p>{item.caption}</p> : null}
-                          </div>
-                        ) : null}
-                        <item.Demo />
-                      </article>
-                    ))}
-                  </div>
-                </div>
-              </InView>
-            ))}
           </div>
         </section>
 

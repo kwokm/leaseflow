@@ -44,7 +44,7 @@ Standard is the only package in the product UI and data model.
 - `/packet/[id]` — shareable renter packet
 - `/realtor` — redirect to the gated landlord dashboard
 
-Leasing-operations routes remain available as prototype extensions, but Pipeline, Applications, and Properties lead the landlord experience. Payments is not shown in the desk rail.
+Pipeline, Applications, and Properties are the complete landlord navigation. Legacy leads, messages, showings, payments, and lease URLs redirect to the screening pipeline.
 
 ## Local development
 
@@ -64,7 +64,7 @@ npm run build
 - Landlord auth is a browser-local prototype session with a routing cookie, not production authentication.
 - Listings, decisions, drafts, submissions, and demo state are stored in localStorage.
 - Uploaded files never leave the browser. Object URL previews expire; restored packets label them “Preview unavailable after reload.”
-- Experian, background, LeaseScore, AI income, payments, notifications, and leases are mock-only.
+- Experian, background, LeaseScore, AI income, payment, and notifications are mock-only.
 - Shared packet links are prototype links and are not a production authorization model.
 
 ## Design

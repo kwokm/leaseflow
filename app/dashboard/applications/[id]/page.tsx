@@ -43,7 +43,6 @@ import { resolveRentalPacket } from "@/lib/apply/rental-app";
 import type { ApplyState } from "@/lib/apply/types";
 import type { ApplicationStatus } from "@/lib/data/mock-data";
 import type { RentalApplication } from "@/lib/apply/rental-app";
-import { queueLease, useLeaseByApplication } from "@/lib/leasing/store";
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
@@ -126,8 +125,6 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
     : applicant
       ? getExperianPull(applicant.id)
       : undefined;
-  const lease = useLeaseByApplication(id);
-
   if (local && !submissionChecked) {
     return <p className="px-6 py-12 text-[13px] text-mute">Loading the application…</p>;
   }
@@ -154,20 +151,8 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
   const credit = creditScore(applicant);
 
   function decide(next: "approved" | "declined") {
-    if (!property) return;
     setDecision(id, next);
     setStatusOverride(next);
-    if (next === "approved") {
-      const nextLease = queueLease({
-        applicationId: id,
-        listingId: property.id,
-        tenantName: fullName,
-        address: property.address,
-        rent: property.rent,
-      });
-      router.push(`/dashboard/leases/${nextLease.id}`);
-      return;
-    }
     router.push("/dashboard/applications");
   }
 
@@ -194,11 +179,6 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
           <Button asChild variant="outline" size="sm">
             <Link href="/dashboard/applications">Back</Link>
           </Button>
-          {lease ? (
-            <Button asChild size="sm">
-              <Link href={`/dashboard/leases/${lease.id}`}>Open lease</Link>
-            </Button>
-          ) : null}
           <Button variant="outline" size="sm" onClick={() => window.print()}>
             Print
           </Button>

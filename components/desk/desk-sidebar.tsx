@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Calendar, Home, Inbox, LayoutGrid, ScrollText } from "lucide-react";
+import { Home, LayoutGrid, ScrollText } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -10,8 +10,7 @@ const NAV = [
     href: "/dashboard",
     label: "Pipeline",
     icon: LayoutGrid,
-    match: (path: string) =>
-      path === "/dashboard" || path.startsWith("/dashboard/leases"),
+    match: (path: string) => path === "/dashboard",
   },
   {
     href: "/dashboard/applications",
@@ -24,19 +23,6 @@ const NAV = [
     label: "Properties",
     icon: Home,
     match: (path: string) => path.startsWith("/dashboard/listings"),
-  },
-  {
-    href: "/dashboard/leads",
-    label: "Leads",
-    icon: Inbox,
-    match: (path: string) =>
-      path.startsWith("/dashboard/leads") || path.startsWith("/dashboard/messages"),
-  },
-  {
-    href: "/dashboard/showings",
-    label: "Showings",
-    icon: Calendar,
-    match: (path: string) => path.startsWith("/dashboard/showings"),
   },
 ] as const;
 

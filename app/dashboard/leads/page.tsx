@@ -1,5 +1,5 @@
-import { LeadInbox } from "@/components/leasing/lead-inbox";
+import { redirect } from "next/navigation";
 
 export default function LeadsPage() {
-  return <LeadInbox />;
+  redirect("/dashboard");
 }
