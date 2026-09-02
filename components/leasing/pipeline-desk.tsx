@@ -6,6 +6,7 @@ import Link from "next/link";
 import { DeskToolbar } from "@/components/desk/packet-window";
 import { StatusPill } from "@/components/desk/status-pill";
 import { Avatar } from "@/components/desk/avatar";
+import { AiIncomeLine, HouseholdSummary } from "@/components/desk/household-block";
 import { Reveal } from "@/components/motion/reveal";
 import { ApplyLinkActions } from "@/components/listings/apply-link-actions";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,7 @@ import {
 } from "@/lib/data/mock-data";
 import { loadDeskApplicants } from "@/lib/desk/queue";
 import { shortAddress } from "@/lib/desk/display";
+import { householdTotals, householdsFirst } from "@/lib/desk/household";
 import { SCREENING_TASKS, screeningChecks } from "@/lib/desk/screening";
 import { listingThumb } from "@/lib/listings/store";
 import { cn } from "@/lib/utils";
@@ -58,7 +60,15 @@ function HomePhoto({ property }: { property: Property }) {
   );
 }
 
-function ApplicantRow({ applicant, preview }: { applicant: Applicant; preview: boolean }) {
+function ApplicantRow({
+  applicant,
+  preview,
+  nested = false,
+}: {
+  applicant: Applicant;
+  preview: boolean;
+  nested?: boolean;
+}) {
   const name = `${applicant.firstName} ${applicant.lastName}`;
   const checks = screeningChecks(applicant);
   const content = (
@@ -68,8 +78,14 @@ function ApplicantRow({ applicant, preview }: { applicant: Applicant; preview: b
         <span className="min-w-0">
           <span className="block truncate text-[13px] font-semibold tracking-[-0.16px] text-ink">
             {name}
+            {nested ? (
+              <span className="ml-1.5 text-[11px] font-medium text-mute">Co-tenant</span>
+            ) : null}
           </span>
           <StatusPill status={applicant.status} className="mt-1" />
+          <span className="mt-1 block">
+            <AiIncomeLine applicant={applicant} />
+          </span>
         </span>
       </span>
       <span className="pipe-tasks">
@@ -86,20 +102,18 @@ function ApplicantRow({ applicant, preview }: { applicant: Applicant; preview: b
     </>
   );
 
+  if (preview) {
+    return <div className="pipe-applicant">{content}</div>;
+  }
+
   return (
-    <li>
-      {preview ? (
-        <div className="pipe-applicant">{content}</div>
-      ) : (
-        <Link
-          href={`/dashboard/applications/${applicant.id}`}
-          className="pipe-applicant"
-          aria-label={`Open packet for ${name}`}
-        >
-          {content}
-        </Link>
-      )}
-    </li>
+    <Link
+      href={`/dashboard/applications/${applicant.id}`}
+      className="pipe-applicant"
+      aria-label={`Open packet for ${name}`}
+    >
+      {content}
+    </Link>
   );
 }
 
@@ -155,6 +169,7 @@ export function PipelineDesk({ preview = false }: { preview?: boolean }) {
       <div className="pipe-grid">
         {homes.map((property) => {
           const rows = applicants.filter((row) => row.propertyId === property.id);
+          const groups = householdsFirst(rows);
           const summary = (
             <>
               <HomePhoto property={property} />
@@ -184,10 +199,33 @@ export function PipelineDesk({ preview = false }: { preview?: boolean }) {
                 </Link>
               )}
               <ul className="mt-3 border-t border-line">
-                {rows.length ? (
-                  rows.map((applicant) => (
-                    <ApplicantRow key={applicant.id} applicant={applicant} preview={preview} />
-                  ))
+                {groups.length ? (
+                  groups.map((group) => {
+                    if (group.kind === "solo") {
+                      return (
+                        <li key={group.applicant.id}>
+                          <ApplicantRow applicant={group.applicant} preview={preview} />
+                        </li>
+                      );
+                    }
+
+                    const totals = householdTotals(group.members, property.rent);
+                    return (
+                      <li key={group.householdId} className="pipe-household">
+                        <div className="pipe-household-head">
+                          <HouseholdSummary totals={totals} />
+                        </div>
+                        {group.members.map((member) => (
+                          <ApplicantRow
+                            key={member.id}
+                            applicant={member}
+                            preview={preview}
+                            nested
+                          />
+                        ))}
+                      </li>
+                    );
+                  })
                 ) : (
                   <li className="space-y-3 px-3.5 py-3 text-[12px] font-medium text-mute">
                     <p>No applicants yet.</p>
