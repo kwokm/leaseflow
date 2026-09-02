@@ -1,4 +1,5 @@
 import {
+  getAiIncome,
   getExperianPull,
   getPropertyById,
   getReportByApplicant,
@@ -66,10 +67,12 @@ export function statusClass(status: ApplicationStatus): string {
 }
 
 export function incomeMultiple(applicant: Applicant): number | undefined {
+  const screen = getAiIncome(applicant.id);
   const report = getReportByApplicant(applicant.id);
   const property = getPropertyById(applicant.propertyId);
-  if (!report || !property?.rent) return undefined;
-  return report.income.monthlyIncome / property.rent;
+  const monthly = screen?.grossMonthly ?? report?.income.monthlyIncome;
+  if (!monthly || !property?.rent) return undefined;
+  return monthly / property.rent;
 }
 
 export function creditScore(applicant: Applicant): number | undefined {
