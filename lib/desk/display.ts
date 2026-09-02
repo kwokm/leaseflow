@@ -8,7 +8,6 @@ import {
 } from "@/lib/data/mock-data";
 import { getAiIncome } from "@/lib/data/household-model";
 
-/** The three rows from the locked landing screenshot, in that order. */
 export const DESK_HERO_IDS = ["app-1", "app-6", "app-4"] as const;
 
 const AVA_BY_INITIALS: Record<string, string> = {
@@ -31,7 +30,7 @@ export function avatarClass(firstName: string, lastName: string): string {
   return AVA_BY_INITIALS[initials] ?? "ava-dk";
 }
 
-/** Street (+ unit) only — matches “742 Evergreen Terrace” / “123 Main Street 4B”. */
+/** Street (+ unit) only - matches 170 Chorus / 14 Modesto. */
 export function shortAddress(address: string): string {
   const parts = address.split(",").map((part) => part.trim());
   const street = parts[0] ?? address;
