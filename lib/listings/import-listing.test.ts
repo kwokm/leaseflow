@@ -202,6 +202,19 @@ test("does not invent address, rent, or photos", () => {
   assert.deepEqual(sale.photos, []);
 });
 
+test("drops social thumbnails from pulled photos", () => {
+  const preview = parseListingHtml(
+    `<html><head>
+      <meta property="og:title" content="170 Chorus, Irvine, CA 92618 | Zillow" />
+      <meta property="og:image" content="https://photos.zillowstatic.com/fp/front-cc_ft_1536.jpg" />
+      <meta property="og:image" content="https://www.zillowstatic.com/static/images/social/share_thumbnail.png" />
+    </head></html>`,
+    "https://www.zillow.com/homedetails/170-Chorus/1_zpid/",
+    "zillow"
+  );
+  assert.deepEqual(preview.photos, ["https://photos.zillowstatic.com/fp/front-cc_ft_1536.jpg"]);
+});
+
 test("detects a bot wall and rejects non-addresses", () => {
   assert.equal(detectBotWall("<html><title>Just a moment...</title><body>Enable JavaScript and cookies to continue</body></html>", 200), true);
   assert.equal(detectBotWall("<html><body>ok</body></html>", 403), true);

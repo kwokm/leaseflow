@@ -84,7 +84,7 @@ const PHOTO_HOST =
   /zillowstatic\.com|cdn-redfin\.com|rdcpix\.com|images\.apartments\.com|thumbs\.trulia|photos\.zillow|media\.redfin|sslx?\.cdn-redfin|images\.homes\.com|cloudfront\.net/i;
 
 const SKIP_PHOTO =
-  /logo|sprite|icon|avatar|pixel|tracking|favicon|mapbox|maps\.google|placeholder|1x1\./i;
+  /logo|sprite|icon|avatar|pixel|tracking|favicon|mapbox|maps\.google|placeholder|1x1\.|share_thumbnail|\/static\/images\/|social\/|og_default/i;
 
 const RESIDENCE_TYPE =
   /singlefamily|familyresidence|house|apartment|condo|townhouse|residence|accommodation|realestatelisting|living/i;
@@ -348,6 +348,24 @@ function first<T>(...values: (T | undefined)[]): T | undefined {
   return values.find((value) => value !== undefined && value !== null && value !== "");
 }
 
+/** Keep unique listing photos; drop social thumbnails and size variants. */
+function rankPhotos(found: Set<string>): string[] {
+  const byKey = new Map<string, string>();
+  for (const url of found) {
+    const key = url
+      .replace(/-cc_ft_[a-z0-9]+/i, "")
+      .replace(/[_-]\d{2,4}x\d{2,4}/i, "")
+      .replace(/\.(webp|jpe?g|png)(\?.*)?$/i, "");
+    const current = byKey.get(key);
+    const prefer =
+      !current ||
+      (/photos\.zillowstatic\.com\/fp\//.test(url) && !/\/fp\//.test(current)) ||
+      (/bigphoto|od-cc_ft_1536|_1536|_2048/.test(url) && !/_1536|_2048|bigphoto/.test(current));
+    if (prefer) byKey.set(key, url);
+  }
+  return [...byKey.values()].slice(0, 16);
+}
+
 export function detectBotWall(html: string, status: number): boolean {
   if ([401, 403, 429, 503].includes(status)) return true;
   if (html.length < 400 && BOT_WALL.test(html)) return true;
@@ -454,7 +472,7 @@ export function parseListingHtml(
     sqft,
     neighborhood,
     propertyType,
-    photos: [...photos].slice(0, 16),
+    photos: rankPhotos(photos),
   };
 
   if (!preview.address) {
