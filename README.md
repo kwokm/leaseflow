@@ -93,6 +93,30 @@ Documents are read back through `/api/uploads/file`, which requires a session �
 | `LEASEPROOF_BETA_EMAILS` | production | Comma-separated landlord emails, case-insensitive. **Empty in production means nobody new gets a desk.** Unset on `LEASEPROOF_DEMO=1` or Vercel Preview (`VERCEL_ENV=preview`) falls back to `michaelgkwok@gmail.com` and `aaisuzukillc@gmail.com`. Applicants are not on this list. |
 | `LEASEPROOF_LIVE_FEES` | no | `1` allows a live Stripe key to charge $24.99. **Defaults off.** Do not set until counsel clears Cal. Civ. Code § 1950.6. Test keys work without this. |
 | `NEXT_PUBLIC_APP_URL` | no | absolute origin for Stripe return URLs; falls back to `VERCEL_URL`, then localhost |
+| `INCOME_WORKER_SECRET` | worker | Bearer secret for `/api/income/worker/*`. Unset → those routes 503. **Never commit a real value.** |
+| `LEASEPROOF_API_URL` | Studio only | Preview origin the Mac Studio worker polls. Vercel never calls the Studio inbound. |
+
+### Mac Studio AI Income Check
+
+Extraction runs on Michael's Mac Studio (Ollama vision, zero vendor $). Vercel enqueues a pending `income_checks` row after a paystub / statement / W-2 upload. The Studio **pulls** jobs — it is never called inbound.
+
+On the Studio:
+
+```bash
+cd /path/to/leaseflow
+LEASEPROOF_API_URL=https://<this-preview>.vercel.app \
+INCOME_WORKER_SECRET='the same value as Vercel' \
+INCOME_OPENAI_BASE_URL=http://127.0.0.1:11434/v1 \
+INCOME_OPENAI_API_KEY=ollama \
+INCOME_MODEL=qwen2.5vl:7b \
+node scripts/income-worker.mjs
+```
+
+`node --experimental-strip-types` also works. The worker loops every ~3s: claim → download via `/api/income/worker/file/:id` → rasterize PDF first pages with `qlmanage` / `sips` → `POST` OpenAI-compatible `/v1/chat/completions` → complete.
+
+To point at a local Darkbloom OpenAI endpoint later, change `INCOME_OPENAI_BASE_URL` and `INCOME_OPENAI_API_KEY` only. Do not start Darkbloom from this repo. Do not interrupt EXO earning.
+
+The apply Proof step polls until the row is `ready` and labels results **Read from your upload** — never verified or approved. If the worker is down the UI says “Waiting for income check…” and apply can continue. Landlord packet / pipeline use ready Neon rows; household gross is the sum of each applicant’s ready `monthly_gross`.
 
 ### Degradation
 
@@ -123,7 +147,7 @@ created takes down every page that queries Neon — so the build applies them, a
 fails rather than shipping against a schema it cannot use. Without `DATABASE_URL`
 the step is a no-op, so a checkout with no secrets still builds.
 
-Tables: `users`, `listings`, `households`, `applications`, `documents`, `consents`, `payments`, `credit_shares`.
+Tables: `users`, `listings`, `households`, `applications`, `documents`, `consents`, `payments`, `credit_shares`, `income_checks`.
 
 ## Main routes
 

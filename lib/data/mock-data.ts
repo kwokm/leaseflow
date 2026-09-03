@@ -43,6 +43,25 @@ export interface Applicant {
   appliedAt: string;
   completedAt?: string;
   leaseScore?: number;
+  /**
+   * Live AI Income Check rollup from Neon when the Studio worker has written
+   * a ready row. Absent on seeded mock packets that still use filename/demo
+   * screens.
+   */
+  incomeCheck?: LiveIncomeCheckSummary;
+}
+
+/** Landlord-visible rollup of ready income_checks for one applicant. */
+export interface LiveIncomeCheckSummary {
+  status: "pending" | "claimed" | "ready" | "error";
+  monthlyGross: number | null;
+  monthlyGrossCents: number | null;
+  nameMatch: boolean | null;
+  recency: "current" | "stale" | "unknown" | null;
+  recencyLabel: string | null;
+  employer: string | null;
+  readyCount: number;
+  checkCount: number;
 }
 
 export interface CreditSummary {

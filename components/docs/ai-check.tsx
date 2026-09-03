@@ -11,6 +11,11 @@ import { cn } from "@/lib/utils";
 
 const SCAN_S = 0.7;
 
+function formatGross(cents: number | null | undefined): string | null {
+  if (cents == null) return null;
+  return `$${Math.round(cents / 100).toLocaleString()} / mo`;
+}
+
 function Pill({
   ok,
   children,
@@ -25,6 +30,9 @@ function Pill({
 
 function Row({ row, delay }: { row: DocCheckRow; delay: number }) {
   const reduced = useReducedMotion();
+  const gross = formatGross(row.monthlyGrossCents);
+  const waiting = Boolean(row.waiting);
+  const errored = Boolean(row.errored);
 
   return (
     <motion.li
@@ -37,15 +45,32 @@ function Row({ row, delay }: { row: DocCheckRow; delay: number }) {
         <p className="text-[13px] font-medium text-ink">
           {row.kindLabel}
           {row.extra ? <span className="ml-2 text-[12px] text-mute">Sample</span> : null}
+          {row.source === "live" && !waiting && !errored ? (
+            <span className="ml-2 text-[12px] text-mute">{row.readLabel ?? "Read from your upload"}</span>
+          ) : null}
         </p>
         <p className="mt-0.5 truncate text-[12px] text-mute">{row.fileName}</p>
         <p className="mt-0.5 text-[12px] text-mute">
-          {row.detectedName} · {row.periodLabel}
+          {waiting
+            ? "Waiting for income check…"
+            : errored
+              ? "Could not read this file"
+              : `${row.detectedName} · ${row.periodLabel}${gross ? ` · ${gross}` : ""}${
+                  row.employer ? ` · ${row.employer}` : ""
+                }`}
         </p>
       </div>
       <div className="flex flex-wrap gap-1.5">
-        <Pill ok={row.nameMatch}>{row.nameMatch ? "Match" : "Mismatch"}</Pill>
-        <Pill ok={row.recency === "current"}>{row.recencyLabel}</Pill>
+        {waiting ? (
+          <span className="status">Waiting</span>
+        ) : errored ? (
+          <span className="status status-no">Unread</span>
+        ) : (
+          <>
+            <Pill ok={row.nameMatch}>{row.nameMatch ? "Match" : "Mismatch"}</Pill>
+            <Pill ok={row.recency === "current"}>{row.recencyLabel}</Pill>
+          </>
+        )}
       </div>
     </motion.li>
   );
@@ -58,6 +83,8 @@ export function AiDocCheck({
   scan = true,
   compact = false,
   embedded = false,
+  live = false,
+  waiting = false,
 }: {
   report: DocCheckReport;
   onToggleSample?: () => void;
@@ -65,9 +92,13 @@ export function AiDocCheck({
   scan?: boolean;
   compact?: boolean;
   embedded?: boolean;
+  live?: boolean;
+  waiting?: boolean;
 }) {
   const reduced = useReducedMotion();
   const [ready, setReady] = useState(!scan || Boolean(reduced));
+  const isLive = live || Boolean(report.live);
+  const isWaiting = waiting || Boolean(report.waiting);
 
   useEffect(() => {
     if (!scan || reduced) {
@@ -82,12 +113,18 @@ export function AiDocCheck({
   if (compact) {
     return (
       <div>
-        <p className="text-[12px] font-medium text-mute-2">AI document check</p>
+        <p className="text-[12px] font-medium text-mute-2">AI Income Check</p>
         <p className="mt-0.5 text-[13px] font-medium text-ink">
-          {report.passed ? "Income docs verified" : "Income docs need a look"}
+          {isWaiting
+            ? "Waiting for income check…"
+            : isLive
+              ? "Read from your upload"
+              : report.passed
+                ? "Income documents match"
+                : "Income documents need a look"}
         </p>
         <p className="mt-0.5 text-[12px] text-mute">
-          Mock check · name match / last 2 months
+          AI Income Check reads paystubs and statements. You decide who to approve.
         </p>
       </div>
     );
@@ -98,19 +135,18 @@ export function AiDocCheck({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-[12px] font-medium uppercase tracking-[0.06em] text-mute-2">
-            AI document check
+            AI Income Check
           </p>
           <h2 className="mt-1 text-[17px] font-semibold tracking-[-0.3px] text-ink">
             Income documents
           </h2>
           <p className="mt-1 text-[13px] font-medium text-mute">
-            Name on the file vs the packet, and whether copies are the last two months
-            (W-2 / 1099: tax year 2025). Mock read from filenames — not a live bureau.
+            AI Income Check reads paystubs and statements. You decide who to approve.
           </p>
         </div>
-        {ready ? (
-          <span className={cn("status", report.passed ? "status-ok" : "status-no")}>
-            {report.passed ? "Pass" : "Issues"}
+        {ready && !isWaiting ? (
+          <span className={cn("status", report.passed ? "status-ok" : report.rows.length ? "status-no" : "")}>
+            {isLive ? "Read from your upload" : report.passed ? "Pass" : "Issues"}
           </span>
         ) : null}
       </div>
@@ -132,7 +168,11 @@ export function AiDocCheck({
         </div>
       ) : (
         <>
-          {report.rows.length === 0 ? (
+          {isWaiting && report.rows.length === 0 ? (
+            <p className="mt-4 text-[13px] font-medium text-mute" aria-live="polite">
+              Waiting for income check…
+            </p>
+          ) : report.rows.length === 0 ? (
             <p className="mt-4 text-[13px] font-medium text-mute">No income documents to check.</p>
           ) : (
             <ul className="mt-2">
@@ -143,9 +183,13 @@ export function AiDocCheck({
           )}
 
           <p className="mt-3 text-[12px] text-mute-2">
-            {report.passed
-              ? "All names match the applicant and recency rules pass."
-              : "Happy-path dummy files still pass. This preview does not block submit."}
+            {isLive
+              ? isWaiting
+                ? "The Mac Studio worker is reading this upload. You can keep going."
+                : "Read from your upload — not a verification or an approval."
+              : report.passed
+                ? "All names match the applicant and recency rules pass."
+                : "Happy-path dummy files still pass. This preview does not block submit."}
           </p>
 
           {onToggleSample ? (

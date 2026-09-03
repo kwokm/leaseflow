@@ -314,6 +314,56 @@ export const adverseActionNotices = pgTable(
   })
 );
 
+/**
+ * Mac Studio pull-queue for AI Income Check. Vercel never calls the Studio;
+ * the worker claims a pending row, reads the blob through the worker file
+ * route, and writes extraction back. Bytes stay in Blob — this row is the
+ * extracted fields plus job state.
+ */
+export const incomeChecks = pgTable(
+  "income_checks",
+  {
+    id: text("id").primaryKey(),
+    applicationId: text("application_id").references(() => applications.id, {
+      onDelete: "set null",
+    }),
+    listingId: text("listing_id").references(() => listings.id, {
+      onDelete: "set null",
+    }),
+    documentId: text("document_id").references(() => documents.id, {
+      onDelete: "set null",
+    }),
+    applicantName: text("applicant_name").notNull().default(""),
+    docKind: text("doc_kind").notNull(),
+    blobPath: text("blob_path").notNull(),
+    fileName: text("file_name").notNull(),
+    /** pending -> claimed -> ready | error */
+    status: text("status").notNull().default("pending"),
+    claimedAt: timestamp("claimed_at", { withTimezone: true }),
+    claimedBy: text("claimed_by"),
+    errorText: text("error_text"),
+    monthlyGrossCents: integer("monthly_gross_cents"),
+    payFrequency: text("pay_frequency"),
+    employer: text("employer"),
+    periodStart: text("period_start"),
+    periodEnd: text("period_end"),
+    detectedName: text("detected_name"),
+    nameMatch: boolean("name_match"),
+    recency: text("recency"),
+    recencyLabel: text("recency_label"),
+    extractor: text("extractor"),
+    rawJson: jsonb("raw_json").$type<Record<string, unknown>>(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    statusIdx: index("income_checks_status_idx").on(table.status),
+    applicationIdx: index("income_checks_application_id_idx").on(table.applicationId),
+    listingIdx: index("income_checks_listing_id_idx").on(table.listingId),
+    createdIdx: index("income_checks_created_at_idx").on(table.createdAt),
+  })
+);
+
 export type UserRow = typeof users.$inferSelect;
 export type ListingRow = typeof listings.$inferSelect;
 export type NewListingRow = typeof listings.$inferInsert;
@@ -325,3 +375,5 @@ export type CreditConsentRow = typeof creditConsents.$inferSelect;
 export type PaymentRow = typeof payments.$inferSelect;
 export type CreditShareRow = typeof creditShares.$inferSelect;
 export type AdverseActionNoticeRow = typeof adverseActionNotices.$inferSelect;
+export type IncomeCheckRow = typeof incomeChecks.$inferSelect;
+export type NewIncomeCheckRow = typeof incomeChecks.$inferInsert;

@@ -19,6 +19,8 @@ export interface LocalFile {
   url?: string;
   storedUrl?: string;
   pathname?: string;
+  /** Neon income_checks id, set after the apply flow enqueues a Studio job. */
+  incomeCheckId?: string;
   addedAt: string;
 }
 

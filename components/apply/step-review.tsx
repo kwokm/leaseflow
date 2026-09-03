@@ -6,6 +6,8 @@ import { CreditCard, Lock, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AiDocCheck } from "@/components/docs/ai-check";
 import { SAMPLE_MISMATCH, checkApplyState } from "@/lib/docs/ai-check";
+import { incomeFilesFromState, useIncomeChecks } from "@/components/apply/income-check-panel";
+import { reportFromIncomeChecks } from "@/lib/income/view";
 import { CreditConsentReceipt } from "@/components/apply/credit-consent-receipt";
 import { StepBody } from "@/components/apply/motion";
 import { Note, StepHeading, SummaryRow } from "@/components/apply/step-shell";
@@ -43,10 +45,32 @@ function ReviewBlock({
 export function StepReview({ state, property, goTo }: StepProps) {
   const [showSample, setShowSample] = useState(false);
   const config = useRuntimeConfig();
-  const docCheck = useMemo(
+  const liveIds = useMemo(
+    () =>
+      incomeFilesFromState(state)
+        .map((file) => file.incomeCheckId)
+        .filter((id): id is string => Boolean(id)),
+    [state.paystubs, state.statements],
+  );
+  const { checks: liveChecks, waiting: liveWaiting } = useIncomeChecks(liveIds);
+  const liveReport = useMemo(() => reportFromIncomeChecks(liveChecks), [liveChecks]);
+  const filenameReport = useMemo(
     () => checkApplyState(state, showSample ? [SAMPLE_MISMATCH] : []),
     [state, showSample],
   );
+  const docCheck = liveReport.checkedCount
+    ? liveReport
+    : config.demo
+      ? filenameReport
+      : {
+          rows: [],
+          passed: false,
+          namePass: false,
+          recencyPass: false,
+          checkedCount: 0,
+          live: true,
+          waiting: liveIds.length > 0 || liveWaiting,
+        };
   const fee = getScreeningFee(state.screeningPackage);
   const p = state.personal;
 
@@ -112,7 +136,9 @@ export function StepReview({ state, property, goTo }: StepProps) {
       <AiDocCheck
         report={docCheck}
         showSample={showSample}
-        onToggleSample={() => setShowSample((value) => !value)}
+        onToggleSample={config.demo ? () => setShowSample((value) => !value) : undefined}
+        live={Boolean(liveReport.checkedCount) || !config.demo}
+        waiting={liveWaiting && Boolean(liveIds.length)}
       />
 
       <section className="rounded-lg border border-line bg-paper p-5 shadow-window">

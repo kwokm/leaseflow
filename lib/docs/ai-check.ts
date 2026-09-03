@@ -25,6 +25,13 @@ export type DocCheckRow = {
   recency: "current" | "stale";
   recencyLabel: string;
   extra?: boolean;
+  source?: "live" | "filename";
+  status?: string;
+  monthlyGrossCents?: number | null;
+  employer?: string | null;
+  waiting?: boolean;
+  errored?: boolean;
+  readLabel?: string;
 };
 
 export type DocCheckReport = {
@@ -33,6 +40,8 @@ export type DocCheckReport = {
   namePass: boolean;
   recencyPass: boolean;
   checkedCount: number;
+  live?: boolean;
+  waiting?: boolean;
 };
 
 const KIND_LABEL: Record<IncomeDocKind, string> = {

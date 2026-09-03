@@ -12,6 +12,7 @@ import {
   payments,
   type ApplicationRow,
 } from "@/lib/db/schema";
+import { attachChecksToApplication, summariesByApplication } from "@/lib/income/service";
 import { newConfirmationId, newId } from "@/lib/ids";
 import { toStoredPacket, type StoredPacket } from "@/lib/apply/sanitize";
 import type { ApplyState } from "@/lib/apply/types";
@@ -111,6 +112,11 @@ export async function submitApplication(
 
   await writeConsents(applicationId, state, context, now);
   await writeDocuments(applicationId, state);
+  const checkIds = [
+    ...state.paystubs.map((file) => file.incomeCheckId),
+    ...state.statements.map((file) => file.incomeCheckId),
+  ].filter((id): id is string => Boolean(id));
+  await attachChecksToApplication(applicationId, listing.id, checkIds);
   await authorizeCreditShare(applicationId, state, listing.ownerId ?? listing.id, context);
 
   await database.insert(payments).values({
@@ -456,7 +462,17 @@ export async function listDeskApplicants(
     )
     .orderBy(desc(applications.submittedAt));
 
-  return rows.map(toApplicant);
+  const applicants = rows.map(toApplicant);
+  try {
+    const summaries = await summariesByApplication(applicants.map((row) => row.id));
+    for (const applicant of applicants) {
+      const summary = summaries.get(applicant.id);
+      if (summary) applicant.incomeCheck = summary;
+    }
+  } catch (error) {
+    console.error("[applications] Could not read income checks for the desk.", error);
+  }
+  return applicants;
 }
 
 export async function getApplicationById(id: string): Promise<ApplicationRow | undefined> {

@@ -65,13 +65,17 @@ export function statusClass(status: ApplicationStatus): string {
   return "status";
 }
 
-export function incomeMultiple(applicant: Applicant): number | undefined {
+export function incomeMultiple(applicant: Applicant, rent?: number): number | undefined {
   const screen = getAiIncome(applicant.id);
   const report = getReportByApplicant(applicant.id);
   const property = demoPropertyById(applicant.propertyId);
-  const monthly = screen?.grossMonthly ?? report?.income.monthlyIncome;
-  if (!monthly || !property?.rent) return undefined;
-  return monthly / property.rent;
+  const monthly =
+    applicant.incomeCheck?.monthlyGross ??
+    screen?.grossMonthly ??
+    report?.income.monthlyIncome;
+  const listingRent = rent ?? property?.rent;
+  if (!monthly || !listingRent) return undefined;
+  return monthly / listingRent;
 }
 
 export function creditScore(applicant: Applicant): number | undefined {

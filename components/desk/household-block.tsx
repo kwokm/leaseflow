@@ -20,8 +20,43 @@ export function AiIncomeLine({
   screen?: AiIncomeScreen;
   compact?: boolean;
 }) {
+  const live = applicant?.incomeCheck;
+  if (live?.monthlyGross != null) {
+    const extras = [
+      live.nameMatch === true ? "Match" : live.nameMatch === false ? "Mismatch" : null,
+      live.recencyLabel,
+    ]
+      .filter(Boolean)
+      .join(" · ");
+    if (compact) {
+      return (
+        <span className="ai-income num text-[12px] font-semibold text-ink">
+          {formatGrossMonthly(live.monthlyGross)}
+        </span>
+      );
+    }
+    return (
+      <p className="text-[13px] font-medium leading-5 text-ink">
+        <span className="ai-income">
+          AI Income Check · {formatGrossMonthly(live.monthlyGross)} gross
+        </span>
+        {extras ? <span className="ai-income-src"> · {extras}</span> : null}
+        <span className="mt-0.5 block text-[12px] font-medium text-mute-2">
+          Read from your upload. You decide who to approve.
+        </span>
+      </p>
+    );
+  }
+
   const resolved = screen ?? (applicant ? getAiIncome(applicant.id) : undefined);
-  if (!resolved) return null;
+  if (!resolved) {
+    if (live?.status === "pending" || live?.status === "claimed") {
+      return (
+        <p className="text-[13px] font-medium text-mute">Waiting for income check…</p>
+      );
+    }
+    return null;
+  }
 
   if (compact) {
     return (

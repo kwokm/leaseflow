@@ -29,6 +29,9 @@ export function fullName(applicant: Applicant): string {
 }
 
 export function grossMonthlyOf(applicant: Applicant): number | undefined {
+  if (applicant.incomeCheck?.monthlyGross != null) {
+    return applicant.incomeCheck.monthlyGross;
+  }
   const screen = getAiIncome(applicant.id);
   if (screen?.grossMonthly) return screen.grossMonthly;
   const report = getReportByApplicant(applicant.id);

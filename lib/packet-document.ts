@@ -134,7 +134,14 @@ export function buildPacketHtml({
             : "—",
         ],
         ["Monthly income", monthly ? currency(monthly) : "—"],
-        ["Verification", report.income.verified || ai?.verified ? "Verified" : "Not verified"],
+        [
+          "Read from your upload",
+          ai
+            ? "AI Income Check — not a verification or approval"
+            : report.income.employer
+              ? "Stated on the application"
+              : "—",
+        ],
         [
           "Rent-to-income",
           monthly ? `${Math.round((property.rent / monthly) * 100)}%` : "—",

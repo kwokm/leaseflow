@@ -15,6 +15,8 @@ import { ApplicationToRent } from "@/components/rental-app/application-to-rent";
 import { RenterHelpActions } from "@/components/apply/renter-help";
 import { Button } from "@/components/ui/button";
 import { checkApplicationDetails, checkApplyState } from "@/lib/docs/ai-check";
+import { useApplicationIncomeChecks } from "@/components/apply/income-check-panel";
+import { reportFromIncomeChecks, summarizePublicChecks } from "@/lib/income/view";
 import { resolveRentalPacket } from "@/lib/apply/rental-app";
 import { isSampleMarketingPacket } from "@/lib/apply/sample-packet";
 import { getReportByApplicant } from "@/lib/data/mock-data";
@@ -31,6 +33,7 @@ export default function SharedPacketPage({
   const [packet, setPacket] = useState<ReturnType<typeof resolveRentalPacket>>(() =>
     resolveRentalPacket(id),
   );
+  const { checks: liveChecks, waiting: liveWaiting } = useApplicationIncomeChecks(id);
 
   useEffect(() => {
     setPacket(resolveRentalPacket(id));
@@ -53,23 +56,41 @@ export default function SharedPacketPage({
 
   const { application, applicant, property, details, state } = packet;
   const fullName = `${applicant.firstName} ${applicant.lastName}`;
-  const docCheck = state
+  const liveReport = reportFromIncomeChecks(liveChecks);
+  const filenameReport = state
     ? checkApplyState(state)
     : checkApplicationDetails(details, fullName);
+  const sample = isSampleMarketingPacket(id) || isSampleMarketingPacket(applicant.id);
+  const docCheck = liveReport.checkedCount
+    ? liveReport
+    : sample
+      ? filenameReport
+      : {
+          rows: [],
+          passed: false,
+          namePass: false,
+          recencyPass: false,
+          checkedCount: 0,
+          live: true,
+          waiting: liveWaiting,
+        };
   const report = getReportByApplicant(applicant.id);
+  const liveSummary = summarizePublicChecks(liveChecks);
+  const applicantWithLive = liveSummary
+    ? { ...applicant, incomeCheck: liveSummary }
+    : applicant;
   const household = applicant.householdId
     ? (() => {
         const seeded = getHousehold(applicant.householdId).filter(
           (row) => row.propertyId === applicant.propertyId,
         );
         const byId = new Map(seeded.map((row) => [row.id, row]));
-        byId.set(applicant.id, applicant);
+        byId.set(applicant.id, applicantWithLive);
         return [...byId.values()];
       })()
-    : [applicant];
+    : [applicantWithLive];
   const totals = household.length > 1 ? householdTotals(household, property.rent) : undefined;
-  const aiIncome = report?.aiIncome;
-  const sample = isSampleMarketingPacket(id) || isSampleMarketingPacket(applicant.id);
+  const aiIncome = liveSummary ? undefined : report?.aiIncome;
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-white print:bg-white">
@@ -111,13 +132,19 @@ export default function SharedPacketPage({
                 </p>
               </div>
               <PacketHouseholdChrome
-                applicant={applicant}
+                applicant={applicantWithLive}
                 members={household}
                 hrefFor={(memberId) => `/packet/${memberId}`}
               />
-              {aiIncome || totals ? (
+              {liveSummary || aiIncome || totals ? (
                 <div className="border-b border-line px-5 py-4 sm:px-6">
-                  {aiIncome ? <AiIncomeLine screen={aiIncome} /> : null}
+                  {liveSummary ? (
+                    <AiIncomeLine applicant={applicantWithLive} />
+                  ) : aiIncome ? (
+                    <AiIncomeLine screen={aiIncome} />
+                  ) : liveWaiting ? (
+                    <p className="text-[13px] font-medium text-mute">Waiting for income check…</p>
+                  ) : null}
                   {totals?.vsRent ? (
                     <p className="mt-1 text-[13px] font-medium text-ink">{totals.vsRent}</p>
                   ) : null}
@@ -145,7 +172,13 @@ export default function SharedPacketPage({
                 applicationIds={[applicant.id, id, state?.applicationId ?? ""]}
               />
               <div className="border-t border-line px-5 py-5 sm:px-6">
-                <AiDocCheck report={docCheck} scan={false} embedded />
+                <AiDocCheck
+                  report={docCheck}
+                  scan={false}
+                  embedded
+                  live={Boolean(liveReport.checkedCount)}
+                  waiting={liveWaiting}
+                />
               </div>
             </Reveal>
           </PacketWindow>

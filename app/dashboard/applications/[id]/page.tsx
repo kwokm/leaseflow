@@ -42,6 +42,8 @@ import { getHousehold } from "@/lib/data/household-model";
 import { Reveal } from "@/components/motion/reveal";
 import { AiDocCheck } from "@/components/docs/ai-check";
 import { SAMPLE_MISMATCH, checkApplicationDetails } from "@/lib/docs/ai-check";
+import { useApplicationIncomeChecks } from "@/components/apply/income-check-panel";
+import { reportFromIncomeChecks, summarizePublicChecks } from "@/lib/income/view";
 import { resolveRentalPacket } from "@/lib/apply/rental-app";
 import type { ApplyState } from "@/lib/apply/types";
 import type { ApplicationStatus } from "@/lib/data/mock-data";
@@ -86,6 +88,7 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
   const [showSample, setShowSample] = useState(false);
   const [tab, setTab] = useState<"packet" | "application">("packet");
   const [rental, setRental] = useState<RentalApplication | null>(null);
+  const { checks: liveChecks, waiting: liveWaiting } = useApplicationIncomeChecks(id);
 
   const local = isLocalApplicantId(id);
   const [submission, setSubmission] = useState<ApplyState | undefined>();
@@ -153,21 +156,46 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
 
   const fullName = `${applicant.firstName} ${applicant.lastName}`;
   const decided = applicant.status === "approved" || applicant.status === "declined";
-  const multiple = incomeMultiple(applicant);
   const credit = creditScore(applicant);
+  const liveSummary = summarizePublicChecks(liveChecks);
+  const applicantWithLive = liveSummary
+    ? { ...applicant, incomeCheck: liveSummary }
+    : applicant;
+  const multiple = incomeMultiple(applicantWithLive, property.rent);
   const household = applicant.householdId
     ? (() => {
         const seededMembers = getHousehold(applicant.householdId).filter(
           (row) => row.propertyId === applicant.propertyId,
         );
         const byId = new Map(seededMembers.map((row) => [row.id, row]));
-        byId.set(applicant.id, applicant);
+        byId.set(applicant.id, applicantWithLive);
         return [...byId.values()];
       })()
-    : [applicant];
-  const totals = household.length > 1 ? householdTotals(household, property.rent) : undefined;
-  const aiIncome = report?.aiIncome;
-  const monthly = aiIncome?.grossMonthly ?? report?.income.monthlyIncome;
+    : [applicantWithLive];
+  const householdWithLive = household;
+  const totals = householdWithLive.length > 1 ? householdTotals(householdWithLive, property.rent) : undefined;
+  const liveReport = reportFromIncomeChecks(liveChecks);
+  const filenameReport = checkApplicationDetails(
+    details,
+    fullName,
+    showSample ? [SAMPLE_MISMATCH] : [],
+  );
+  const docCheck = liveReport.checkedCount
+    ? liveReport
+    : local
+      ? {
+          rows: [],
+          passed: false,
+          namePass: false,
+          recencyPass: false,
+          checkedCount: 0,
+          live: true,
+          waiting: liveWaiting,
+        }
+      : filenameReport;
+  const aiIncome = liveSummary ? undefined : report?.aiIncome;
+  const monthly =
+    liveSummary?.monthlyGross ?? aiIncome?.grossMonthly ?? report?.income.monthlyIncome;
 
   function decide(next: "approved" | "declined") {
     setDecision(id, next);
@@ -239,7 +267,7 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
       </div>
       </Reveal>
 
-      <PacketHouseholdChrome applicant={applicant} members={household} />
+      <PacketHouseholdChrome applicant={applicantWithLive} members={householdWithLive} />
 
       <div className="border-b border-line px-5 py-3 print:hidden sm:px-6">
         <div className="flex flex-wrap items-center gap-1.5">
@@ -340,7 +368,26 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
       </Section>
 
       <Section title="Income">
-        {aiIncome ? (
+        {liveSummary ? (
+          <div className="mb-4 rounded-md border border-line bg-[#fbf9fd] p-3">
+            <AiIncomeLine applicant={applicantWithLive} />
+            <ul className="mt-2 space-y-1">
+              {liveChecks.map((check) => (
+                <li key={check.id} className="text-[12px] font-medium text-mute">
+                  {check.fileName}
+                  {check.monthlyGrossCents != null
+                    ? ` · $${Math.round(check.monthlyGrossCents / 100).toLocaleString()}/mo`
+                    : ""}
+                  {check.recencyLabel ? ` · ${check.recencyLabel}` : ""}
+                  {check.status !== "ready" ? ` · ${check.status}` : " · Read from your upload"}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-2 text-[12px] font-medium text-mute-2">
+              AI Income Check reads paystubs and statements. You decide who to approve.
+            </p>
+          </div>
+        ) : aiIncome ? (
           <div className="mb-4 rounded-md border border-line bg-[#fbf9fd] p-3">
             <AiIncomeLine screen={aiIncome} />
             <ul className="mt-2 space-y-1">
@@ -351,11 +398,11 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
               ))}
             </ul>
             <p className="mt-2 text-[12px] font-medium text-mute-2">
-              {aiIncome.verified
-                ? "Verified — names on the files match this applicant. Mock extraction, not a live model."
-                : "Mock extraction, not a live model."}
+              Sample extraction from filenames — not a live model.
             </p>
           </div>
+        ) : liveWaiting ? (
+          <p className="mb-4 text-[13px] font-medium text-mute">Waiting for income check…</p>
         ) : null}
         {report ? (
           <dl>
@@ -366,7 +413,20 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
               value={`$${(monthly ?? report.income.monthlyIncome).toLocaleString()}`}
             />
             <Row label="Rent multiple" value={multiple ? `${multiple.toFixed(1)}×` : "—"} />
-            <Row label="Verified" value={report.income.verified || aiIncome?.verified ? "Yes" : "No"} />
+            {liveSummary ? (
+              <Row
+                label="Read from your upload"
+                value={
+                  liveSummary.nameMatch === true
+                    ? "Name match"
+                    : liveSummary.nameMatch === false
+                      ? "Name mismatch"
+                      : "—"
+                }
+              />
+            ) : (
+              <Row label="Stated income" value={report.income.verified ? "On file" : "On file"} />
+            )}
           </dl>
         ) : details ? (
           <dl>
@@ -381,17 +441,15 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
         )}
       </Section>
 
-      <Section title="AI document check">
+      <Section title="AI Income Check">
         <AiDocCheck
-          report={checkApplicationDetails(
-            details,
-            fullName,
-            showSample ? [SAMPLE_MISMATCH] : [],
-          )}
+          report={docCheck}
           showSample={showSample}
-          onToggleSample={() => setShowSample((value) => !value)}
+          onToggleSample={liveReport.checkedCount ? undefined : () => setShowSample((value) => !value)}
           scan={false}
           embedded
+          live={Boolean(liveReport.checkedCount)}
+          waiting={liveWaiting}
         />
       </Section>
 

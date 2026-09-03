@@ -22,6 +22,8 @@ const ALLOWED_KINDS = new Set([
   "photo_id_back",
   "paystub",
   "bank_statement",
+  "w2",
+  "form_1099",
 ]);
 
 /**

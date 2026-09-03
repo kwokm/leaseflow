@@ -22,12 +22,14 @@ export function screeningChecks(applicant: Applicant): Record<ScreeningKey, bool
   return {
     photoId: kinds.has("photo_id_front") || kinds.has("photo_id_back"),
     experian: Boolean(getExperianPull(applicant.id) || report?.credit),
-    income: Boolean(
-      report?.income.verified ||
-        kinds.has("paystub") ||
-        kinds.has("bank_statement") ||
-        kinds.has("w2"),
-    ),
+    income: applicant.incomeCheck
+      ? applicant.incomeCheck.status === "ready"
+      : Boolean(
+          report?.income.verified ||
+            kinds.has("paystub") ||
+            kinds.has("bank_statement") ||
+            kinds.has("w2"),
+        ),
     background: Boolean(report?.background),
   };
 }
