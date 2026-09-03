@@ -1,6 +1,8 @@
 import "server-only";
 
 import { attachCheckoutSession } from "@/lib/applications/service";
+import { liveChargesAllowed } from "@/lib/config/env";
+import { LIVE_CHARGES_BLOCKED_MESSAGE } from "@/lib/payments/live-fees";
 import { getStripe } from "@/lib/payments/stripe";
 import {
   STANDARD_SCREENING_DESCRIPTION,
@@ -23,6 +25,10 @@ export type CheckoutInput = {
  * so a fresh Stripe account works with only a secret key.
  */
 export async function createCheckoutSession(input: CheckoutInput): Promise<{ url: string }> {
+  if (!liveChargesAllowed()) {
+    throw new Error(LIVE_CHARGES_BLOCKED_MESSAGE);
+  }
+
   const stripe = getStripe();
   if (!stripe) throw new Error("STRIPE_SECRET_KEY is not set");
 

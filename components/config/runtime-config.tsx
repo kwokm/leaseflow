@@ -14,6 +14,8 @@ const FALLBACK: RuntimeConfig = {
   database: false,
   stripe: false,
   blob: false,
+  liveFees: false,
+  stripeLive: false,
 };
 
 const RuntimeConfigContext = createContext<RuntimeConfig>(FALLBACK);

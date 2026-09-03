@@ -15,18 +15,44 @@ import { Reveal } from "@/components/motion/reveal";
 
 export default function ListingsPage() {
   const router = useRouter();
-  const { properties } = useProperties();
+  const { properties, ready } = useProperties();
   const { applicants } = useDeskApplicants();
+  const empty = ready && properties.length === 0;
 
   return (
     <Reveal>
       <DeskToolbar meta={`${properties.length} listings`}>
         <DeskPill active>All properties</DeskPill>
+        <Button asChild variant="outline" size="sm">
+          <Link href="/dashboard/listings/new?mode=import">Import listing</Link>
+        </Button>
         <Button asChild size="sm">
           <Link href="/dashboard/listings/new">New listing</Link>
         </Button>
       </DeskToolbar>
 
+      {empty ? (
+        <section className="px-5 py-12 sm:px-6">
+          <p className="text-[12px] font-medium uppercase tracking-[0.06em] text-mute-2">
+            Properties
+          </p>
+          <h1 className="mt-2 text-[24px] font-semibold tracking-[-0.5px] text-ink">
+            No listings yet.
+          </h1>
+          <p className="mt-2 max-w-xl text-[14px] font-medium leading-5 text-mute">
+            Import a public Zillow or Redfin URL, or add a property by hand. The
+            pipeline stays empty until you do.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-2">
+            <Button asChild>
+              <Link href="/dashboard/listings/new?mode=import">Import listing</Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link href="/dashboard/listings/new">Add manually</Link>
+            </Button>
+          </div>
+        </section>
+      ) : (
       <div className="overflow-x-auto">
         <table className="app-table">
           <thead>
@@ -89,6 +115,7 @@ export default function ListingsPage() {
           </tbody>
         </table>
       </div>
+      )}
     </Reveal>
   );
 }

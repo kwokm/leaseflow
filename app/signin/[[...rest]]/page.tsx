@@ -33,7 +33,9 @@ export default async function SignInPage({
         {role === "renter" ? "Sign in to apply" : "Sign in to your landlord desk"}
       </h1>
       <p className="mb-6 text-[14px] font-medium leading-5 text-mute">
-        Continue with Google or your email address.
+        {role === "renter"
+          ? "Continue with Google or your email address."
+          : "Orange County private beta. Continue with Google or the email you were invited with."}
       </p>
       <SignIn
         routing="path"

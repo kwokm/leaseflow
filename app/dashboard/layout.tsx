@@ -7,7 +7,8 @@ import { DashboardMotion } from "@/components/motion/dashboard-motion";
 import { SpatialMount, SpatialOrigin } from "@/components/motion/spatial";
 import { PageWash } from "@/components/page-wash";
 import { Button } from "@/components/ui/button";
-import { getDeskViewer } from "@/lib/auth/current-user";
+import { PrivateBetaGate } from "@/components/auth/private-beta-gate";
+import { getDeskLandlord } from "@/lib/auth/current-user";
 import { clerkEnabled, isDemoMode } from "@/lib/config/env";
 import { FEATURED_LISTING_ID } from "@/lib/data/mock-data";
 
@@ -20,11 +21,14 @@ export const dynamic = "force-dynamic";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const demo = isDemoMode();
-  const viewer = await getDeskViewer();
+  const desk = await getDeskLandlord();
 
   // Middleware is the primary gate; this is the second one, so a misconfigured
   // matcher cannot expose landlord data.
-  if (!demo && !viewer) redirect("/signin?next=/dashboard");
+  if (desk.status === "signed-out") redirect("/signin?next=/dashboard");
+  if (desk.status === "not-invited") {
+    return <PrivateBetaGate email={desk.email} />;
+  }
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-white print:bg-white">
@@ -38,6 +42,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <BrandMark />
             <BrandWord />
           </Link>
+          <span className="desk-pill">{demo ? "Demo" : "Private beta"}</span>
           <div className="ml-auto flex items-center gap-2">
             {/* The seeded listing only exists under LEASEPROOF_DEMO, so outside
                 demo mode this button is a guaranteed 404. Real apply links come
@@ -48,13 +53,16 @@ export default async function DashboardLayout({ children }: { children: React.Re
               </Button>
             ) : null}
             <Button asChild variant="outline">
+              <Link href="/dashboard/listings/new?mode=import">Import listing</Link>
+            </Button>
+            <Button asChild variant="outline">
               <Link href="/dashboard/listings/new">New listing</Link>
             </Button>
             {clerkEnabled() ? (
               <UserButton afterSignOutUrl="/" />
             ) : (
               <Button asChild>
-                <Link href="/dashboard">Open realtor desk</Link>
+                <Link href="/dashboard">Open desk</Link>
               </Button>
             )}
           </div>

@@ -190,18 +190,22 @@ export function StepReview({ state, property, goTo }: StepProps) {
 
         <p className="mt-4 flex items-start gap-2 text-[14px] font-medium leading-5 text-mute">
           <Lock className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
-          {config.stripe
+          {config.stripe && config.liveFees
             ? "Continue to Stripe to pay. Your card details are entered on Stripe's secure page and never reach Leaseproof. Your credit report is requested only after this payment clears."
-            : config.demo
-              ? "Demo deployment — checkout is skipped and no card is charged."
-              : "Payments are not configured on this deployment yet."}
+            : config.stripe
+              ? "Continue to Stripe Checkout in test mode. Card details stay on Stripe. This is not a collected landlord screening fee."
+              : config.demo
+                ? "Demo deployment — checkout is skipped and no card is charged."
+                : "Payments are not configured on this deployment yet."}
         </p>
       </section>
 
       <Note>
-        {config.stripe
-          ? "You pay $24.99 once. The landlord pays nothing extra, and Experian is included."
-          : "No charge is made on this deployment."}
+        {config.stripe && config.liveFees
+          ? "You pay $24.99 once. Experian is included. This checkout is not a landlord screening-fee collection for the property."
+          : config.stripe
+            ? "Stripe Checkout is in test mode for this private beta. This is not a collected landlord screening fee."
+            : "No charge is made on this deployment."}
       </Note>
     </StepBody>
   );

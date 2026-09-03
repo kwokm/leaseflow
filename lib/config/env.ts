@@ -1,5 +1,11 @@
 import "server-only";
 
+import {
+  liveChargesAllowed as liveChargesAllowedFrom,
+  liveFeesFlagOn,
+  stripeKeyIsLive,
+} from "@/lib/payments/live-fees";
+
 /**
  * Server-side view of the environment. Every integration is optional at build
  * time so the app compiles and the Vercel preview boots without secrets — each
@@ -33,6 +39,25 @@ export function stripeEnabled(): boolean {
   return Boolean(process.env.STRIPE_SECRET_KEY);
 }
 
+/**
+ * Live $24.99 charges stay off until this is explicitly `1`. Defaults off.
+ * A live Stripe key cannot create Checkout without it.
+ */
+export function liveFeesEnabled(): boolean {
+  return liveFeesFlagOn(process.env.LEASEPROOF_LIVE_FEES);
+}
+
+export function stripeIsLiveMode(): boolean {
+  return stripeKeyIsLive(process.env.STRIPE_SECRET_KEY);
+}
+
+export function liveChargesAllowed(): boolean {
+  return liveChargesAllowedFrom({
+    stripeSecretKey: process.env.STRIPE_SECRET_KEY,
+    liveFees: process.env.LEASEPROOF_LIVE_FEES,
+  });
+}
+
 export function blobEnabled(): boolean {
   return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
 }
@@ -60,6 +85,8 @@ export type RuntimeConfig = {
   database: boolean;
   stripe: boolean;
   blob: boolean;
+  liveFees: boolean;
+  stripeLive: boolean;
 };
 
 /** Snapshot handed to the client so components can branch without env access. */
@@ -70,5 +97,7 @@ export function runtimeConfig(): RuntimeConfig {
     database: databaseEnabled(),
     stripe: stripeEnabled(),
     blob: blobEnabled(),
+    liveFees: liveFeesEnabled(),
+    stripeLive: stripeIsLiveMode(),
   };
 }

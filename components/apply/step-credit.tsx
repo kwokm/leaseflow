@@ -357,13 +357,14 @@ export function StepCredit({ state, patch, errors }: StepProps) {
       ) : experian.status === "authorized" ? (
         <WindowPanel label="Experian">
           <div className="flex items-start gap-3">
-            <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-ok" aria-hidden />
+            <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-mute" aria-hidden />
             <div className="min-w-0">
               <p className="text-[17px] font-semibold tracking-[-0.3px] text-ink">
                 Authorization saved
               </p>
               <p className="mt-1 text-[14px] font-medium leading-5 text-mute">
-                {CREDIT_SUCCESS_MESSAGE}
+                Your consent is archived. Experian Connect is not live on this
+                private beta, so nothing was shared with the landlord.
               </p>
             </div>
           </div>

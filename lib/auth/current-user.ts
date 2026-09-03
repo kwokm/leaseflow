@@ -2,6 +2,7 @@ import "server-only";
 
 import { auth, clerkClient, currentUser } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
+import { isLandlordEmailAllowed } from "@/lib/auth/beta-allowlist";
 import { clerkEnabled, isDemoMode } from "@/lib/config/env";
 import { getDb } from "@/lib/db/client";
 import { users, type UserRow } from "@/lib/db/schema";
@@ -22,6 +23,8 @@ export type Viewer = {
    * empty desk the signed-in landlord would read as "you have nothing".
    */
   storageUnavailable: boolean;
+  /** False for emails that are not on `LEASEPROOF_BETA_EMAILS`. */
+  landlordInvited: boolean;
 };
 
 /**
@@ -49,12 +52,23 @@ export async function getViewer(defaultRole: Role = "renter"): Promise<Viewer | 
     clerk.primaryEmailAddress?.emailAddress ??
     clerk.emailAddresses[0]?.emailAddress ??
     "";
-  const role = roleFrom(clerk.publicMetadata?.role, defaultRole);
+  const invited = isLandlordEmailAllowed(email);
+  const metadataRole = clerk.publicMetadata?.role;
+  let role = roleFrom(metadataRole, defaultRole);
 
   // First landing decides the role: the desk stamps "landlord", the apply flow
-  // stamps "renter". Once set in Clerk metadata it is never overwritten here.
-  if (!isRole(clerk.publicMetadata?.role)) {
-    await stampRole(clerk.id, role);
+  // stamps "renter". An uninvited email never becomes a landlord — even if they
+  // opened /signup intending to create a desk.
+  if (!isRole(metadataRole)) {
+    if (defaultRole === "landlord" && !invited) {
+      role = "renter";
+    } else {
+      await stampRole(clerk.id, role);
+    }
+  } else if (defaultRole === "landlord" && invited && metadataRole !== "landlord") {
+    // Allowlisted landlords who first applied as renters can still open the desk.
+    role = "landlord";
+    await stampRole(clerk.id, "landlord");
   }
 
   const viewer: Viewer = {
@@ -65,7 +79,12 @@ export async function getViewer(defaultRole: Role = "renter"): Promise<Viewer | 
     lastName: clerk.lastName,
     user: null,
     storageUnavailable: false,
+    landlordInvited: invited,
   };
+
+  if (defaultRole === "landlord" && !invited && !isRole(metadataRole)) {
+    return viewer;
+  }
 
   // The identity is Clerk's; Neon only mirrors it. A database failure here must
   // not cost the landlord their session — it leaves `user` null, which the
@@ -142,4 +161,27 @@ async function syncUser(viewer: Viewer): Promise<UserRow | null> {
 export async function getDeskViewer(): Promise<Viewer | null> {
   if (isDemoMode()) return null;
   return getViewer("landlord");
+}
+
+export type DeskLandlord =
+  | { status: "demo"; viewer: Viewer | null }
+  | { status: "ok"; viewer: Viewer }
+  | { status: "signed-out" }
+  | { status: "not-invited"; email: string };
+
+/**
+ * Desk and landlord-write APIs. Demo stays open. Production requires a Clerk
+ * session whose email is on `LEASEPROOF_BETA_EMAILS`.
+ */
+export async function getDeskLandlord(): Promise<DeskLandlord> {
+  if (isDemoMode()) {
+    return { status: "demo", viewer: await getViewer("landlord") };
+  }
+
+  const viewer = await getViewer("landlord");
+  if (!viewer) return { status: "signed-out" };
+  if (!isLandlordEmailAllowed(viewer.email)) {
+    return { status: "not-invited", email: viewer.email };
+  }
+  return { status: "ok", viewer };
 }

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { getViewer } from "@/lib/auth/current-user";
+import { getDeskLandlord } from "@/lib/auth/current-user";
+import { privateBetaResponse } from "@/lib/auth/desk-response";
 import { databaseEnabled, isDemoMode } from "@/lib/config/env";
 import { createListing, listPropertiesSafely, type ListingInput } from "@/lib/listings/service";
 
@@ -15,7 +16,13 @@ export const dynamic = "force-dynamic";
  * not be drawn as "you have no listings".
  */
 export async function GET() {
-  const viewer = await getViewer("landlord");
+  const desk = await getDeskLandlord();
+  if (desk.status === "not-invited") return privateBetaResponse();
+  if (desk.status === "signed-out") {
+    return NextResponse.json({ listings: [], demo: isDemoMode() });
+  }
+
+  const viewer = desk.viewer;
 
   // Signed in, but we never got as far as their row — do not answer "no listings".
   if (viewer?.storageUnavailable) {
@@ -43,7 +50,13 @@ export async function POST(request: Request) {
   // owner would be invisible to every desk, including its creator's. Missing
   // for want of a session and missing because Neon would not answer are two
   // different problems, and telling a signed-in landlord to sign in is a lie.
-  const viewer = await getViewer("landlord");
+  const desk = await getDeskLandlord();
+  if (desk.status === "signed-out") {
+    return NextResponse.json({ error: "Sign in to create a listing." }, { status: 401 });
+  }
+  if (desk.status === "not-invited") return privateBetaResponse();
+
+  const viewer = desk.viewer;
   if (!viewer) {
     return NextResponse.json({ error: "Sign in to create a listing." }, { status: 401 });
   }

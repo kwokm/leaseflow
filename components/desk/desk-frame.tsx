@@ -1,39 +1,26 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { useRuntimeConfig } from "@/components/config/runtime-config";
 import { DeskSidebar } from "@/components/desk/desk-sidebar";
 import { PacketWindow } from "@/components/desk/packet-window";
-import { getApplicantById, demoPropertyById } from "@/lib/data/mock-data";
-import { shortAddress } from "@/lib/desk/display";
 
 function titleFor(pathname: string): string {
-  const packet = pathname.match(/^\/dashboard\/applications\/([^/]+)/);
-  if (packet) {
-    const applicant = getApplicantById(packet[1]);
-    const property = applicant ? demoPropertyById(applicant.propertyId) : undefined;
-    if (applicant && property) {
-      return `Application packet • ${applicant.firstName} ${applicant.lastName}`;
-    }
-    return "Application packet";
-  }
-
-  const listing = pathname.match(/^\/dashboard\/listings\/([^/]+)/);
-  if (listing && listing[1] !== "new") {
-    const property = demoPropertyById(listing[1]);
-    if (property) return shortAddress(property.address);
+  if (/^\/dashboard\/applications\/[^/]+/.test(pathname)) return "Application packet";
+  if (/^\/dashboard\/listings\/[^/]+/.test(pathname) && !pathname.endsWith("/new")) {
     return "Listing";
   }
-
   if (pathname.startsWith("/dashboard/listings")) return "Properties";
-  if (pathname.startsWith("/dashboard/applications")) return "Application packet • 510 S Resh St";
-  return "Pipeline • 510 S Resh St";
+  if (pathname.startsWith("/dashboard/applications")) return "Applications";
+  return "Pipeline";
 }
 
 export function DeskFrame({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { demo } = useRuntimeConfig();
 
   return (
-    <PacketWindow title={titleFor(pathname)} meta="Realtor desk • Demo sync">
+    <PacketWindow title={titleFor(pathname)} meta={demo ? "Demo" : "Private beta"}>
       <div className="desk">
         <DeskSidebar />
         <div className="min-w-0">{children}</div>

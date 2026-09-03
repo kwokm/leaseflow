@@ -7,6 +7,7 @@ import {
   type ApplicationStatus,
 } from "@/lib/data/mock-data";
 import { useDeskApplicants } from "@/lib/desk/use-desk-applicants";
+import { useRuntimeConfig } from "@/components/config/runtime-config";
 import { ApplicationTable } from "@/components/desk/application-table";
 import { DeskPill, DeskToolbar } from "@/components/desk/packet-window";
 import { ScreeningDemo } from "@/components/demos/screening";
@@ -28,10 +29,12 @@ export function ApplicationDesk({
   preview?: boolean;
 }) {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const { demo } = useRuntimeConfig();
   // `preview` is the marketing screenshot on the landing page, which is always
   // the seeded catalogue; the real desk reads the queue from Neon.
   const { applicants } = useDeskApplicants();
   const rows: Applicant[] = preview ? getAllApplications() : applicants;
+  const showDemoReel = preview || demo;
 
   const scoped = useMemo(() => {
     return rows.filter((row) => {
@@ -62,7 +65,7 @@ export function ApplicationDesk({
           </DeskPill>
         </DeskToolbar>
       ) : null}
-      {chrome ? (
+      {chrome && showDemoReel ? (
         <div className="border-b border-line">
           <ScreeningDemo />
         </div>
