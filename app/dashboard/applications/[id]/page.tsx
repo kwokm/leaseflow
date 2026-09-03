@@ -502,7 +502,6 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
         canSend={Boolean(experian)}
         open={adverseActionOpen}
         onOpenChange={setAdverseActionOpen}
-        hideTrigger
       />
 
       <Dialog open={declineOpen} onOpenChange={setDeclineOpen}>
