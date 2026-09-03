@@ -1,3 +1,4 @@
+import { creditConsentReady } from "@/lib/legal/fcra";
 import { isCompleteDob, isEmail } from "./format";
 import { APPLY_STEP, type ApplyState } from "./types";
 
@@ -54,23 +55,27 @@ function validateProof(state: ApplyState, errors: StepErrors): void {
 }
 
 /**
- * `authorized` is enough to continue: under charge-then-screen the report is
- * requested after payment, so the applicant has done everything they can here.
+ * Credit does not advance until a consent row is written and the Experian stub
+ * has been allowed to proceed. Checkboxes + typed name alone are not enough.
  */
 function validateCredit(state: ApplyState, errors: StepErrors): void {
-  if (state.experian.status !== "connected" && state.experian.status !== "authorized") {
-    errors.experian = "Authorize the Experian Connect share to continue.";
+  if (!creditConsentReady(state.consent)) {
+    if (!state.consent.checkboxAuth) errors.checkboxAuth = "Check the authorization to continue.";
+    if (!state.consent.checkboxUse) errors.checkboxUse = "Check the use acknowledgement to continue.";
+    if (!state.consent.typedFullName.trim()) {
+      errors.typedFullName = "Type your full name to continue.";
+    }
+    return;
   }
-}
 
-/**
- * No card validation: Stripe Checkout collects payment details on its own page,
- * so there is nothing here to check beyond the authorizations.
- */
-function validatePay(state: ApplyState, errors: StepErrors): void {
-  if (!state.consent.fcra) errors.fcra = "You must authorize the screening to continue.";
-  if (!state.consent.backgroundAck) errors.backgroundAck = "Acknowledge the background notice.";
-  if (!state.consent.signature.trim()) errors.signature = "Type your full name to sign.";
+  if (!state.consent.consentId) {
+    errors.experian = "Save the authorization before continuing.";
+    return;
+  }
+
+  if (state.experian.status !== "connected" && state.experian.status !== "authorized") {
+    errors.experian = "Continue with Experian to share your report.";
+  }
 }
 
 /** Per-stage required-field checks. Blocks Next and renders inline messages. */
@@ -80,7 +85,6 @@ export function validateStep(step: number, state: ApplyState): StepErrors {
   if (step === APPLY_STEP.you) validateYou(state, errors);
   if (step === APPLY_STEP.proof) validateProof(state, errors);
   if (step === APPLY_STEP.credit) validateCredit(state, errors);
-  if (step === APPLY_STEP.pay) validatePay(state, errors);
 
   return errors;
 }

@@ -433,21 +433,34 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
         )}
       </Section>
 
-      <Section title="FCRA">
-        <p className="text-[13px] font-medium leading-5 text-mute">
-          Screening reports are consumer reports under the FCRA. Credit, background, and score data
-          on this packet is mock — names, scores, and tradelines are fabricated and no consumer
-          reporting agency is used.
-        </p>
-        {details ? (
-          <dl className="mt-3">
-            <Row label="Signature" value={details.consent.signature} />
-            <Row
-              label="Consent"
-              value={new Date(details.consent.acceptedAt).toLocaleString()}
-            />
-          </dl>
-        ) : null}
+      <Section title="What you agreed to">
+        <dl>
+          <Row
+            label="Who"
+            value={submission?.consent.typedFullName || details?.consent.signature || "—"}
+          />
+          <Row
+            label="When"
+            value={
+              submission?.consent.acceptedAt || details?.consent.acceptedAt
+                ? new Date(
+                    submission?.consent.acceptedAt || details?.consent.acceptedAt || ""
+                  ).toLocaleString()
+                : "—"
+            }
+          />
+          <Row
+            label="Copy version"
+            value={
+              submission?.consent.copyVersion || details?.consent.copyVersion || "lp-fcra-credit-v1.0"
+            }
+          />
+        </dl>
+        {(submission?.consent.disclosureText || details?.consent.disclosureText) && (
+          <p className="mt-3 whitespace-pre-wrap text-[13px] font-medium leading-5 text-mute">
+            {submission?.consent.disclosureText || details?.consent.disclosureText}
+          </p>
+        )}
       </Section>
         </>
       ) : null}

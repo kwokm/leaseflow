@@ -1,6 +1,7 @@
 import type { ScreeningPackage } from "@/lib/data/mock-data";
+import { CREDIT_DISCLOSURE_BODY, FCRA_PACK_VERSION } from "@/lib/legal/fcra";
 
-export const APPLY_STATE_VERSION = 7;
+export const APPLY_STATE_VERSION = 8;
 
 /**
  * A file the renter attached.
@@ -99,10 +100,19 @@ export interface HouseholdInfo {
 }
 
 export interface ConsentInfo {
-  fcra: boolean;
-  backgroundAck: boolean;
+  checkboxAuth: boolean;
+  checkboxUse: boolean;
+  typedFullName: string;
+  /** Mirrors typedFullName so existing packet/rental-app surfaces keep working. */
   signature: string;
   acceptedAt?: string;
+  consentId?: string;
+  copyVersion?: string;
+  copySha256?: string;
+  disclosureText?: string;
+  recipientName?: string;
+  locale?: string;
+  declined?: boolean;
 }
 
 /**
@@ -270,9 +280,9 @@ export const APPLY_STEPS: StepDefinition[] = [
     id: APPLY_STEP.credit,
     key: "credit",
     name: "Credit",
-    title: "Credit report",
-    lead: "Share through Experian Connect",
-    tone: "included in the Standard fee.",
+    title: "Share your Experian report",
+    lead: "Share your Experian report",
+    tone: "authenticate, then share with this landlord.",
   },
   {
     id: APPLY_STEP.pay,
@@ -488,7 +498,7 @@ export function createInitialState(listingId: string, pkg: ScreeningPackage): Ap
       priorEviction: false,
       notes: "",
     },
-    consent: { fcra: false, backgroundAck: false, signature: "" },
+    consent: { checkboxAuth: false, checkboxUse: false, typedFullName: "", signature: "" },
     payment: { stage: "unpaid" },
     rental: emptyRentalProfile(),
   };
@@ -559,9 +569,15 @@ export function createDemoState(listingId: string, pkg: ScreeningPackage): Apply
       notes: "No additional occupants. Quiet household.",
     },
     consent: {
-      fcra: true,
-      backgroundAck: true,
+      checkboxAuth: true,
+      checkboxUse: true,
+      typedFullName: "Jane Doe",
       signature: "Jane Doe",
+      acceptedAt: "2026-08-01T12:08:00.000Z",
+      copyVersion: FCRA_PACK_VERSION,
+      disclosureText: CREDIT_DISCLOSURE_BODY,
+      recipientName: "this landlord",
+      locale: "en-US",
     },
     payment: { stage: "unpaid" },
     rental: demoRentalProfile(),

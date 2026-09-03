@@ -1,3 +1,4 @@
+import { CREDIT_DISCLOSURE_BODY } from "@/lib/legal/fcra";
 import type { ApplicationDetails } from "./mock-data";
 
 // Renter-submitted application details (keyed by applicant id).
@@ -423,6 +424,9 @@ export const mockApplicationDetails: Record<string, ApplicationDetails> = {
       acceptedAt: "2026-08-10T12:00:00Z",
       signature: "Jane Doe",
       ipAddress: "203.0.113.42",
+      copyVersion: "lp-fcra-credit-v1.0",
+      disclosureText: CREDIT_DISCLOSURE_BODY,
+      recipientName: "this landlord",
     },
   },
 };

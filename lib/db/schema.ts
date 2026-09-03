@@ -170,6 +170,52 @@ export const consents = pgTable(
   })
 );
 
+/**
+ * Append-only Credit-step archive. Historical rows are never rewritten — the
+ * only later write allowed is filling `experian_share_id` (and optionally
+ * `kba_succeeded_at`) once Connect returns a handle.
+ *
+ * Do not store SSN, KBA answers, or Experian credentials here.
+ */
+export const creditConsents = pgTable(
+  "credit_consents",
+  {
+    id: text("id").primaryKey(),
+    applicantUserId: text("applicant_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    applicationId: text("application_id")
+      .notNull()
+      .references(() => applications.id, { onDelete: "cascade" }),
+    listingId: text("listing_id")
+      .notNull()
+      .references(() => listings.id, { onDelete: "cascade" }),
+    landlordId: text("landlord_id").references(() => users.id, { onDelete: "set null" }),
+    consentedAt: timestamp("consented_at", { withTimezone: true }).notNull(),
+    copyVersion: text("copy_version").notNull(),
+    copySha256: text("copy_sha256").notNull(),
+    disclosureText: text("disclosure_text").notNull(),
+    checkboxAuth: boolean("checkbox_auth").notNull(),
+    checkboxUse: boolean("checkbox_use").notNull(),
+    checkboxAuthLabel: text("checkbox_auth_label").notNull(),
+    checkboxUseLabel: text("checkbox_use_label").notNull(),
+    typedFullName: text("typed_full_name").notNull(),
+    purpose: text("purpose").notNull().default("housing_application"),
+    recipientName: text("recipient_name").notNull(),
+    locale: text("locale").notNull().default("en-US"),
+    ipAddress: text("ip_address"),
+    userAgent: text("user_agent"),
+    disclosureSnapshotHtml: text("disclosure_snapshot_html").notNull(),
+    experianShareId: text("experian_share_id"),
+    kbaSucceededAt: timestamp("kba_succeeded_at", { withTimezone: true }),
+  },
+  (table) => ({
+    applicationIdx: index("credit_consents_application_id_idx").on(table.applicationId),
+    listingIdx: index("credit_consents_listing_id_idx").on(table.listingId),
+    applicantIdx: index("credit_consents_applicant_user_id_idx").on(table.applicantUserId),
+  })
+);
+
 /** Applicant-paid screening fee. Amounts are minor units to avoid float drift. */
 export const payments = pgTable(
   "payments",
@@ -236,5 +282,6 @@ export type ApplicationRow = typeof applications.$inferSelect;
 export type NewApplicationRow = typeof applications.$inferInsert;
 export type DocumentRow = typeof documents.$inferSelect;
 export type ConsentRow = typeof consents.$inferSelect;
+export type CreditConsentRow = typeof creditConsents.$inferSelect;
 export type PaymentRow = typeof payments.$inferSelect;
 export type CreditShareRow = typeof creditShares.$inferSelect;
