@@ -70,6 +70,9 @@ export function AiIncomeLine({
     <p className="text-[13px] font-medium leading-5 text-ink">
       <span className="ai-income">{formatAiIncomeLine(resolved)}</span>
       <span className="ai-income-src"> · {aiIncomeSourceLabel(resolved)}</span>
+      <span className="mt-0.5 block text-[12px] font-medium text-mute-2">
+        AI Income Check reads paystubs and statements. You decide who to approve.
+      </span>
     </p>
   );
 }
