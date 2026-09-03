@@ -1,21 +1,37 @@
 "use client";
 
 import * as React from "react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { Check, Loader2, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { FieldError } from "@/components/apply/field";
+import { Checkbox, Field, FieldError } from "@/components/apply/field";
+import { CreditConsentReceipt } from "@/components/apply/credit-consent-receipt";
 import { StepBody } from "@/components/apply/motion";
-import { Note, StepHeading, SummaryRow, WindowPanel } from "@/components/apply/step-shell";
+import { Note, SummaryRow, WindowPanel } from "@/components/apply/step-shell";
 import type { StepProps } from "@/components/apply/step-shell";
 import { useRuntimeConfig } from "@/components/config/runtime-config";
 import { DURATION, EASE_OUT } from "@/lib/apply/motion";
 import { buildMockExperianPull, scoreBand } from "@/lib/apply/experian-mock";
 import { formatDateTime } from "@/lib/apply/format";
+import type { ConsentInfo } from "@/lib/apply/types";
 import {
-  CONNECT_BULLETS,
-  CONNECT_INQUIRY_LINE,
-  FCRA_PLACEHOLDER_NOTICE,
+  CONSENT_AUTH_CHECKBOX,
+  CONSENT_USE_CHECKBOX,
+  CREDIT_CA_NOTICE,
+  CREDIT_DECLINE_MESSAGE,
+  CREDIT_DISCLOSURE_BODY,
+  CREDIT_DISCLOSURE_HEADING,
+  CREDIT_ERROR_EXPERIAN_UNAVAILABLE,
+  CREDIT_ERROR_KBA_FAILED,
+  CREDIT_HOW_THIS_WORKS,
+  CREDIT_HOW_THIS_WORKS_HELPER,
+  CREDIT_PRIMARY_ACTION,
+  CREDIT_SECONDARY_ACTION,
+  CREDIT_STEP_DECK,
+  CREDIT_STEP_TITLE,
+  CREDIT_SUCCESS_MESSAGE,
+  FCRA_PACK_VERSION,
+  creditConsentReady,
 } from "@/lib/legal/fcra";
 
 function useCountUp(target: number | undefined) {
@@ -48,121 +64,6 @@ function useCountUp(target: number | undefined) {
   return value;
 }
 
-/**
- * Experian Connect consent. The applicant authenticates with Experian and
- * Experian shares the report with the landlord — Leaseproof never asks for
- * bureau credentials and never handles the report itself.
- */
-function ConnectDialog({
-  onAuthorize,
-  onCancel,
-  busy,
-}: {
-  onAuthorize: () => void;
-  onCancel: () => void;
-  busy: boolean;
-}) {
-  const dialogRef = React.useRef<HTMLDivElement>(null);
-  const confirmRef = React.useRef<HTMLButtonElement>(null);
-  const reduced = useReducedMotion();
-
-  React.useEffect(() => {
-    confirmRef.current?.focus();
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        onCancel();
-        return;
-      }
-      if (event.key !== "Tab") return;
-
-      // Keep focus inside the dialog.
-      const focusable = dialogRef.current?.querySelectorAll<HTMLElement>(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-      );
-      if (!focusable?.length) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    };
-
-    document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
-  }, [onCancel]);
-
-  return (
-    <motion.div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 p-0 sm:items-center sm:p-6"
-      initial={reduced ? false : { opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: DURATION.ui, ease: EASE_OUT }}
-    >
-      <motion.div
-        ref={dialogRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="experian-connect-title"
-        className="w-full max-w-lg overflow-hidden rounded-t-lg border border-line bg-paper shadow-window sm:rounded-lg"
-        initial={reduced ? false : { opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: 8 }}
-        transition={{ duration: DURATION.step, ease: EASE_OUT }}
-      >
-        <div className="card-head">
-          <span className="card-head-title">Experian Connect</span>
-          <span className="card-head-meta">Soft inquiry</span>
-        </div>
-
-        <div className="p-5">
-          <h2
-            id="experian-connect-title"
-            className="text-[20px] font-semibold tracking-[-0.4px] text-ink"
-          >
-            Share your credit report with this landlord
-          </h2>
-          <p className="mt-2 text-[14px] font-medium leading-5 tracking-[-0.14px] text-mute">
-            Experian verifies your identity and releases the report. Leaseproof never asks for your
-            Experian username or password.
-          </p>
-
-          <ul className="mt-4 space-y-2.5 rounded-btn border border-line bg-mist p-4">
-            {CONNECT_BULLETS.map((item) => (
-              <li
-                key={item}
-                className="flex items-start gap-2 text-[14px] font-medium leading-5 tracking-[-0.14px] text-ink-2"
-              >
-                <Check className="mt-0.5 h-4 w-4 shrink-0 text-ok" aria-hidden />
-                {item}
-              </li>
-            ))}
-          </ul>
-
-          <p className="mt-4 text-[13px] font-medium leading-5 text-mute">
-            {FCRA_PLACEHOLDER_NOTICE}
-          </p>
-
-          <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-            <Button type="button" variant="outline" size="touch" onClick={onCancel} disabled={busy}>
-              Cancel
-            </Button>
-            <Button ref={confirmRef} type="button" size="touch" onClick={onAuthorize} disabled={busy}>
-              {busy ? "Authorizing…" : "Authorize share"}
-            </Button>
-          </div>
-        </div>
-      </motion.div>
-    </motion.div>
-  );
-}
-
 function ScoreReveal({ score }: { score: number }) {
   const displayed = useCountUp(score);
   const reduced = useReducedMotion();
@@ -179,16 +80,34 @@ function ScoreReveal({ score }: { score: number }) {
   );
 }
 
+function patchConsent(current: ConsentInfo, partial: Partial<ConsentInfo>): ConsentInfo {
+  const next = { ...current, ...partial };
+  if (partial.typedFullName !== undefined) {
+    next.signature = partial.typedFullName;
+  }
+  return next;
+}
+
 export function StepCredit({ state, patch, errors }: StepProps) {
   const experian = state.experian;
   const config = useRuntimeConfig();
   const [busy, setBusy] = React.useState(false);
   const [failure, setFailure] = React.useState<string | null>(null);
   const reduced = useReducedMotion();
+  const ready = creditConsentReady(state.consent);
+  const shared = experian.status === "connected" || experian.status === "authorized";
+
+  const setConsent = (partial: Partial<ConsentInfo>) => {
+    patch({ consent: patchConsent(state.consent, partial) });
+  };
 
   const authorize = async () => {
+    if (!ready || busy) return;
+
     setBusy(true);
     setFailure(null);
+    setConsent({ declined: false });
+    patch({ experian: { ...state.experian, status: "pulling" } });
 
     try {
       const response = await fetch("/api/screening/authorize", {
@@ -196,9 +115,16 @@ export function StepCredit({ state, patch, errors }: StepProps) {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           listingId: state.listingId,
+          applicationId: state.applicationId,
+          consentId: state.consent.consentId,
           firstName: state.personal.firstName,
           lastName: state.personal.lastName,
           email: state.personal.email,
+          phone: state.personal.phone,
+          checkboxAuth: state.consent.checkboxAuth,
+          checkboxUse: state.consent.checkboxUse,
+          typedFullName: state.consent.typedFullName,
+          locale: state.consent.locale ?? "en-US",
         }),
       });
 
@@ -206,17 +132,46 @@ export function StepCredit({ state, patch, errors }: StepProps) {
         shareReference?: string;
         previewAvailable?: boolean;
         error?: string;
+        consent?: {
+          consentId: string;
+          applicationId: string;
+          consentedAt: string;
+          copyVersion: string;
+          copySha256: string;
+          disclosureText: string;
+          recipientName: string;
+          locale: string;
+          typedFullName: string;
+        };
       };
 
+      if (payload.consent) {
+        patch({
+          applicationId: payload.consent.applicationId,
+          consent: patchConsent(state.consent, {
+            consentId: payload.consent.consentId,
+            acceptedAt: payload.consent.consentedAt,
+            copyVersion: payload.consent.copyVersion,
+            copySha256: payload.consent.copySha256,
+            disclosureText: payload.consent.disclosureText,
+            recipientName: payload.consent.recipientName,
+            locale: payload.consent.locale,
+            typedFullName: payload.consent.typedFullName,
+            declined: false,
+          }),
+        });
+      }
+
       if (!response.ok || !payload.shareReference) {
-        setFailure(payload.error ?? "Could not reach Experian Connect. Try again.");
-        patch({ experian: { status: "idle" } });
+        const message =
+          payload.error === CREDIT_ERROR_KBA_FAILED
+            ? CREDIT_ERROR_KBA_FAILED
+            : (payload.error ?? CREDIT_ERROR_EXPERIAN_UNAVAILABLE);
+        setFailure(message);
+        patch({ experian: { status: "idle", shareReference: undefined } });
         return;
       }
 
-      // Demo deployments reveal the fabricated summary right away. Everywhere
-      // else the share stays authorized and the report is only requested once
-      // the fee is captured.
       if (payload.previewAvailable) {
         patch({
           experian: {
@@ -234,7 +189,7 @@ export function StepCredit({ state, patch, errors }: StepProps) {
         experian: { status: "authorized", shareReference: payload.shareReference },
       });
     } catch {
-      setFailure("Could not reach Experian Connect. Try again.");
+      setFailure(CREDIT_ERROR_EXPERIAN_UNAVAILABLE);
       patch({ experian: { status: "idle" } });
     } finally {
       setBusy(false);
@@ -242,18 +197,112 @@ export function StepCredit({ state, patch, errors }: StepProps) {
   };
 
   const band = experian.score ? scoreBand(experian.score) : undefined;
+  const showForm = !shared;
 
   return (
     <StepBody>
-      <StepHeading lead="Credit report." tone="Included in the $24.99 Standard fee." />
+      <h1 className="text-[28px] font-semibold leading-[1.1] tracking-[-0.7px] text-ink sm:text-[34px] sm:tracking-[-0.9px]">
+        {CREDIT_STEP_TITLE}
+      </h1>
       <p className="max-w-xl text-[15px] font-medium leading-[21px] tracking-[-0.16px] text-mute">
-        Authorize once and your report travels with this application. The landlord sees your score
-        and a summary — never your account numbers.
+        {CREDIT_STEP_DECK}
       </p>
 
-      {experian.status === "connected" && experian.score ? (
-        <WindowPanel label="Experian Connect">
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+      <WindowPanel label="How this works">
+        <ol className="space-y-2.5">
+          {CREDIT_HOW_THIS_WORKS.map((item, index) => (
+            <li
+              key={item}
+              className="flex items-start gap-3 text-[14px] font-medium leading-5 tracking-[-0.14px] text-ink-2"
+            >
+              <span className="num mt-px w-5 shrink-0 text-mute">{index + 1}.</span>
+              <span>{item}</span>
+            </li>
+          ))}
+        </ol>
+        <p className="mt-4 text-[13px] font-medium leading-5 text-mute">
+          {CREDIT_HOW_THIS_WORKS_HELPER}
+        </p>
+      </WindowPanel>
+
+      {showForm ? (
+        <WindowPanel label={CREDIT_DISCLOSURE_HEADING}>
+          <div className="space-y-3 text-[13px] font-medium leading-5 text-mute">
+            {CREDIT_DISCLOSURE_BODY.split("\n\n").map((paragraph) => (
+              <p key={paragraph.slice(0, 48)} className="whitespace-pre-wrap">
+                {paragraph}
+              </p>
+            ))}
+          </div>
+          <p className="mt-4 text-[13px] font-medium leading-5 text-ink-2">{CREDIT_CA_NOTICE}</p>
+
+          <div className="mt-5 space-y-1 border-t border-line pt-4">
+            <Checkbox
+              id="checkboxAuth"
+              checked={state.consent.checkboxAuth}
+              error={errors.checkboxAuth}
+              onChange={(checked) => setConsent({ checkboxAuth: checked, declined: false })}
+            >
+              {CONSENT_AUTH_CHECKBOX}
+            </Checkbox>
+            <Checkbox
+              id="checkboxUse"
+              checked={state.consent.checkboxUse}
+              error={errors.checkboxUse}
+              onChange={(checked) => setConsent({ checkboxUse: checked, declined: false })}
+            >
+              {CONSENT_USE_CHECKBOX}
+            </Checkbox>
+          </div>
+
+          <div className="mt-4 max-w-sm">
+            <Field
+              id="typedFullName"
+              label="Full name"
+              placeholder="Type your full name"
+              autoComplete="name"
+              value={state.consent.typedFullName}
+              error={errors.typedFullName}
+              onChange={(event) =>
+                setConsent({ typedFullName: event.target.value, declined: false })
+              }
+            />
+          </div>
+
+          {state.consent.declined ? (
+            <Note tone="warn">{CREDIT_DECLINE_MESSAGE}</Note>
+          ) : null}
+
+          <FieldError id="experian-error" message={failure ?? errors.experian} />
+
+          <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              size="touch"
+              disabled={busy}
+              onClick={() => {
+                setFailure(null);
+                setConsent({ declined: true });
+                patch({ experian: { status: "idle" } });
+              }}
+            >
+              {CREDIT_SECONDARY_ACTION}
+            </Button>
+            <Button
+              type="button"
+              size="touch"
+              disabled={!ready || busy}
+              onClick={() => void authorize()}
+            >
+              {busy ? "Contacting Experian…" : CREDIT_PRIMARY_ACTION}
+            </Button>
+          </div>
+        </WindowPanel>
+      ) : experian.status === "connected" && experian.score ? (
+        <WindowPanel label="Experian">
+          <p className="text-[14px] font-medium leading-5 text-ink-2">{CREDIT_SUCCESS_MESSAGE}</p>
+          <div className="mt-5 flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <span className="inline-flex items-center gap-1 text-[13px] font-medium text-ok">
                 <ShieldCheck className="h-4 w-4" aria-hidden />
@@ -277,7 +326,6 @@ export function StepCredit({ state, patch, errors }: StepProps) {
               <SummaryRow label="Recent inquiries" value={experian.recentInquiries} />
               <SummaryRow label="Public records" value={experian.publicRecords} />
               <SummaryRow label="Shared" value={formatDateTime(experian.pulledAt)} />
-              <SummaryRow label="Extra Experian fee" value="$0.00" />
             </motion.dl>
           </div>
 
@@ -302,32 +350,26 @@ export function StepCredit({ state, patch, errors }: StepProps) {
 
           {config.demo ? (
             <p className="mt-5 border-t border-line pt-4 text-[13px] font-medium text-mute">
-              Demo summary — generated locally, no consumer reporting agency was contacted.
+              Demo summary — generated locally. Experian was not contacted.
             </p>
           ) : null}
         </WindowPanel>
       ) : experian.status === "authorized" ? (
-        <WindowPanel label="Experian Connect">
+        <WindowPanel label="Experian">
           <div className="flex items-start gap-3">
             <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-ok" aria-hidden />
             <div className="min-w-0">
               <p className="text-[17px] font-semibold tracking-[-0.3px] text-ink">
-                Share authorized
+                Authorization saved
               </p>
               <p className="mt-1 text-[14px] font-medium leading-5 text-mute">
-                Your report is requested after you pay the $24.99 screening fee on the next step —
-                not before. {CONNECT_INQUIRY_LINE}
+                {CREDIT_SUCCESS_MESSAGE}
               </p>
             </div>
           </div>
-          <dl className="mt-4 border-t border-line pt-4">
-            <SummaryRow label="Provider" value="Experian Connect" />
-            <SummaryRow label="Inquiry" value="Soft" />
-            <SummaryRow label="Extra Experian fee" value="$0.00" />
-          </dl>
         </WindowPanel>
       ) : experian.status === "pulling" ? (
-        <WindowPanel label="Experian Connect">
+        <WindowPanel label="Experian">
           <div className="flex items-center gap-3">
             <Loader2 className="h-5 w-5 animate-spin text-mute" aria-hidden />
             <p
@@ -335,47 +377,15 @@ export function StepCredit({ state, patch, errors }: StepProps) {
               role="status"
               aria-live="polite"
             >
-              Contacting Experian Connect…
+              Contacting Experian…
             </p>
           </div>
         </WindowPanel>
-      ) : (
-        <WindowPanel label="Experian Connect">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="min-w-0">
-              <p className="text-[17px] font-semibold tracking-[-0.3px] text-ink">
-                Share your credit report
-              </p>
-              <p className="mt-1 text-[14px] font-medium leading-5 text-mute">
-                {CONNECT_INQUIRY_LINE} You pay before anything is requested.
-              </p>
-            </div>
-            <Button
-              type="button"
-              size="touch"
-              className="shrink-0"
-              onClick={() => patch({ experian: { status: "authorizing" } })}
-            >
-              Continue with Experian
-            </Button>
-          </div>
-          <FieldError id="experian-error" message={failure ?? errors.experian} />
-        </WindowPanel>
-      )}
+      ) : null}
 
-      <Note tone="warn">
-        {FCRA_PLACEHOLDER_NOTICE} Leaseproof never asks for your Experian username or password.
-      </Note>
+      {state.consent.consentId ? <CreditConsentReceipt consent={state.consent} /> : null}
 
-      <AnimatePresence>
-        {experian.status === "authorizing" && (
-          <ConnectDialog
-            busy={busy}
-            onAuthorize={authorize}
-            onCancel={() => patch({ experian: { status: "idle" } })}
-          />
-        )}
-      </AnimatePresence>
+      <p className="text-[12px] font-medium text-mute">Copy version {FCRA_PACK_VERSION}.</p>
     </StepBody>
   );
 }

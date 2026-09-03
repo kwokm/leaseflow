@@ -191,9 +191,12 @@ export function ApplicationToRent({
 
       <section className="print-avoid-break px-5 py-5 sm:px-6">
         <h3 className="text-[12px] font-medium uppercase tracking-[0.06em] text-mute-2">
-          Background check notice
+          What you agreed to
         </h3>
-        <p className="mt-2 text-[13px] font-medium leading-5 text-mute">{application.noticeBody}</p>
+        <p className="mt-1 text-[12px] font-medium text-mute">{application.noticeTitle}</p>
+        <p className="mt-2 whitespace-pre-wrap text-[13px] font-medium leading-5 text-mute">
+          {application.noticeBody}
+        </p>
       </section>
     </article>
   );

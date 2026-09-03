@@ -9,6 +9,7 @@ import { AiDocCheck } from "@/components/docs/ai-check";
 import { PageWash } from "@/components/page-wash";
 import { Reveal } from "@/components/motion/reveal";
 import { SpatialMount, SpatialOrigin } from "@/components/motion/spatial";
+import { CreditConsentReceipt } from "@/components/apply/credit-consent-receipt";
 import { ApplicationToRent } from "@/components/rental-app/application-to-rent";
 import { Button } from "@/components/ui/button";
 import { checkApplicationDetails, checkApplyState } from "@/lib/docs/ai-check";
@@ -115,6 +116,18 @@ export default function SharedPacketPage({
                 </div>
               ) : null}
               <ApplicationToRent application={application} />
+              <div className="border-t border-line px-5 py-5 sm:px-6">
+                <CreditConsentReceipt
+                  consent={{
+                    typedFullName: state?.consent.typedFullName || details?.consent.signature,
+                    consentedAt: state?.consent.acceptedAt || details?.consent.acceptedAt,
+                    copyVersion: state?.consent.copyVersion || details?.consent.copyVersion,
+                    disclosureText:
+                      state?.consent.disclosureText || details?.consent.disclosureText,
+                    recipientName: state?.consent.recipientName || details?.consent.recipientName,
+                  }}
+                />
+              </div>
               <div className="border-t border-line px-5 py-5 sm:px-6">
                 <AiDocCheck report={docCheck} scan={false} embedded />
               </div>

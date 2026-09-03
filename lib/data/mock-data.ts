@@ -166,7 +166,14 @@ export interface ApplicationDetails {
     notes?: string;
   };
   documents: ApplicationDocument[];
-  consent: { acceptedAt: string; signature: string; ipAddress: string };
+  consent: {
+    acceptedAt: string;
+    signature: string;
+    ipAddress: string;
+    copyVersion?: string;
+    disclosureText?: string;
+    recipientName?: string;
+  };
 }
 
 export type PaymentStatus = "paid" | "pending" | "refunded" | "failed";

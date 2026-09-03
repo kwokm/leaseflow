@@ -188,8 +188,11 @@ export function submissionDetails(state: ApplyState): ApplicationDetails {
     documents: submissionDocuments(state),
     consent: {
       acceptedAt: state.consent.acceptedAt ?? state.submittedAt ?? "",
-      signature: state.consent.signature,
+      signature: state.consent.typedFullName || state.consent.signature,
       ipAddress: "203.0.113.10",
+      copyVersion: state.consent.copyVersion,
+      disclosureText: state.consent.disclosureText,
+      recipientName: state.consent.recipientName,
     },
   };
 }

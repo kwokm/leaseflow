@@ -228,12 +228,20 @@ export function buildPacketHtml({
             : `<p class="muted">No documents uploaded.</p>`
         ),
         section(
-          "Consent",
+          "What you agreed to",
           `<table>${rows([
-            ["Signature", details.consent.signature],
-            ["Accepted", formatDate(details.consent.acceptedAt)],
-            ["IP address", details.consent.ipAddress],
-          ])}</table>`
+            ["Who", details.consent.signature],
+            ["When", formatDate(details.consent.acceptedAt)],
+            ["Copy version", details.consent.copyVersion ?? "lp-fcra-credit-v1.0"],
+            ["Shared with", details.consent.recipientName ?? "this landlord"],
+          ])}</table>
+          ${
+            details.consent.disclosureText
+              ? `<div class="muted" style="white-space:pre-wrap;margin-top:12px">${escapeHtml(
+                  details.consent.disclosureText
+                )}</div>`
+              : ""
+          }`
         ),
       ].join("")
     : section(

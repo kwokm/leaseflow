@@ -8,6 +8,13 @@
       "when": 1788387126535,
       "tag": "0000_leaseproof_init",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1788395181452,
+      "tag": "0001_credit_consents",
+      "breakpoints": true
     }
   ]
 }

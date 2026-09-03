@@ -10,7 +10,7 @@ import {
   type Property,
 } from "@/lib/data/mock-data";
 import { loadDraft, loadSubmissions } from "@/lib/apply/storage";
-import { FCRA_PLACEHOLDER_NOTICE } from "@/lib/legal/fcra";
+import { CREDIT_DISCLOSURE_BODY, CREDIT_DISCLOSURE_HEADING } from "@/lib/legal/fcra";
 import { householdIdFromOccupants, isLocalApplicantId, confirmationIdFromApplicantId } from "@/lib/apply/to-packet";
 import { getHousehold } from "@/lib/data/household-model";
 import { maskSsn } from "@/lib/apply/format";
@@ -156,7 +156,11 @@ export function buildRentalApplication(input: {
     .filter(Boolean)
     .join(" ");
   const fee = getScreeningFee(state?.screeningPackage ?? property.screeningPackage);
-  const signed = state?.consent.signature || details?.consent.signature || fullName;
+  const signed =
+    state?.consent.typedFullName ||
+    state?.consent.signature ||
+    details?.consent.signature ||
+    fullName;
   const signedAt = filledAt(state, details);
   const ssn = state?.personal.ssn ? maskSsn(state.personal.ssn) : details?.ssnLast4 ? `•••-••-${details.ssnLast4}` : "—";
 
@@ -215,7 +219,7 @@ export function buildRentalApplication(input: {
     relatives: rental.relatives.map((row) => [row.name, joinContact({ ...row, name: "" }).replace(/^ · /, "")]),
     acknowledgments: [
       "Applicant-pays screening through Leaseproof.",
-      "Background-check notice acknowledged.",
+      "Experian consumer-report share authorized for this rental application.",
       "Information is true and complete to the best of the applicant’s knowledge.",
     ],
     signature: signed,
@@ -227,8 +231,8 @@ export function buildRentalApplication(input: {
       note: "Applicant pays through Stripe. The landlord does not collect this fee.",
     },
     ssnDisplay: ssn === "—" ? "Not collected on this form" : ssn,
-    noticeTitle: "Background check notice",
-    noticeBody: `The landlord may obtain a consumer report and a public-records background search in connection with this rental. That may include credit, eviction, and criminal-history information from a consumer reporting agency. If a report leads to an adverse decision, the applicant receives a notice identifying the agency and explaining dispute rights. This is a summary notice, not a C.A.R. form. ${FCRA_PLACEHOLDER_NOTICE}`,
+    noticeTitle: CREDIT_DISCLOSURE_HEADING,
+    noticeBody: state?.consent.disclosureText || CREDIT_DISCLOSURE_BODY,
   };
 }
 
@@ -371,8 +375,13 @@ function synthesizeState(
     },
     consent: {
       ...base.consent,
+      typedFullName:
+        details?.consent.signature || `${applicant.firstName} ${applicant.lastName}`,
       signature: details?.consent.signature || `${applicant.firstName} ${applicant.lastName}`,
       acceptedAt: details?.consent.acceptedAt,
+      copyVersion: details?.consent.copyVersion ?? base.consent.copyVersion,
+      disclosureText: details?.consent.disclosureText ?? base.consent.disclosureText,
+      recipientName: details?.consent.recipientName ?? base.consent.recipientName,
     },
     rental: {
       ...base.rental,

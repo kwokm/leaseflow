@@ -6,21 +6,14 @@ import { CreditCard, Lock, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AiDocCheck } from "@/components/docs/ai-check";
 import { SAMPLE_MISMATCH, checkApplyState } from "@/lib/docs/ai-check";
-import { Checkbox, Field } from "@/components/apply/field";
+import { CreditConsentReceipt } from "@/components/apply/credit-consent-receipt";
 import { StepBody } from "@/components/apply/motion";
 import { Note, StepHeading, SummaryRow } from "@/components/apply/step-shell";
 import type { StepProps } from "@/components/apply/step-shell";
 import { useRuntimeConfig } from "@/components/config/runtime-config";
 import { formatDateTime, formatMoney, maskDob, maskSsn } from "@/lib/apply/format";
 import { getScreeningFee } from "@/lib/data/mock-data";
-import {
-  CONSENT_BACKGROUND_CHECKBOX,
-  CONSENT_FCRA_CHECKBOX,
-  CREDIT_DISCLOSURE_HEADING,
-  FCRA_PLACEHOLDER_NOTICE,
-  creditDisclosureParagraphs,
-} from "@/lib/legal/fcra";
-import { APPLY_STEP, type ConsentInfo } from "@/lib/apply/types";
+import { APPLY_STEP } from "@/lib/apply/types";
 
 function ReviewBlock({
   title,
@@ -47,7 +40,7 @@ function ReviewBlock({
   );
 }
 
-export function StepReview({ state, patch, errors, property, goTo }: StepProps) {
+export function StepReview({ state, property, goTo }: StepProps) {
   const [showSample, setShowSample] = useState(false);
   const config = useRuntimeConfig();
   const docCheck = useMemo(
@@ -56,8 +49,6 @@ export function StepReview({ state, patch, errors, property, goTo }: StepProps) 
   );
   const fee = getScreeningFee(state.screeningPackage);
   const p = state.personal;
-  const setConsent = (partial: Partial<ConsentInfo>) =>
-    patch({ consent: { ...state.consent, ...partial } });
 
   const address = [p.street, p.unit, p.city, [p.state, p.zip].filter(Boolean).join(" ")]
     .filter(Boolean)
@@ -179,53 +170,7 @@ export function StepReview({ state, patch, errors, property, goTo }: StepProps) 
         <SummaryRow label="Prior eviction" value={state.household.priorEviction ? "Yes" : "No"} />
       </ReviewBlock>
 
-      {/* FCRA-style authorization */}
-      <section className="rounded-lg border border-line bg-paper p-5 shadow-window">
-        <h2 className="text-[17px] font-semibold tracking-[-0.3px] text-ink">
-          Authorization and disclosure
-        </h2>
-        <div className="mt-3 max-h-56 overflow-y-auto rounded-btn border border-line bg-mist p-4 text-[13px] font-medium leading-5 text-mute">
-          <p className="font-semibold text-ink-2">{CREDIT_DISCLOSURE_HEADING}</p>
-          {creditDisclosureParagraphs(property.address).map((paragraph) => (
-            <p key={paragraph.slice(0, 48)} className="mt-2">
-              {paragraph}
-            </p>
-          ))}
-          <p className="mt-2 font-semibold text-ink-2">{FCRA_PLACEHOLDER_NOTICE}</p>
-        </div>
-
-        <div className="mt-4 space-y-1">
-          <Checkbox
-            id="fcra"
-            checked={state.consent.fcra}
-            error={errors.fcra}
-            onChange={(checked) => setConsent({ fcra: checked })}
-          >
-            {CONSENT_FCRA_CHECKBOX}
-          </Checkbox>
-          <Checkbox
-            id="backgroundAck"
-            checked={state.consent.backgroundAck}
-            error={errors.backgroundAck}
-            onChange={(checked) => setConsent({ backgroundAck: checked })}
-          >
-            {CONSENT_BACKGROUND_CHECKBOX}
-          </Checkbox>
-        </div>
-
-        <div className="mt-4 max-w-sm">
-          <Field
-            id="signature"
-            label="Electronic signature"
-            placeholder="Type your full name"
-            autoComplete="off"
-            value={state.consent.signature}
-            error={errors.signature}
-            hint="Typing your name here counts as your signature."
-            onChange={(event) => setConsent({ signature: event.target.value })}
-          />
-        </div>
-      </section>
+      <CreditConsentReceipt consent={state.consent} />
 
       {/* Stripe Checkout hand-off — card details are entered on Stripe, not here. */}
       <section className="rounded-lg border border-line bg-paper p-5 shadow-window">

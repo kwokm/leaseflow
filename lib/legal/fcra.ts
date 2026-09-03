@@ -1,61 +1,90 @@
 /**
- * Consent copy and its version.
+ * Credit-step copy. Source of truth: Notion pack `lp-fcra-credit-v1.0`.
  *
- * The authoritative wording lives in the Notion FCRA pack `lp-fcra-credit-v1.0`.
- * The strings below are PLACEHOLDERS pending that pack — they are deliberately
- * conservative, and every consent row written to Neon records
- * `FCRA_PACK_VERSION` so we always know which wording an applicant agreed to.
+ * Do not paraphrase these strings. If a word changes, bump FCRA_PACK_VERSION
+ * and `copySha256` in the same change. Attorney-review required before any
+ * use as legal advice — that watermark is for humans, not the applicant UI.
  *
- * Two rules this file exists to enforce:
- *  1. Do not restate what a credit check does to someone's score. Experian
- *     Connect is a soft inquiry; that is a fact about the inquiry type, not a
- *     promise about scoring, and no copy here goes further than that.
- *  2. Do not reword these strings ad hoc. Replace them wholesale when the pack
- *     lands, and bump FCRA_PACK_VERSION in the same change.
+ * Hashing and HTML snapshots live in `fcra-archive.ts` (server-only) so this
+ * file stays importable from the Credit-step client.
  */
+
 export const FCRA_PACK_VERSION = "lp-fcra-credit-v1.0";
 
-/** Rendered next to placeholder copy so nobody mistakes it for final wording. */
-export const FCRA_PLACEHOLDER_NOTICE =
-  `Placeholder copy — final wording comes from the Leaseproof FCRA pack ${FCRA_PACK_VERSION}.`;
+export const CREDIT_STEP_LABEL = "Credit";
+
+export const CREDIT_STEP_TITLE = "Share your Experian report";
+
+export const CREDIT_STEP_DECK =
+  "You authenticate with Experian and share your consumer report with this landlord for this application. Leaseproof is not a consumer reporting agency. Experian is.";
+
+export const CREDIT_HOW_THIS_WORKS = [
+  "You confirm the disclosure and authorization below.",
+  "Experian verifies it is you.",
+  "Your report is shared with this landlord inside the Leaseproof packet.",
+] as const;
+
+export const CREDIT_HOW_THIS_WORKS_HELPER =
+  "This is not a new loan application, and it is not a landlord running a bureau pull through their own subscriber account.";
+
+export const CREDIT_DISCLOSURE_HEADING = "Credit report disclosure and authorization";
+
+/**
+ * Exact disclosure body, including the copy-version line. Persist this string
+ * verbatim on every consent row.
+ */
+export const CREDIT_DISCLOSURE_BODY = [
+  "AAI Suzuki LLC, doing business as Leaseproof, will help you share a consumer report from Experian with the landlord for this rental application.",
+  "Experian is a consumer reporting agency. A consumer report can include credit history and a credit score. The landlord may use this report to decide whether to rent to you and on what terms, including deposit or co-signer conditions.",
+  "You are giving written instructions for Experian to furnish this report for that housing purpose. The report may be used only for this rental application. It may not be used for employment, insurance, or unrelated credit decisions.",
+  "Leaseproof is not a consumer reporting agency and does not decide whether you get the unit. The landlord does.",
+  "If the landlord takes an unfavorable action based even in part on this report — for example denying the application, requiring a co-signer, or asking for a larger deposit or higher rent than another applicant — federal law requires them to give you an adverse-action notice. That notice must name Experian and explain your right to a free copy of the report (if you ask within 60 days) and your right to dispute inaccurate information.",
+  "Copy version `lp-fcra-credit-v1.0`.",
+].join("\n\n");
+
+/** Factual CA line. Not a third checkbox. */
+export const CREDIT_CA_NOTICE =
+  "California: if this landlord takes an unfavorable action based on this credit report, they must notify you in writing.";
+
+export const CONSENT_AUTH_CHECKBOX =
+  "I have read this disclosure. I authorize AAI Suzuki LLC (Leaseproof) to obtain my Experian consumer report under my written instructions and to share it with this landlord for this rental application only.";
+
+export const CONSENT_USE_CHECKBOX =
+  "I understand this landlord may use the shared Experian report to evaluate this housing application.";
+
+export const CREDIT_PRIMARY_ACTION = "Continue with Experian";
+
+export const CREDIT_SECONDARY_ACTION = "Don’t share a report";
+
+export const CREDIT_DECLINE_MESSAGE =
+  "This application needs a shared Experian report. You can go back, or leave this application.";
+
+export const CREDIT_ERROR_EXPERIAN_UNAVAILABLE =
+  "We could not reach Experian. Your authorization was saved. Try again. Nothing was shared with the landlord.";
+
+export const CREDIT_ERROR_KBA_FAILED =
+  "Experian could not verify it was you. Nothing was shared. You can try again.";
+
+export const CREDIT_SUCCESS_MESSAGE =
+  "Your Experian report is in the packet for this landlord. Next is Pay.";
+
+export const CREDIT_CONSENT_PURPOSE = "housing_application";
+
+export const CREDIT_CONSENT_LOCALE = "en-US";
 
 export const CONSENT_KIND = {
-  /** Authorization to obtain a consumer report for this application. */
+  /** Authorization to obtain an Experian consumer report for this application. */
   fcraCredit: "fcra_credit",
-  /** Acknowledgement that a public-records background search is included. */
-  backgroundAck: "background_ack",
   /** Permission for Experian Connect to share the report with this landlord. */
   experianConnect: "experian_connect",
 } as const;
 
 export type ConsentKind = (typeof CONSENT_KIND)[keyof typeof CONSENT_KIND];
 
-/** Applicant-facing description of the Experian Connect hand-off. */
-export const CONNECT_BULLETS = [
-  "Experian verifies your identity, then shares the report with this landlord",
-  "Shared for this application only, and access ends when it is decided",
-  "The landlord sees a score and summary — never your account numbers",
-] as const;
-
-export const CONNECT_INQUIRY_LINE = "Experian Connect uses a soft inquiry.";
-
-export const CREDIT_DISCLOSURE_HEADING =
-  "Disclosure regarding consumer reports and investigative consumer reports";
-
-/**
- * Placeholder disclosure body. `address` is interpolated so the applicant sees
- * which tenancy the authorization covers.
- */
-export function creditDisclosureParagraphs(address: string): string[] {
-  return [
-    `In connection with your rental application for ${address}, a consumer report and/or investigative consumer report may be obtained about you. These reports may include information about your credit history, rental history, eviction records, and criminal records, obtained from consumer reporting agencies.`,
-    "Under the Fair Credit Reporting Act you have the right to request disclosure of the nature and scope of any investigative consumer report, to know whether a report was obtained, and to receive a free copy of any report that results in an adverse decision. You also have the right to dispute the accuracy or completeness of any information in your file.",
-    "If your application is declined based in whole or in part on information in a consumer report, you will receive an adverse action notice identifying the reporting agency and explaining your rights.",
-  ];
+export function creditConsentReady(input: {
+  checkboxAuth: boolean;
+  checkboxUse: boolean;
+  typedFullName: string;
+}): boolean {
+  return input.checkboxAuth && input.checkboxUse && input.typedFullName.trim().length > 0;
 }
-
-export const CONSENT_FCRA_CHECKBOX =
-  "I have read the disclosure and authorize Leaseproof to obtain consumer reports about me for this rental application.";
-
-export const CONSENT_BACKGROUND_CHECKBOX =
-  "I understand a public-records background search is part of this screening.";

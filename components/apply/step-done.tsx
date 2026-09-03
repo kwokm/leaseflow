@@ -90,7 +90,10 @@ export function StepDone({ state, property }: StepProps) {
           />
           <SummaryRow label="Credit source" value="Experian Connect" />
           <SummaryRow label="Documents" value={`${documents.length} files`} />
-          <SummaryRow label="Signed" value={state.consent.signature || "—"} />
+          <SummaryRow
+            label="Signed"
+            value={state.consent.typedFullName || state.consent.signature || "—"}
+          />
         </dl>
 
         <ul className="mt-4 space-y-1.5 border-t border-line pt-4">

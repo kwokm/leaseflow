@@ -18,6 +18,7 @@ import type { ApplyState } from "@/lib/apply/types";
 import type { Applicant } from "@/lib/data/mock-data";
 import { CONSENT_KIND, FCRA_PACK_VERSION } from "@/lib/legal/fcra";
 import { experianConnect } from "@/lib/screening/experian-connect";
+import { getLatestCreditConsent } from "@/lib/screening/credit-consent";
 import { STANDARD_SCREENING_FEE_CENTS } from "@/lib/payments/pricing";
 
 export type SubmitContext = {
@@ -52,28 +53,61 @@ export async function submitApplication(
     .limit(1);
   if (!listing) throw new Error("Listing not found");
 
-  const applicationId = newId("app");
-  const confirmationId = newConfirmationId();
   const now = new Date();
   const packet = toStoredPacket(state);
-
   const householdId = await ensureHousehold(state, listing.id);
 
-  await database.insert(applications).values({
-    id: applicationId,
-    confirmationId,
-    listingId: listing.id,
-    householdId,
-    applicantUserId: context.applicantUserId,
-    firstName: state.personal.firstName,
-    lastName: state.personal.lastName,
-    email: state.personal.email,
-    phone: state.personal.phone,
-    status: "awaiting_payment",
-    screeningPackage: state.screeningPackage,
-    packet: packet as unknown as Record<string, unknown>,
-    submittedAt: now,
-  });
+  let applicationId = state.applicationId;
+  let confirmationId = state.confirmationId;
+
+  if (applicationId) {
+    const [existing] = await database
+      .select()
+      .from(applications)
+      .where(eq(applications.id, applicationId))
+      .limit(1);
+    if (existing) {
+      confirmationId = existing.confirmationId;
+      await database
+        .update(applications)
+        .set({
+          householdId,
+          applicantUserId: context.applicantUserId ?? existing.applicantUserId,
+          firstName: state.personal.firstName,
+          lastName: state.personal.lastName,
+          email: state.personal.email,
+          phone: state.personal.phone,
+          status: "awaiting_payment",
+          screeningPackage: state.screeningPackage,
+          packet: packet as unknown as Record<string, unknown>,
+          submittedAt: existing.submittedAt ?? now,
+          updatedAt: now,
+        })
+        .where(eq(applications.id, existing.id));
+    } else {
+      applicationId = undefined;
+    }
+  }
+
+  if (!applicationId) {
+    applicationId = newId("app");
+    confirmationId = newConfirmationId();
+    await database.insert(applications).values({
+      id: applicationId,
+      confirmationId,
+      listingId: listing.id,
+      householdId,
+      applicantUserId: context.applicantUserId,
+      firstName: state.personal.firstName,
+      lastName: state.personal.lastName,
+      email: state.personal.email,
+      phone: state.personal.phone,
+      status: "awaiting_payment",
+      screeningPackage: state.screeningPackage,
+      packet: packet as unknown as Record<string, unknown>,
+      submittedAt: now,
+    });
+  }
 
   await writeConsents(applicationId, state, context, now);
   await writeDocuments(applicationId, state);
@@ -88,7 +122,7 @@ export async function submitApplication(
     status: "pending",
   });
 
-  return { id: applicationId, confirmationId, status: "awaiting_payment" };
+  return { id: applicationId, confirmationId: confirmationId ?? newConfirmationId(), status: "awaiting_payment" };
 }
 
 /** People applying together share a household scoped to the listing. */
@@ -124,20 +158,22 @@ async function writeConsents(
   const base = {
     applicationId,
     version: FCRA_PACK_VERSION,
-    signature: state.consent.signature,
+    signature: state.consent.typedFullName || state.consent.signature,
     ipAddress: context.ipAddress,
     userAgent: context.userAgent,
     acceptedAt: now,
   };
 
+  const [already] = await database
+    .select({ id: consents.id })
+    .from(consents)
+    .where(eq(consents.applicationId, applicationId))
+    .limit(1);
+  if (already) return;
+
+  const granted = state.consent.checkboxAuth && state.consent.checkboxUse;
   const rows: (typeof consents.$inferInsert)[] = [
-    { id: newId("con"), kind: CONSENT_KIND.fcraCredit, granted: state.consent.fcra, ...base },
-    {
-      id: newId("con"),
-      kind: CONSENT_KIND.backgroundAck,
-      granted: state.consent.backgroundAck,
-      ...base,
-    },
+    { id: newId("con"), kind: CONSENT_KIND.fcraCredit, granted, ...base },
   ];
 
   if (state.experian.status === "authorized" || state.experian.status === "connected") {
@@ -194,26 +230,45 @@ async function authorizeCreditShare(
   if (!database) return;
   if (state.experian.status !== "authorized" && state.experian.status !== "connected") return;
 
-  const authorization = await experianConnect().authorize({
-    applicationId,
-    returnUrl: context.returnUrl,
-    recipientReference,
-    applicant: {
-      firstName: state.personal.firstName,
-      lastName: state.personal.lastName,
-      email: state.personal.email,
-    },
-  });
+  const [existingShare] = await database
+    .select()
+    .from(creditShares)
+    .where(eq(creditShares.applicationId, applicationId))
+    .limit(1);
+  if (existingShare) return;
+
+  const archived = await getLatestCreditConsent(applicationId);
+  if (!archived && !state.consent.consentId) {
+    throw new Error("Credit consent must be archived before an Experian share can start.");
+  }
+
+  let shareReference = state.experian.shareReference ?? archived?.experianShareId ?? null;
+  let expiresAt: Date | undefined;
+
+  if (!shareReference) {
+    const authorization = await experianConnect().authorize({
+      applicationId,
+      returnUrl: context.returnUrl,
+      recipientReference,
+      applicant: {
+        firstName: state.personal.firstName,
+        lastName: state.personal.lastName,
+        email: state.personal.email,
+      },
+    });
+    shareReference = authorization.shareReference;
+    expiresAt = authorization.expiresAt;
+  }
 
   await database.insert(creditShares).values({
     id: newId("crs"),
     applicationId,
     provider: "experian_connect",
     status: "awaiting_payment",
-    shareReference: authorization.shareReference,
-    inquiryType: authorization.inquiryType,
+    shareReference,
+    inquiryType: "soft",
     authorizedAt: new Date(),
-    expiresAt: authorization.expiresAt,
+    expiresAt,
   });
 }
 
@@ -421,6 +476,7 @@ export type ApplicationStatusView = {
   status: string;
   paid: boolean;
   packet: StoredPacket | null;
+  creditConsent: Awaited<ReturnType<typeof getLatestCreditConsent>>;
 };
 
 export async function getApplicationStatus(id: string): Promise<ApplicationStatusView | null> {
@@ -446,5 +502,6 @@ export async function getApplicationStatus(id: string): Promise<ApplicationStatu
     status: row.status,
     paid: payment?.status === "paid",
     packet: (row.packet as unknown as StoredPacket) ?? null,
+    creditConsent: await getLatestCreditConsent(id),
   };
 }
