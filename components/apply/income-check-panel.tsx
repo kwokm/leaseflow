@@ -118,8 +118,11 @@ export function IncomeCheckPanel({
   embedded?: boolean;
 }) {
   const ids = useMemo(
-    () => incomeFilesFromState(state).map((file) => file.incomeCheckId).filter((id): id is string => Boolean(id)),
-    [state.paystubs, state.statements],
+    () =>
+      incomeFilesFromState(state)
+        .map((file) => file.incomeCheckId)
+        .filter((id): id is string => Boolean(id)),
+    [state],
   );
   const uploaded = incomeFilesFromState(state).some((file) => file.pathname);
   const { checks, waiting } = useIncomeChecks(ids);

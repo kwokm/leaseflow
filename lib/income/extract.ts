@@ -1,7 +1,7 @@
 /**
  * Pure AI Income Check helpers. Used by the complete route and unit tests.
- * Recency is always measured from the clock you pass in — never a hardcoded
- * “today” like 2026-08-14.
+ * Recency is always measured from the clock you pass in — never a baked-in
+ * calendar day.
  */
 
 export const INCOME_DOC_KINDS = [
@@ -179,7 +179,7 @@ export function recencyFromPeriod(
 ): { recency: Recency; recencyLabel: string } {
   if (isAnnualKind(input.kind)) {
     const year =
-      parseIsoDate(input.periodEnd ?? input.periodStart)?.getUTCFullYear() ??
+      parseIsoDate(input.periodEnd ?? input.periodStart ?? null)?.getUTCFullYear() ??
       (input.periodEnd || input.periodStart || "").match(/^(20\d{2})/)?.[1];
     const taxYear = typeof year === "string" ? Number(year) : year;
     const currentYear = today.getUTCFullYear();

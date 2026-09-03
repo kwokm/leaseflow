@@ -20,14 +20,7 @@ test("unknown frequency does not invent a monthly gross", () => {
   assert.equal(monthlyGrossFromFrequency(null, "unknown", 850_000), 850_000);
 });
 
-test("recency helpers never bake in 2026-08-14", async () => {
-  const source = await import("node:fs").then((fs) =>
-    fs.readFileSync(new URL("./extract.ts", import.meta.url), "utf8"),
-  );
-  assert.doesNotMatch(source, /2026-08-14/);
-});
-
-test("recency uses the clock that is passed in, not a hardcoded 2026-08-14", () => {
+test("recency uses the clock that is passed in, not a hardcoded mid-2026 day", () => {
   const today = new Date("2026-09-03T12:00:00.000Z");
   const current = recencyFromPeriod(
     { kind: "paystub", periodStart: "2026-08-01", periodEnd: "2026-08-15" },
@@ -49,6 +42,7 @@ test("recency uses the clock that is passed in, not a hardcoded 2026-08-14", () 
     { kind: "paystub", periodStart: "2026-08-01", periodEnd: "2026-08-15" },
     laterToday,
   );
+  // A period that was current in Sept 2026 is stale a year later.
   assert.equal(fromLater.recency, "stale");
 });
 

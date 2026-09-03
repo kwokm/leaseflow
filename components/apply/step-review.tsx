@@ -50,7 +50,7 @@ export function StepReview({ state, property, goTo }: StepProps) {
       incomeFilesFromState(state)
         .map((file) => file.incomeCheckId)
         .filter((id): id is string => Boolean(id)),
-    [state.paystubs, state.statements],
+    [state],
   );
   const { checks: liveChecks, waiting: liveWaiting } = useIncomeChecks(liveIds);
   const liveReport = useMemo(() => reportFromIncomeChecks(liveChecks), [liveChecks]);
