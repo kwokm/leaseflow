@@ -46,6 +46,8 @@ import { resolveRentalPacket } from "@/lib/apply/rental-app";
 import type { ApplyState } from "@/lib/apply/types";
 import type { ApplicationStatus } from "@/lib/data/mock-data";
 import type { RentalApplication } from "@/lib/apply/rental-app";
+import { AdverseActionPanel } from "@/components/desk/adverse-action-panel";
+import { noticesForApplication } from "@/lib/desk/adverse-action-store";
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
@@ -79,6 +81,7 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
   const { id } = use(params);
   const router = useRouter();
   const [adverseActionOpen, setAdverseActionOpen] = useState(false);
+  const [declineOpen, setDeclineOpen] = useState(false);
   const [statusOverride, setStatusOverride] = useState<ApplicationStatus | null>(null);
   const [showSample, setShowSample] = useState(false);
   const [tab, setTab] = useState<"packet" | "application">("packet");
@@ -201,16 +204,33 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
           <Button
             variant="outline"
             size="sm"
-            onClick={() => downloadPacket({ applicant, property, details, report, experian })}
+            onClick={() =>
+              downloadPacket({
+                applicant,
+                property,
+                details,
+                report,
+                experian,
+                adverseActionNotices: noticesForApplication(applicant.id),
+              })
+            }
           >
             Download
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={!experian}
+            onClick={() => setAdverseActionOpen(true)}
+          >
+            Send adverse-action notice
           </Button>
           {!decided && (
             <>
               <Button size="sm" onClick={() => decide("approved")}>
                 Approve
               </Button>
-              <Button variant="destructive" size="sm" onClick={() => setAdverseActionOpen(true)}>
+              <Button variant="destructive" size="sm" onClick={() => setDeclineOpen(true)}>
                 Decline
               </Button>
             </>
@@ -462,26 +482,51 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
           </p>
         )}
       </Section>
+
         </>
       ) : null}
 
-      <Dialog open={adverseActionOpen} onOpenChange={setAdverseActionOpen}>
+      <AdverseActionPanel
+        applicationId={applicant.id}
+        listingId={applicant.propertyId}
+        applicantFullName={fullName}
+        applicantEmail={applicant.email}
+        propertyAddress={property.address}
+        experian={experian}
+        landlord={{
+          name: "",
+          address: "",
+          phone: "",
+          email: "",
+        }}
+        canSend={Boolean(experian)}
+        open={adverseActionOpen}
+        onOpenChange={setAdverseActionOpen}
+        hideTrigger
+      />
+
+      <Dialog open={declineOpen} onOpenChange={setDeclineOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>Decline this packet</DialogTitle>
             <DialogDescription>
-              Demo notice only. The queue pill will change to Declined. No notice is sent.
+              Changes the queue status only. Does not send a written adverse-action notice.
             </DialogDescription>
           </DialogHeader>
           <p className="text-[13px] leading-5 text-mute">
-            {fullName} at {shortAddress(property.address)} will show as Declined on the desk. This
-            is mock data — no consumer reporting agency is used.
+            {fullName} at {shortAddress(property.address)} will show as Declined on the desk.
           </p>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setAdverseActionOpen(false)}>
+            <Button variant="outline" onClick={() => setDeclineOpen(false)}>
               Cancel
             </Button>
-            <Button variant="destructive" onClick={() => decide("declined")}>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                setDeclineOpen(false);
+                decide("declined");
+              }}
+            >
               Decline
             </Button>
           </DialogFooter>

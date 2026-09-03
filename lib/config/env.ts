@@ -37,6 +37,11 @@ export function blobEnabled(): boolean {
   return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
 }
 
+/** True only when a real mailer can accept a message. Absence means queue, never fake a send. */
+export function mailerEnabled(): boolean {
+  return Boolean(process.env.RESEND_API_KEY?.trim() && process.env.MAIL_FROM?.trim());
+}
+
 /**
  * Absolute origin for Stripe return URLs. Vercel sets VERCEL_URL without a
  * scheme, so it is normalised here.
