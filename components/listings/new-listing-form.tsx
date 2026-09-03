@@ -445,7 +445,7 @@ export function NewListingForm({ initialMode }: { initialMode: ListingEntryMode 
                       </li>
                       <li className="flex items-start gap-2">
                         <Check className="mt-0.5 h-4 w-4 shrink-0 text-ok" aria-hidden />
-                        AI income and bank verification
+                        AI Income Check and bank verification
                       </li>
                       <li className="flex items-start gap-2">
                         <Check className="mt-0.5 h-4 w-4 shrink-0 text-ok" aria-hidden />

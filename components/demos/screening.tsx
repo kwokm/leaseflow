@@ -5,7 +5,7 @@ import { DemoPlay } from "@/components/demos/shell";
 const CHECKS = [
   { label: "Photo ID", note: "Name matches the applicant", retick: "1s" },
   { label: "Experian", note: "Demo pull · landlord not charged", retick: "1.5s" },
-  { label: "AI income check", note: "Gross monthly from paystubs / W-2", retick: "2s" },
+  { label: "AI Income Check", note: "Gross monthly from paystubs / W-2", retick: "2s" },
   { label: "Background", note: "Mock public-records note", retick: "2.5s" },
 ] as const;
 

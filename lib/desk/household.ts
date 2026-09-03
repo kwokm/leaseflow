@@ -48,7 +48,7 @@ export function aiIncomeSourceLabel(screen: AiIncomeScreen): string {
 }
 
 export function formatAiIncomeLine(screen: AiIncomeScreen): string {
-  return `AI income · $${screen.grossMonthly.toLocaleString()} / mo gross`;
+  return `AI Income Check · $${screen.grossMonthly.toLocaleString()} / mo gross`;
 }
 
 export function formatGrossMonthly(amount: number): string {

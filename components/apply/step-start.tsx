@@ -18,7 +18,7 @@ const STANDARD_FEATURES = [
   "Experian credit report and score",
   "National criminal and eviction search",
   "Identity check",
-  "AI income and bank verification",
+  "AI Income Check and bank verification",
   "The packet, shared with the landlord",
   "Apply to as many homes as you want",
 ];
@@ -140,8 +140,8 @@ export function StepStart({ state, patch, property, embedded }: StepProps) {
       </section>
 
       <Note tone="blue">
-        {STANDARD_PRICING_STORY} The Standard fee also includes background, ID, and AI income and
-        bank verification.
+        {STANDARD_PRICING_STORY} The Standard fee also includes background, ID, and AI Income Check
+        and bank verification.
       </Note>
 
       <Panel title="What you'll need" description="Have these ready before you start.">

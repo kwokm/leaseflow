@@ -76,7 +76,7 @@ const INCOME_DOCS = [
 export function PillarIncome() {
   return (
     <DemoPlay flush className="pillar-demo">
-      <PacketWindow title="AI income check · Jane Doe" meta="Name + recency">
+      <PacketWindow title="AI Income Check · Jane Doe" meta="Name + recency">
         <div className="px-3.5 py-3 sm:px-4">
           <p className="text-[12px] font-medium text-mute">
             Paystubs and statements. Names match. Last two months.
