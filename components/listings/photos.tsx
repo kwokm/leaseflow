@@ -6,7 +6,7 @@ function isRemote(src: string): boolean {
 }
 
 function usesNextImage(src: string): boolean {
-  return /zillowstatic\.com|d36xftgacqn2p\.cloudfront\.net/i.test(src);
+  return /zillowstatic\.com|d36xftgacqn2p\.cloudfront\.net|cdn-redfin\.com|rdcpix\.com/i.test(src);
 }
 
 function Photo({

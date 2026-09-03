@@ -10,7 +10,7 @@ Tenant screening: a landlord posts a listing, a renter applies, pays the $24.99 
 
 1. Sign in at `/signin` (Google or email, via Clerk).
 2. A new account opens an **empty** screening pipeline — seeded listings are demo-only.
-3. Create a property at `/dashboard/listings/new`.
+3. Create a property at `/dashboard/listings/new`, or **Import listing** from a public Zillow / Redfin / Realtor.com URL (JSON-LD and Open Graph; a blocked portal is a failed import, not invented data).
 4. Copy its apply link from the listing.
 5. Review submitted packets in `/dashboard/applications`.
 

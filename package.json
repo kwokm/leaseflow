@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
+    "test:import": "node --experimental-strip-types --test lib/listings/import-listing.test.ts",
     "db:generate": "drizzle-kit generate",
     "db:deploy": "node scripts/migrate.mjs",
     "db:migrate": "drizzle-kit migrate",
