@@ -98,19 +98,32 @@ export function NewListingForm({ initialMode }: { initialMode: ListingEntryMode 
         body: JSON.stringify({ url: trimmed }),
       });
       const payload = (await response.json()) as {
-        preview?: ListingPreview;
+        preview?: ListingPreview | null;
         note?: string;
         error?: string;
       };
 
-      if (!response.ok || !payload.preview) {
-        setPullError(payload.error ?? "Could not import that listing.");
+      if (!response.ok || !payload.preview?.address) {
+        if (payload.preview) {
+          applyPreview(
+            payload.preview,
+            payload.note ?? "Partial fields only — finish the rest by hand."
+          );
+        }
+        setPullError(
+          payload.error ??
+            "Could not import that listing. Portals often block automated reads. Use the form."
+        );
+        setMode("manual");
         return;
       }
 
       applyPreview(payload.preview, payload.note ?? "Listing pulled.");
     } catch {
-      setPullError("Could not reach the import. Leave the form and fill the fields by hand.");
+      setPullError(
+        "Could not reach the import. Portals often block automated reads. Finish the form by hand."
+      );
+      setMode("manual");
     } finally {
       setPulling(false);
     }
@@ -156,10 +169,10 @@ export function NewListingForm({ initialMode }: { initialMode: ListingEntryMode 
         </h1>
         <p className="text-mute mt-1">
           {mode === "choose"
-            ? "Import a public listing URL, or add the address and rent by hand."
+            ? "Add the address and rent yourself. Import from a public URL is a fallback — portals often block automated reads."
             : mode === "import"
-              ? "Paste a Zillow, Redfin, or Realtor.com URL. Preview what we read, then save — nothing is invented if the site blocks us."
-              : "Fill the address and rent. You can still import from a URL if you have one."}
+              ? "Paste a Zillow, Redfin, or Realtor.com URL. We only keep fields we actually read. If the site blocks us, you will land on the form with whatever came back — nothing is invented."
+              : "Fill the address and rent. Import is optional and often hits a bot wall."}
         </p>
       </Reveal>
 
@@ -169,17 +182,16 @@ export function NewListingForm({ initialMode }: { initialMode: ListingEntryMode 
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Link2 className="h-4 w-4" aria-hidden />
-                  Import listing
+                  <PenLine className="h-4 w-4" aria-hidden />
+                  Add listing
                 </CardTitle>
                 <CardDescription>
-                  Paste a public Zillow, Redfin, or Realtor.com URL. Preview address, rent, and
-                  photos before you save.
+                  Type the address, rent, and beds yourself. This is the path that always works.
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button type="button" onClick={() => setMode("import")}>
-                  Import listing
+                <Button type="button" onClick={() => setMode("manual")}>
+                  Add listing
                 </Button>
               </CardContent>
             </Card>
@@ -188,17 +200,17 @@ export function NewListingForm({ initialMode }: { initialMode: ListingEntryMode 
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <PenLine className="h-4 w-4" aria-hidden />
-                  Add manually
+                  <Link2 className="h-4 w-4" aria-hidden />
+                  Import listing
                 </CardTitle>
                 <CardDescription>
-                  Type the address, rent, and beds yourself. Same Standard screening packet either
-                  way.
+                  Optional. Paste a public Zillow, Redfin, or Realtor.com URL. Those sites often
+                  block automated reads — if they do, you finish the form by hand.
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button type="button" variant="outline" onClick={() => setMode("manual")}>
-                  Add manually
+                <Button type="button" variant="outline" onClick={() => setMode("import")}>
+                  Import listing
                 </Button>
               </CardContent>
             </Card>
@@ -216,7 +228,8 @@ export function NewListingForm({ initialMode }: { initialMode: ListingEntryMode 
                     <CardTitle>Paste a listing URL</CardTitle>
                     <CardDescription>
                       Homedetails, Redfin /home/, and Realtor.com listing pages. We read JSON-LD and
-                      Open Graph from the public page — not a portal partnership.
+                      Open Graph from the public page — not a portal partnership. Those sites often
+                      show a bot wall; if they do we leave you on this form with whatever we read.
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -306,7 +319,17 @@ export function NewListingForm({ initialMode }: { initialMode: ListingEntryMode 
                   >
                     Import listing
                   </button>
+                  {" "}
+                  — optional. Portals often block automated reads.
                 </p>
+                {pullError ? (
+                  <p role="alert" className="mt-2 text-[13px] font-medium text-no">
+                    {pullError}
+                  </p>
+                ) : null}
+                {pullNote && !showImport ? (
+                  <p className="mt-2 text-[13px] font-medium text-mute">{pullNote}</p>
+                ) : null}
               </RevealItem>
             )}
 

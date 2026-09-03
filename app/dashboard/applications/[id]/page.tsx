@@ -36,8 +36,10 @@ import {
   submissionReport,
 } from "@/lib/apply/to-packet";
 import { setDecision, withDecision } from "@/lib/desk/decisions";
+import { useDeskApplicant } from "@/lib/desk/use-desk-applicants";
 import { creditScore, incomeMultiple, shortAddress } from "@/lib/desk/display";
 import { householdTotals } from "@/lib/desk/household";
+import { useProperty } from "@/lib/listings/use-property";
 import { getHousehold } from "@/lib/data/household-model";
 import { Reveal } from "@/components/motion/reveal";
 import { AiDocCheck } from "@/components/docs/ai-check";
@@ -88,7 +90,13 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
   const [showSample, setShowSample] = useState(false);
   const [tab, setTab] = useState<"packet" | "application">("packet");
   const [rental, setRental] = useState<RentalApplication | null>(null);
+  const [decideError, setDecideError] = useState<string | null>(null);
+  const [deciding, setDeciding] = useState(false);
   const { checks: liveChecks, waiting: liveWaiting } = useApplicationIncomeChecks(id);
+  const { applicant: neonApplicant, ready: neonReady, refresh: refreshNeon } = useDeskApplicant(id);
+  const { property: neonProperty, ready: neonListingReady } = useProperty(
+    neonApplicant?.propertyId ?? ""
+  );
 
   const local = isLocalApplicantId(id);
   const [submission, setSubmission] = useState<ApplyState | undefined>();
@@ -109,10 +117,13 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
       ? submissionApplicant(submission)
       : undefined
     : getApplicantById(id);
+  const live = !local && !seeded ? neonApplicant : undefined;
   const applicant = seeded
     ? { ...withDecision(seeded), ...(statusOverride ? { status: statusOverride } : {}) }
+    : live;
+  const property = applicant
+    ? demoPropertyById(applicant.propertyId) ?? (live ? neonProperty : undefined)
     : undefined;
-  const property = applicant ? demoPropertyById(applicant.propertyId) : undefined;
   const report = local
     ? submission
       ? submissionReport(submission)
@@ -135,6 +146,10 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
       ? getExperianPull(applicant.id)
       : undefined;
   if (local && !submissionChecked) {
+    return <p className="px-6 py-12 text-[13px] text-mute">Loading the application…</p>;
+  }
+
+  if (!local && !seeded && (!neonReady || (neonApplicant && !neonListingReady && !neonProperty))) {
     return <p className="px-6 py-12 text-[13px] text-mute">Loading the application…</p>;
   }
 
@@ -197,7 +212,31 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
   const monthly =
     liveSummary?.monthlyGross ?? aiIncome?.grossMonthly ?? report?.income.monthlyIncome;
 
-  function decide(next: "approved" | "declined") {
+  async function decide(next: "approved" | "declined") {
+    if (live) {
+      setDeciding(true);
+      setDecideError(null);
+      try {
+        const response = await fetch(`/api/applications/${encodeURIComponent(id)}/decision`, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ decision: next }),
+        });
+        const payload = (await response.json().catch(() => ({}))) as { error?: string };
+        if (!response.ok) {
+          setDecideError(payload.error ?? "Could not save that decision.");
+          return;
+        }
+        await refreshNeon();
+      } catch {
+        setDecideError("Could not reach the desk. Try again.");
+        return;
+      } finally {
+        setDeciding(false);
+      }
+      return;
+    }
+
     setDecision(id, next);
     setStatusOverride(next);
     router.push("/dashboard/applications");
@@ -255,15 +294,25 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
           </Button>
           {!decided && (
             <>
-              <Button size="sm" onClick={() => decide("approved")}>
+              <Button size="sm" disabled={deciding} onClick={() => void decide("approved")}>
                 Approve
               </Button>
-              <Button variant="destructive" size="sm" onClick={() => setDeclineOpen(true)}>
+              <Button
+                variant="destructive"
+                size="sm"
+                disabled={deciding}
+                onClick={() => setDeclineOpen(true)}
+              >
                 Decline
               </Button>
             </>
           )}
         </div>
+        {decideError ? (
+          <p role="alert" className="mt-2 w-full text-[13px] font-medium text-no">
+            {decideError}
+          </p>
+        ) : null}
       </div>
       </Reveal>
 

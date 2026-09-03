@@ -104,6 +104,13 @@ export const applications = pgTable(
     phone: text("phone"),
     /** Screening lifecycle: draft -> awaiting_payment -> paid -> screening -> completed. */
     status: text("status").notNull().default("draft"),
+    /**
+     * Landlord decision. Separate from `status` so approving does not erase
+     * paid / screening / completed history.
+     */
+    decision: text("decision"),
+    decidedAt: timestamp("decided_at", { withTimezone: true }),
+    decidedBy: text("decided_by").references(() => users.id, { onDelete: "set null" }),
     screeningPackage: text("screening_package").notNull().default("standard"),
     /**
      * The packet the renter filled in, minus anything sensitive. The API strips

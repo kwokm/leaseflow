@@ -12,11 +12,18 @@ import {
   payments,
   type ApplicationRow,
 } from "@/lib/db/schema";
+import {
+  applyDecisionToApplicant,
+  canWriteListingDecision,
+  deskStatusFrom,
+  isLandlordDecision,
+  type LandlordDecision,
+} from "@/lib/applications/decision";
 import { attachChecksToApplication, summariesByApplication } from "@/lib/income/service";
 import { newConfirmationId, newId } from "@/lib/ids";
 import { toStoredPacket, type StoredPacket } from "@/lib/apply/sanitize";
 import type { ApplyState } from "@/lib/apply/types";
-import type { Applicant } from "@/lib/data/mock-data";
+import type { Applicant, DeskScreeningInputs } from "@/lib/data/mock-data";
 import { CONSENT_KIND, FCRA_PACK_VERSION } from "@/lib/legal/fcra";
 import { experianConnect } from "@/lib/screening/experian-connect";
 import { getLatestCreditConsent } from "@/lib/screening/credit-consent";
@@ -402,26 +409,89 @@ export async function markDemoPaid(applicationId: string): Promise<void> {
 const DESK_VISIBLE_STATUSES = ["paid", "screening", "completed", "approved", "declined"];
 
 function toApplicant(row: ApplicationRow): Applicant {
-  const status =
-    row.status === "approved" || row.status === "declined"
-      ? row.status
-      : row.status === "completed"
-        ? "completed"
-        : "in_progress";
+  const decision =
+    row.decision === "approved" || row.decision === "declined" ? row.decision : null;
 
   return {
     id: row.id,
     propertyId: row.listingId,
-    status,
+    status: deskStatusFrom({ status: row.status, decision }),
     firstName: row.firstName,
     lastName: row.lastName,
     email: row.email,
     phone: row.phone ?? "",
     appliedAt: (row.submittedAt ?? row.createdAt).toISOString(),
-    completedAt: row.status === "completed" ? row.updatedAt.toISOString() : undefined,
+    completedAt:
+      row.status === "completed" || decision
+        ? row.decidedAt?.toISOString() ?? row.updatedAt.toISOString()
+        : undefined,
     leaseScore: row.leaseScore ?? undefined,
     householdId: row.householdId ?? undefined,
+    decision,
+    decidedAt: row.decidedAt?.toISOString(),
+    screening: { documentKinds: [], creditShareStatus: null },
   };
+}
+
+async function screeningByApplication(
+  applicationIds: string[]
+): Promise<Map<string, DeskScreeningInputs>> {
+  const database = getDb();
+  const out = new Map<string, DeskScreeningInputs>();
+  for (const id of applicationIds) {
+    out.set(id, { documentKinds: [], creditShareStatus: null });
+  }
+  if (!database || !applicationIds.length) return out;
+
+  const docs = await database
+    .select({ applicationId: documents.applicationId, kind: documents.kind })
+    .from(documents)
+    .where(inArray(documents.applicationId, applicationIds));
+
+  for (const doc of docs) {
+    const current = out.get(doc.applicationId) ?? { documentKinds: [], creditShareStatus: null };
+    current.documentKinds.push(doc.kind);
+    out.set(doc.applicationId, current);
+  }
+
+  const shares = await database
+    .select({
+      applicationId: creditShares.applicationId,
+      status: creditShares.status,
+    })
+    .from(creditShares)
+    .where(inArray(creditShares.applicationId, applicationIds));
+
+  for (const share of shares) {
+    const current = out.get(share.applicationId) ?? { documentKinds: [], creditShareStatus: null };
+    // Prefer a filled share over an in-progress one when both exist.
+    if (current.creditShareStatus === "shared") continue;
+    current.creditShareStatus = share.status;
+    out.set(share.applicationId, current);
+  }
+
+  return out;
+}
+
+async function decorateDeskApplicants(rows: ApplicationRow[]): Promise<Applicant[]> {
+  const applicants = rows.map(toApplicant);
+  if (!applicants.length) return applicants;
+
+  const ids = applicants.map((row) => row.id);
+  try {
+    const [summaries, screening] = await Promise.all([
+      summariesByApplication(ids),
+      screeningByApplication(ids),
+    ]);
+    for (const applicant of applicants) {
+      const summary = summaries.get(applicant.id);
+      if (summary) applicant.incomeCheck = summary;
+      applicant.screening = screening.get(applicant.id) ?? applicant.screening;
+    }
+  } catch (error) {
+    console.error("[applications] Could not read screening ticks for the desk.", error);
+  }
+  return applicants;
 }
 
 /**
@@ -462,17 +532,93 @@ export async function listDeskApplicants(
     )
     .orderBy(desc(applications.submittedAt));
 
-  const applicants = rows.map(toApplicant);
-  try {
-    const summaries = await summariesByApplication(applicants.map((row) => row.id));
-    for (const applicant of applicants) {
-      const summary = summaries.get(applicant.id);
-      if (summary) applicant.incomeCheck = summary;
-    }
-  } catch (error) {
-    console.error("[applications] Could not read income checks for the desk.", error);
+  return decorateDeskApplicants(rows);
+}
+
+export async function getDeskApplicant(
+  ownerId: string,
+  applicationId: string
+): Promise<Applicant | null> {
+  const database = getDb();
+  if (!database) return null;
+
+  const [row] = await database
+    .select({
+      application: applications,
+      ownerId: listings.ownerId,
+    })
+    .from(applications)
+    .innerJoin(listings, eq(applications.listingId, listings.id))
+    .where(eq(applications.id, applicationId))
+    .limit(1);
+
+  if (!row) return null;
+  if (!canWriteListingDecision({ viewerUserId: ownerId, listingOwnerId: row.ownerId })) {
+    return null;
   }
-  return applicants;
+
+  const [applicant] = await decorateDeskApplicants([row.application]);
+  return applicant ?? null;
+}
+
+export type DecisionWriteResult =
+  | { ok: true; applicant: Applicant }
+  | { ok: false; status: 401 | 403 | 404 | 400; error: string };
+
+/**
+ * Listing-owner approve/decline. Does not rewrite screening `status` and does
+ * not send an adverse-action letter — decline only stores the decision.
+ */
+export async function setApplicationDecision(
+  ownerId: string,
+  applicationId: string,
+  decision: unknown
+): Promise<DecisionWriteResult> {
+  if (!isLandlordDecision(decision)) {
+    return { ok: false, status: 400, error: "Send approved or declined." };
+  }
+
+  const database = getDb();
+  if (!database) {
+    return { ok: false, status: 403, error: "Applications need a database." };
+  }
+
+  const [row] = await database
+    .select({
+      application: applications,
+      ownerId: listings.ownerId,
+    })
+    .from(applications)
+    .innerJoin(listings, eq(applications.listingId, listings.id))
+    .where(eq(applications.id, applicationId))
+    .limit(1);
+
+  if (!row) {
+    return { ok: false, status: 404, error: "Application not found." };
+  }
+  if (!canWriteListingDecision({ viewerUserId: ownerId, listingOwnerId: row.ownerId })) {
+    return { ok: false, status: 404, error: "Application not found." };
+  }
+
+  const now = new Date();
+  await database
+    .update(applications)
+    .set({
+      decision,
+      decidedAt: now,
+      decidedBy: ownerId,
+      updatedAt: now,
+    })
+    .where(eq(applications.id, applicationId));
+
+  const [fresh] = await database
+    .select()
+    .from(applications)
+    .where(eq(applications.id, applicationId))
+    .limit(1);
+
+  const [applicant] = await decorateDeskApplicants([fresh ?? { ...row.application, decision, decidedAt: now, decidedBy: ownerId, updatedAt: now }]);
+  return { ok: true, applicant: applicant ?? applyDecisionToApplicant(toApplicant(row.application), decision, now.toISOString()) };
 }
 
 export async function getApplicationById(id: string): Promise<ApplicationRow | undefined> {

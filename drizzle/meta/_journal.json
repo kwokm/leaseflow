@@ -29,6 +29,13 @@
       "when": 1788461777919,
       "tag": "0003_income_checks",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1788465271856,
+      "tag": "0004_application_decisions",
+      "breakpoints": true
     }
   ]
 }

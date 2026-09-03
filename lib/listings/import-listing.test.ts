@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
   detectBotWall,
+  IMPORT_BOT_WALL_MESSAGE,
   ImportListingError,
   looksLikeAddress,
   parseListingHtml,
@@ -259,4 +260,28 @@ test("detects a bot wall and rejects non-addresses", () => {
   assert.equal(detectBotWall("<html><body>ok</body></html>", 403), true);
   assert.equal(looksLikeAddress("Homes for Sale"), false);
   assert.equal(looksLikeAddress("170 Chorus, Irvine, CA 92618"), true);
+  assert.match(IMPORT_BOT_WALL_MESSAGE, /blocked the automated read/i);
+  assert.match(IMPORT_BOT_WALL_MESSAGE, /Nothing was invented/);
+});
+
+test("a page without an address keeps whatever fields it did read", () => {
+  try {
+    parseListingHtml(
+      `<html><head>
+        <meta property="og:description" content="3 beds, 2 baths. $3,100/mo" />
+        <script type="application/ld+json">
+        { "@type": "Apartment", "numberOfBedrooms": 3, "offers": { "price": 3100 } }
+        </script>
+      </head></html>`,
+      "https://www.zillow.com/homedetails/x/1_zpid/",
+      "zillow"
+    );
+    assert.fail("expected ImportListingError");
+  } catch (error) {
+    assert.ok(error instanceof ImportListingError);
+    assert.equal(error.code, "not_a_listing");
+    assert.equal(error.preview?.address, undefined);
+    assert.equal(error.preview?.rent, 3100);
+    assert.equal(error.preview?.bedrooms, 3);
+  }
 });
