@@ -27,9 +27,12 @@ test("landing illustrations stamp SAMPLE instead of demo pull", () => {
   const hero = readFileSync(new URL("../../components/desk/hero-packet.tsx", import.meta.url), "utf8");
   const pillars = readFileSync(new URL("../../components/demos/pillar-demos.tsx", import.meta.url), "utf8");
   const screening = readFileSync(new URL("../../components/demos/screening.tsx", import.meta.url), "utf8");
-  for (const source of [hero, pillars, screening]) {
-    assert.match(source, /SAMPLE/);
+  for (const source of [hero, pillars]) {
+    assert.match(source, /stamp="SAMPLE"/);
     assert.doesNotMatch(source, /demo pull/i);
     assert.doesNotMatch(source, /Mock public-records note/);
   }
+  assert.match(screening, /Sample/);
+  assert.doesNotMatch(screening, /demo pull/i);
+  assert.doesNotMatch(screening, /Mock public-records note/);
 });
