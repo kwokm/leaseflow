@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { BrandMark, BrandWord } from "@/components/brand";
+import { RenterHelpActions } from "@/components/apply/renter-help";
 import { SpatialMount, SpatialOrigin } from "@/components/motion/spatial";
 import { PageWash } from "@/components/page-wash";
-import { Button } from "@/components/ui/button";
 import { LANDLORD_SIGN_IN_HREF } from "@/lib/auth/roles";
 
 export default function NotFound() {
@@ -29,16 +29,16 @@ export default function NotFound() {
               This page is not in the packet.
             </h1>
             <p className="mx-auto mt-2 max-w-md text-[15px] font-medium leading-6 text-mute">
-              The link may be old, or the file lives on another desk. Head back to Leaseproof.
+              The link may be old, or the file lives on another desk. Ask your landlord to resend
+              the link.
             </p>
-            <div className="mt-6 flex flex-wrap justify-center gap-2">
-              <Button asChild>
-                <Link href="/">Back to Leaseproof</Link>
-              </Button>
-              <Button asChild variant="outline">
-                <Link href={LANDLORD_SIGN_IN_HREF}>Sign in</Link>
-              </Button>
-            </div>
+            <RenterHelpActions />
+            <p className="mt-4 text-[12px] font-medium text-mute">
+              Landlords —{" "}
+              <Link href={LANDLORD_SIGN_IN_HREF} className="text-ink underline underline-offset-4">
+                Sign in
+              </Link>
+            </p>
           </section>
         </SpatialMount>
       </div>

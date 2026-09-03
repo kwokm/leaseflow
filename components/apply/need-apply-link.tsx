@@ -1,9 +1,8 @@
 import Link from "next/link";
 import { BrandMark, BrandWord } from "@/components/brand";
+import { RenterHelpActions } from "@/components/apply/renter-help";
 import { SpatialMount, SpatialOrigin } from "@/components/motion/spatial";
 import { PageWash } from "@/components/page-wash";
-import { Button } from "@/components/ui/button";
-import { LANDLORD_SIGN_IN_HREF } from "@/lib/auth/roles";
 
 /**
  * Dedicated empty-apply page for the marketing CTA when there is no public
@@ -37,14 +36,7 @@ export function NeedApplyLink() {
               Leaseproof applications open from a listing your landlord shares. There is no public
               apply queue — ask them to send the link for the home you want.
             </p>
-            <div className="mt-6 flex flex-wrap justify-center gap-2">
-              <Button asChild>
-                <Link href="/">Back to Leaseproof</Link>
-              </Button>
-              <Button asChild variant="outline">
-                <Link href={LANDLORD_SIGN_IN_HREF}>Sign in</Link>
-              </Button>
-            </div>
+            <RenterHelpActions />
           </section>
         </SpatialMount>
       </div>

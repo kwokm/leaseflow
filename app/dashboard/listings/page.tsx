@@ -23,11 +23,11 @@ export default function ListingsPage() {
     <Reveal>
       <DeskToolbar meta={`${properties.length} listings`}>
         <DeskPill active>All properties</DeskPill>
+        <Button asChild size="sm">
+          <Link href="/dashboard/listings/new">Add listing</Link>
+        </Button>
         <Button asChild variant="outline" size="sm">
           <Link href="/dashboard/listings/new?mode=import">Import listing</Link>
-        </Button>
-        <Button asChild size="sm">
-          <Link href="/dashboard/listings/new">New listing</Link>
         </Button>
       </DeskToolbar>
 
@@ -40,15 +40,15 @@ export default function ListingsPage() {
             No listings yet.
           </h1>
           <p className="mt-2 max-w-xl text-[14px] font-medium leading-5 text-mute">
-            Import a public Zillow or Redfin URL, or add a property by hand. The
-            pipeline stays empty until you do.
+            Add a property by hand to open the pipeline. Import from a public URL is
+            optional — live Zillow and Redfin pages often block a preview.
           </p>
           <div className="mt-5 flex flex-wrap gap-2">
             <Button asChild>
-              <Link href="/dashboard/listings/new?mode=import">Import listing</Link>
+              <Link href="/dashboard/listings/new">Add listing</Link>
             </Button>
             <Button asChild variant="outline">
-              <Link href="/dashboard/listings/new">Add manually</Link>
+              <Link href="/dashboard/listings/new?mode=import">Import listing</Link>
             </Button>
           </div>
         </section>

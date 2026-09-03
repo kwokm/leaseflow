@@ -23,8 +23,7 @@ import {
   type ResidenceRecord,
   type RentalProfile,
 } from "@/lib/apply/types";
-
-const DEMO_APPLICANT_ID = "app-jane";
+import { DEMO_APPLICANT_ID, packetApplicantId } from "@/lib/apply/sample-packet";
 
 export type RentalApplication = {
   id: string;
@@ -279,8 +278,7 @@ export function resolveRentalPacket(id: string): {
   details?: ApplicationDetails;
   state?: ApplyState;
 } | null {
-  const listingAlias = id === "resh-510" || id === FEATURED_LISTING_ID || id === "jane";
-  const applicantId = listingAlias ? DEMO_APPLICANT_ID : id;
+  const applicantId = packetApplicantId(id);
 
   if (isLocalApplicantId(applicantId) && typeof window !== "undefined") {
     const submission = loadSubmissions().find(
@@ -308,7 +306,7 @@ export function resolveRentalPacket(id: string): {
     }
   }
 
-  const applicant = getApplicantById(applicantId) ?? getApplicantById(DEMO_APPLICANT_ID);
+  const applicant = getApplicantById(applicantId);
   if (!applicant) return null;
   const property = demoPropertyById(applicant.propertyId) ?? demoPropertyById(FEATURED_LISTING_ID);
   if (!property) return null;

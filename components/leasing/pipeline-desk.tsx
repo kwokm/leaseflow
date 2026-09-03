@@ -167,10 +167,10 @@ export function PipelineDesk({ preview = false }: { preview?: boolean }) {
           </p>
           <div className="mt-5 flex flex-wrap gap-2">
             <Button asChild>
-              <Link href="/dashboard/listings/new?mode=import">Import listing</Link>
+              <Link href="/dashboard/listings/new">Add listing</Link>
             </Button>
             <Button asChild variant="outline">
-              <Link href="/dashboard/listings/new">Create listing + get apply link</Link>
+              <Link href="/dashboard/listings/new?mode=import">Import listing</Link>
             </Button>
           </div>
         </section>

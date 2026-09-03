@@ -4,6 +4,7 @@ import { useState } from "react";
 import { SignUp } from "@clerk/nextjs";
 import { PRIVATE_BETA_MESSAGE } from "@/lib/auth/beta-allowlist";
 import { safeDeskNext } from "@/lib/auth/roles";
+import { BetaContactLink } from "@/components/legal/beta-contact";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,6 +16,12 @@ export function LandlordSignup({ next }: { next?: string }) {
 
   const check = async (event: React.FormEvent) => {
     event.preventDefault();
+    if (!email.trim()) {
+      setStatus("denied");
+      setMessage("Enter the email you were invited with.");
+      return;
+    }
+
     setStatus("checking");
     setMessage(null);
 
@@ -79,7 +86,6 @@ export function LandlordSignup({ next }: { next?: string }) {
             id="beta-email"
             type="email"
             autoComplete="email"
-            required
             value={email}
             onChange={(event) => {
               setEmail(event.target.value);
@@ -93,7 +99,13 @@ export function LandlordSignup({ next }: { next?: string }) {
         </div>
         {message ? (
           <p role="alert" className="text-[14px] font-medium leading-5 text-ink">
-            {message}
+            {message}{" "}
+            {status === "denied" && message !== "Enter the email you were invited with." ? (
+              <>
+                Email <BetaContactLink className="underline underline-offset-4" /> to ask for an
+                invite.
+              </>
+            ) : null}
           </p>
         ) : null}
         <Button type="submit" disabled={status === "checking"}>

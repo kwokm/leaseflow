@@ -10,8 +10,11 @@ export const DEFAULT_DEMO_LANDLORD_EMAILS = [
   "aaisuzukillc@gmail.com",
 ] as const;
 
+export const BETA_CONTACT_EMAIL = "aaisuzukillc@gmail.com";
+export const BETA_CONTACT_HREF = `mailto:${BETA_CONTACT_EMAIL}`;
+
 export const PRIVATE_BETA_MESSAGE =
-  "Leaseproof is in a private Orange County beta. The landlord desk is invite-only. Ask the team to add your email.";
+  "Leaseproof is in a private Orange County beta. The landlord desk is invite-only. Email aaisuzukillc@gmail.com to ask the team to add your email.";
 
 function flag(value: string | undefined): boolean {
   return value === "1" || value === "true";

@@ -5,8 +5,10 @@ import { FieldGrid, Note, Panel, StepChrome } from "@/components/apply/step-shel
 import type { StepProps } from "@/components/apply/step-shell";
 import { formatDob, formatPhone, formatSsn, maskDob, maskSsn } from "@/lib/apply/format";
 import type { PersonalInfo } from "@/lib/apply/types";
+import { useRuntimeConfig } from "@/components/config/runtime-config";
 
 export function StepYou({ state, patch, errors, embedded }: StepProps) {
+  const { demo } = useRuntimeConfig();
   const p = state.personal;
   const set = (partial: Partial<PersonalInfo>) => patch({ personal: { ...p, ...partial } });
 
@@ -85,7 +87,7 @@ export function StepYou({ state, patch, errors, embedded }: StepProps) {
             maskedValue={maskSsn(p.ssn)}
             value={p.ssn}
             error={errors.ssn}
-            hint="Demo only — any 9 digits will do."
+            hint={demo ? "Demo only — any 9 digits will do." : undefined}
             onChange={(event) => set({ ssn: formatSsn(event.target.value) })}
           />
         </FieldGrid>

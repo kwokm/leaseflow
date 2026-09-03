@@ -3,6 +3,7 @@ import { BrandMark, BrandWord } from "@/components/brand";
 import { PacketWindow } from "@/components/desk/packet-window";
 import { SpatialMount, SpatialOrigin } from "@/components/motion/spatial";
 import { PageWash } from "@/components/page-wash";
+import { deskSignUpHref } from "@/lib/auth/roles";
 
 /** Shared lilac-wash chrome for the Clerk sign-in and sign-up widgets. */
 export function AuthShell({
@@ -42,16 +43,26 @@ export function AuthShell({
  * Shown when Clerk keys are absent. The desk is unreachable in that state
  * (middleware fails closed), so this explains why rather than 404ing.
  */
-export function AuthUnconfigured({ demo }: { demo: boolean }) {
+export function AuthUnconfigured({
+  demo,
+  next,
+  surface = "signin",
+}: {
+  demo: boolean;
+  next?: string;
+  surface?: "signin" | "signup";
+}) {
   return (
     <div>
       <h1 className="text-[24px] font-semibold leading-[1.15] tracking-[-0.4px] text-ink">
-        {demo ? "Demo mode — no sign-in needed" : "Sign-in is not configured"}
+        {demo ? "Demo mode — no sign-in needed" : "Landlord desk"}
       </h1>
       <p className="mt-2 text-[14px] font-medium leading-5 text-mute">
         {demo
           ? "This deployment runs with LEASEPROOF_DEMO=1, so the desk is open and seeded with sample listings."
-          : "Set NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY and CLERK_SECRET_KEY to enable landlord and renter accounts. Until then the desk stays closed."}
+          : surface === "signup"
+            ? "Orange County private beta. Invited landlords create a desk here. Sign-up is not configured on this deployment yet."
+            : "Orange County private beta. Invited landlords without an account should create a desk first. Sign-in is not configured on this deployment yet."}
       </p>
       {demo ? (
         <p className="mt-5">
@@ -60,6 +71,15 @@ export function AuthUnconfigured({ demo }: { demo: boolean }) {
             className="text-[14px] font-medium text-ink underline underline-offset-4"
           >
             Open the desk
+          </Link>
+        </p>
+      ) : surface === "signin" ? (
+        <p className="mt-5">
+          <Link
+            href={deskSignUpHref(next)}
+            className="text-[14px] font-medium text-ink underline underline-offset-4"
+          >
+            Invited? Create your desk
           </Link>
         </p>
       ) : null}

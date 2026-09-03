@@ -129,7 +129,8 @@ Tables: `users`, `listings`, `households`, `applications`, `documents`, `consent
 
 - `/` — landing (Sign in / Sign up in the header)
 - `/apply` — ask-your-landlord apply page when there is no public listing
-- `/signin`, `/signup` — Clerk authentication
+- `/signin`, `/signup` — Clerk authentication (`/sign-in` and `/sign-up` redirect here)
+- `/privacy`, `/terms` — short Orange County beta pages
 - `/dashboard` — screening pipeline (Clerk session required in production)
 - `/dashboard/listings/new` — listing creation and Zillow import
 - `/dashboard/listings/[id]` — property and apply-link actions

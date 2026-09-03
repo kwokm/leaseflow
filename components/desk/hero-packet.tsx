@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 
 const ID_CHECKS = [
   { motion: "p-check-a", label: "Photo ID", note: "Front and back · name matches Jane Doe" },
-  { motion: "p-check-b", label: "Experian", note: "VantageScore 3.0 · demo pull" },
+  { motion: "p-check-b", label: "Experian", note: "VantageScore 3.0 · Sample" },
   { motion: "p-check-c", label: "AI Income Check / bank", note: "Paystubs and statements · last two months" },
 ] as const;
 
@@ -23,7 +23,7 @@ export function HeroPacket() {
   return (
     <div className="hero-packet">
       <DemoPlay flush className="pillar-demo">
-        <PacketWindow title="Application packet · Jane Doe" meta="Screening · Standard">
+        <PacketWindow title="Application packet · Jane Doe" meta="Screening · Standard" stamp="SAMPLE">
           <div className="px-3.5 py-3 sm:px-4 sm:py-4">
             <div className="d p-chip-a relative h-20 overflow-hidden rounded-md border border-line bg-mist sm:h-24">
               <Image
@@ -56,7 +56,7 @@ export function HeroPacket() {
                   724
                 </p>
               </div>
-              <p className="text-[12px] font-medium text-mute">Ticks in · demo pull</p>
+              <p className="text-[12px] font-medium text-mute">Ticks in · Sample</p>
             </div>
 
             <ul className="mt-2.5 space-y-1.5">

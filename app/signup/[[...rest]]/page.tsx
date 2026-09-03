@@ -19,7 +19,7 @@ export default async function SignUpPage({
   if (!clerkEnabled()) {
     return (
       <AuthShell meta="Create account">
-        <AuthUnconfigured demo={isDemoMode()} />
+        <AuthUnconfigured demo={isDemoMode()} next={next} surface="signup" />
       </AuthShell>
     );
   }

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { BrandMark, BrandWord } from "@/components/brand";
 import { SpatialMount, SpatialOrigin } from "@/components/motion/spatial";
 import { PageWash } from "@/components/page-wash";
-import { Button } from "@/components/ui/button";
+import { RenterHelpActions } from "@/components/apply/renter-help";
 
 /**
  * Shown when the listing store cannot be read. Deliberately not a 404: the
@@ -38,11 +38,7 @@ export function ListingUnavailable() {
               The listing is still there — we just can&rsquo;t reach it this moment. Reload in a
               minute, or ask the landlord to resend the link.
             </p>
-            <div className="mt-6 flex flex-wrap justify-center gap-2">
-              <Button asChild variant="outline">
-                <Link href="/">Back to Leaseproof</Link>
-              </Button>
-            </div>
+            <RenterHelpActions />
           </section>
         </SpatialMount>
       </div>

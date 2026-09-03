@@ -4,20 +4,33 @@ import { cn } from "@/lib/utils";
 export function PacketWindow({
   title,
   meta,
+  stamp,
   children,
   className,
 }: {
   title: string;
   meta?: string;
+  /** Marketing / Jane Doe illustrations — not a real applicant. */
+  stamp?: "SAMPLE";
   children: React.ReactNode;
   className?: string;
 }) {
   return (
-    <section className={cn("window", className)}>
+    <section className={cn("window", stamp && "is-sample", className)}>
       <div className="card-head">
         <span className="card-head-title">{title}</span>
-        {meta ? <span className="card-head-meta">{meta}</span> : null}
+        {stamp || meta ? (
+          <span className="card-head-meta">
+            {stamp ? <span className="sample-stamp">{stamp}</span> : null}
+            {meta ? <span>{meta}</span> : null}
+          </span>
+        ) : null}
       </div>
+      {stamp ? (
+        <p className="sample-banner" role="note">
+          SAMPLE — not a real applicant
+        </p>
+      ) : null}
       {children}
     </section>
   );

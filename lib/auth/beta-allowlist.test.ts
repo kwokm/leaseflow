@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
+  BETA_CONTACT_EMAIL,
+  BETA_CONTACT_HREF,
   DEFAULT_DEMO_LANDLORD_EMAILS,
+  PRIVATE_BETA_MESSAGE,
   isLandlordEmailAllowed,
   landlordBetaEmails,
   parseBetaEmails,
@@ -93,6 +96,13 @@ test("landlordBetaEmails reads LEASEPROOF_BETA_EMAILS and LEASEPROOF_DEMO", () =
     } as NodeJS.ProcessEnv),
     ["new@oc.example"]
   );
+});
+
+test("invite-only copy names a real contact mailbox", () => {
+  assert.equal(BETA_CONTACT_EMAIL, "aaisuzukillc@gmail.com");
+  assert.equal(BETA_CONTACT_HREF, "mailto:aaisuzukillc@gmail.com");
+  assert.match(PRIVATE_BETA_MESSAGE, /invite-only/);
+  assert.match(PRIVATE_BETA_MESSAGE, /aaisuzukillc@gmail.com/);
 });
 
 test("blank emails never match", () => {

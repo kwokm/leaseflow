@@ -295,12 +295,22 @@ export default function Home() {
             <BrandMark size={20} />
             <BrandWord />
           </div>
-          <p className="max-w-xl text-[12px] font-medium leading-5 text-mute">
-            Screening reports are consumer reports under the FCRA. Credit, background, and score
-            data shown in Leaseproof today is mock — names, scores, and tradelines are fabricated and
-            no consumer reporting agency is used. Leaseproof is a working name, not a live trademark
-            claim.
-          </p>
+          <div className="max-w-xl">
+            <p className="mb-2 flex flex-wrap gap-x-3 gap-y-1 text-[12px] font-medium">
+              <Link href="/privacy" className="text-ink underline underline-offset-4">
+                Privacy
+              </Link>
+              <Link href="/terms" className="text-ink underline underline-offset-4">
+                Terms
+              </Link>
+            </p>
+            <p className="text-[12px] font-medium leading-5 text-mute">
+              Screening reports are consumer reports under the FCRA. Credit, background, and score
+              data shown in Leaseproof today is mock — names, scores, and tradelines are fabricated and
+              no consumer reporting agency is used. Leaseproof is a working name, not a live trademark
+              claim.
+            </p>
+          </div>
         </Reveal>
       </footer>
     </div>

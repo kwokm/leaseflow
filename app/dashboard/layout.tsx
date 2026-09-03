@@ -53,11 +53,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
                 <Link href={featuredApplyHref()}>Apply as renter</Link>
               </Button>
             ) : null}
-            <Button asChild variant="outline">
-              <Link href="/dashboard/listings/new?mode=import">Import listing</Link>
+            <Button asChild>
+              <Link href="/dashboard/listings/new">Add listing</Link>
             </Button>
             <Button asChild variant="outline">
-              <Link href="/dashboard/listings/new">New listing</Link>
+              <Link href="/dashboard/listings/new?mode=import">Import listing</Link>
             </Button>
             {clerkEnabled() ? (
               <UserButton afterSignOutUrl="/" />
