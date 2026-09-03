@@ -200,6 +200,45 @@ test("does not invent address, rent, or photos", () => {
   assert.equal(sale.address, "88 Broad St, Boston, MA 02110");
   assert.equal(sale.rent, undefined);
   assert.deepEqual(sale.photos, []);
+
+  const zestimate = parseListingHtml(
+    `<html><head>
+      <meta property="og:title" content="320 S Gramercy Pl APT 203, Los Angeles, CA 90020 | Zillow" />
+      <meta property="og:description" content="This condo is for sale. Rental Zestimate $3,200/mo." />
+      <script type="application/ld+json">
+      { "@type": "Apartment",
+        "address": { "streetAddress": "320 S Gramercy Pl APT 203", "addressLocality": "Los Angeles", "addressRegion": "CA", "postalCode": "90020" },
+        "offers": { "price": 354700 } }
+      </script>
+    </head></html>`,
+    "https://www.zillow.com/homedetails/320-S-Gramercy/20774916_zpid/",
+    "zillow"
+  );
+  assert.equal(zestimate.address, "320 S Gramercy Pl APT 203, Los Angeles, CA 90020");
+  assert.equal(zestimate.rent, undefined);
+});
+
+test("does not harvest similar-home CDN URLs from the raw HTML", () => {
+  const preview = parseListingHtml(
+    `<html><head>
+      <meta property="og:title" content="130 Chorus, Irvine, CA 92618 | Redfin" />
+      <meta property="og:image" content="https://ssl.cdn-redfin.com/photo/45/bigphoto/587/PW25059587_6.jpg" />
+      <script type="application/ld+json">
+      { "@type": "SingleFamilyResidence",
+        "address": { "streetAddress": "130 Chorus", "addressLocality": "Irvine", "addressRegion": "CA", "postalCode": "92618" },
+        "image": "https://ssl.cdn-redfin.com/photo/45/bigphoto/587/PW25059587_6.jpg" }
+      </script>
+    </head>
+    <body>
+      https://ssl.cdn-redfin.com/photo/45/bcsphoto/101/genBcs.OC26192101_0.jpg
+      http://ssl.cdn-redfin.com/vLATEST/images/search/details/twitterCards/twitter-card-camera-160x160.png
+    </body></html>`,
+    "https://www.redfin.com/CA/Irvine/130-Chorus-92618/home/176990655",
+    "redfin"
+  );
+  assert.deepEqual(preview.photos, [
+    "https://ssl.cdn-redfin.com/photo/45/bigphoto/587/PW25059587_6.jpg",
+  ]);
 });
 
 test("drops social thumbnails from pulled photos", () => {

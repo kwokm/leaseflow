@@ -84,7 +84,7 @@ const PHOTO_HOST =
   /zillowstatic\.com|cdn-redfin\.com|rdcpix\.com|images\.apartments\.com|thumbs\.trulia|photos\.zillow|media\.redfin|sslx?\.cdn-redfin|images\.homes\.com|cloudfront\.net/i;
 
 const SKIP_PHOTO =
-  /logo|sprite|icon|avatar|pixel|tracking|favicon|mapbox|maps\.google|placeholder|1x1\.|share_thumbnail|\/static\/images\/|social\/|og_default/i;
+  /logo|sprite|icon|avatar|pixel|tracking|favicon|mapbox|maps\.google|placeholder|1x1\.|share_thumbnail|\/static\/images\/|social\/|og_default|twittercards|twitter-card|vlatest|bcsphoto|genbcs/i;
 
 const RESIDENCE_TYPE =
   /singlefamily|familyresidence|house|apartment|condo|townhouse|residence|accommodation|realestatelisting|living/i;
@@ -328,10 +328,14 @@ function scoreNode(node: Record<string, unknown>): number {
 function rentFrom(value: unknown, context: string): number | undefined {
   const amount = numberFrom(value);
   if (amount === undefined || amount <= 0) return undefined;
-  const rental = /\/\s*mo|per month|monthly|for rent|rental/i.test(context);
-  // Sale prices are not rent. Leave the field empty so the landlord types it.
-  if (amount >= 50_000 && !rental) return undefined;
+  // Sale prices (and "rental Zestimate" copy next to them) are not monthly rent.
+  if (amount >= 50_000) return undefined;
   if (amount < 100) return undefined;
+  const monthly = /\/\s*mo|per month|\/month|monthly rent|for rent/i.test(
+    `${typeof value === "string" ? value : ""} ${context}`
+  );
+  const saleCue = /for sale|list price|sold for/i.test(context);
+  if (saleCue && !monthly) return undefined;
   return Math.round(amount);
 }
 
@@ -387,6 +391,7 @@ export function parseListingHtml(
 
   let address: string | undefined;
   let rent: number | undefined;
+  let salePriceSeen = false;
   let bedrooms: number | undefined;
   let bathrooms: number | undefined;
   let sqft: number | undefined;
@@ -397,6 +402,8 @@ export function parseListingHtml(
     const types = typesOf(node);
     address = first(address, formatAddress(node.address), formatAddress(node.streetAddress), formatAddress(node.name));
     const offer = asRecord(node.offers) ?? node;
+    const listed = numberFrom(offer.price) ?? numberFrom(node.price);
+    if (listed !== undefined && listed >= 50_000) salePriceSeen = true;
     const offerContext = `${textFrom(asRecord(offer)?.description) ?? ""} ${description}`;
     rent = first(
       rent,
@@ -452,13 +459,10 @@ export function parseListingHtml(
   );
   address = first(address, formatAddress(html.match(/"streetAddress"\s*:\s*"([^"]+)"/)?.[1]));
 
-  const cdn = html.match(/https?:\/\/[^"'\\\s]+/gi) ?? [];
-  for (const match of cdn) {
-    if (PHOTO_HOST.test(match) && /\.(jpe?g|png|webp)/i.test(match)) {
-      const url = photoUrl(match.split("?")[0] ?? match);
-      if (url) photos.add(url);
-    }
-  }
+  // Do not harvest every CDN URL on the page — search carousels and "similar
+  // homes" would invent a gallery that is not this listing. JSON-LD + OG only.
+
+  if (salePriceSeen) rent = undefined;
 
   const zpid = sourceUrl.match(/\/(\d+)_zpid/)?.[1];
   const preview: ListingPreview = {
