@@ -4,7 +4,9 @@ import { SummaryRow } from "@/components/apply/step-shell";
 
 export type CreditConsentReceiptData = {
   typedFullName?: string;
+  signature?: string;
   consentedAt?: string;
+  acceptedAt?: string;
   copyVersion?: string;
   disclosureText?: string;
   recipientName?: string;
@@ -17,11 +19,12 @@ export function CreditConsentReceipt({
   consent: CreditConsentReceiptData;
   heading?: string;
 }) {
-  const name = consent.typedFullName?.trim();
+  const name = consent.typedFullName?.trim() || consent.signature?.trim();
+  const when = consent.consentedAt || consent.acceptedAt;
   const version = consent.copyVersion ?? FCRA_PACK_VERSION;
   const disclosure = consent.disclosureText?.trim();
 
-  if (!name && !disclosure && !consent.consentedAt) return null;
+  if (!name && !disclosure && !when) return null;
 
   return (
     <section className="rounded-lg border border-line bg-paper p-5 shadow-window">
@@ -31,7 +34,7 @@ export function CreditConsentReceipt({
       </p>
       <dl className="mt-3">
         <SummaryRow label="Who" value={name || "—"} />
-        <SummaryRow label="When" value={formatDateTime(consent.consentedAt)} />
+        <SummaryRow label="When" value={formatDateTime(when)} />
         <SummaryRow label="Copy version" value={version} />
         {consent.recipientName ? (
           <SummaryRow label="Shared with" value={consent.recipientName} />
