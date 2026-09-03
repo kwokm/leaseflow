@@ -134,7 +134,7 @@ export function ApplicationTable({
             <th>Property</th>
             <th className="num">LeaseScore</th>
             {showExtras ? <th className="num">Credit</th> : null}
-            {showExtras ? <th className="num">AI income</th> : null}
+            {showExtras ? <th className="num">AI Income Check</th> : null}
             <th>Status</th>
           </tr>
         </thead>

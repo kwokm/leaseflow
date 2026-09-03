@@ -127,7 +127,7 @@ export default function Home() {
                   Demo: PillarExperian,
                 },
                 {
-                  lead: "AI income check.",
+                  lead: "AI Income Check.",
                   tone: "Paystubs, W-2s, 1099s, bank and investment statements. Names match the applicant. They’re the last two months.",
                   Demo: PillarIncome,
                 },
@@ -226,7 +226,7 @@ export default function Home() {
                     $24.99
                   </p>
                   <p className="max-w-[40ch] text-[15px] font-medium leading-[1.5] text-mute">
-                    Includes everything — credit, background, ID, AI income and bank verification,
+                    Includes everything — credit, background, ID, AI Income Check and bank verification,
                     and the packet. Apply to as many homes as you want on this one fee.
                   </p>
                   <p className="mt-3 max-w-[40ch] text-[14px] font-medium leading-[1.45] text-mute">

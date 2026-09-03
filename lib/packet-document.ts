@@ -124,7 +124,7 @@ export function buildPacketHtml({
     ? [
         ["Employer", report.income.employer],
         ["Position", report.income.position],
-        ["AI income", ai ? `${currency(ai.grossMonthly)} / mo gross` : "—"],
+        ["AI Income Check", ai ? `${currency(ai.grossMonthly)} / mo gross` : "—"],
         [
           "AI source",
           ai

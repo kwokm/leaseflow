@@ -202,7 +202,7 @@ export function LyShowings() {
 const CHECKS = [
   { label: "Photo ID", note: "Name matches the applicant", retick: "1s" },
   { label: "Experian", note: "Demo pull · landlord not charged", retick: "1.5s" },
-  { label: "AI income check", note: "Name match · last two months", retick: "2s" },
+  { label: "AI Income Check", note: "Name match · last two months", retick: "2s" },
   { label: "Background", note: "Mock public-records note", retick: "2.5s" },
 ] as const;
 

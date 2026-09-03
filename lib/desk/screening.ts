@@ -8,7 +8,7 @@ import {
 export const SCREENING_TASKS = [
   { key: "photoId", label: "Photo ID" },
   { key: "experian", label: "Experian" },
-  { key: "income", label: "AI income" },
+  { key: "income", label: "AI Income Check" },
   { key: "background", label: "Background" },
 ] as const;
 

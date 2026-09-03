@@ -94,8 +94,7 @@ export default function SharedPacketPage({
             <Reveal>
               <div className="border-b border-line px-5 py-4 print:hidden sm:px-6">
                 <p className="text-[13px] font-medium text-mute">
-                  Shareable link — no sign-in. Filled application, listing photos, and AI income
-                  check.
+                  Shareable link — no sign-in. Filled application, listing photos, and AI Income Check.
                 </p>
               </div>
               <PacketHouseholdChrome

@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 const ID_CHECKS = [
   { motion: "p-check-a", label: "Photo ID", note: "Front and back · name matches Jane Doe" },
   { motion: "p-check-b", label: "Experian", note: "VantageScore 3.0 · demo pull" },
-  { motion: "p-check-c", label: "AI income / bank", note: "Paystubs and statements · last two months" },
+  { motion: "p-check-c", label: "AI Income Check / bank", note: "Paystubs and statements · last two months" },
 ] as const;
 
 const PROOF_ROWS = [
