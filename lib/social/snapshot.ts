@@ -1,11 +1,44 @@
-import {
-  BIO_MAX_CHARS,
-  SOCIAL_NETWORKS,
-  type ApplicantBio,
-  type SocialNetwork,
-  type SocialPostView,
-} from "../apply/types.ts";
-import type { ApplicantProfileView } from "../data/mock-data.ts";
+export const SOCIAL_NETWORKS = ["instagram", "tiktok", "facebook"] as const;
+export type SocialNetwork = (typeof SOCIAL_NETWORKS)[number];
+
+export const BIO_MAX_CHARS = 400;
+
+/** Landlord-safe post tile. Never includes tokens. */
+export type SocialPostView = {
+  network: SocialNetwork;
+  position: number;
+  permalink: string;
+  caption: string;
+  takenAt: string | null;
+  thumbUrl?: string;
+  mediaType: string;
+};
+
+export type SocialAccountView = {
+  network: SocialNetwork;
+  profileUrl: string;
+  handle: string;
+  connected: boolean;
+  personalProfile?: boolean;
+  posts: SocialPostView[];
+};
+
+export type ApplicantProfileView = {
+  photoUrl?: string;
+  bio: string;
+  sample?: boolean;
+  social: SocialAccountView[];
+};
+
+/** Apply-state bio shape without pulling `@/` apply types into node:test. */
+export type ApplicantBioInput = {
+  photo?: { storedUrl?: string; pathname?: string } | null;
+  text?: string;
+  socialConsent?: boolean;
+  socialConsentAt?: string;
+  draftId?: string;
+  social?: Partial<Record<SocialNetwork, Partial<SocialAccountView>>>;
+};
 
 export const MAX_SOCIAL_POSTS = 9;
 
@@ -101,15 +134,16 @@ export function hasTokenLeak(value: unknown): boolean {
 }
 
 export function publicSocialPost(post: SocialPostView, position = post.position): SocialPostView {
-  return {
+  const view: SocialPostView = {
     network: post.network,
     position,
     permalink: post.permalink,
     caption: post.caption,
     takenAt: post.takenAt,
-    thumbUrl: post.thumbUrl,
     mediaType: post.mediaType,
   };
+  if (post.thumbUrl) view.thumbUrl = post.thumbUrl;
+  return view;
 }
 
 export function publicSocialAccount(account: {
@@ -158,7 +192,7 @@ export function notConfiguredMessage(network: SocialNetwork): string {
   return `${label} Connect is not configured yet. You can still save a public profile URL as a link.`;
 }
 
-function photoUrlFromBio(bio: ApplicantBio | undefined): string | undefined {
+function photoUrlFromBio(bio: ApplicantBioInput | undefined): string | undefined {
   if (!bio?.photo) return undefined;
   if (bio.photo.storedUrl) return bio.photo.storedUrl;
   if (bio.photo.pathname) return `/api/uploads/file?path=${encodeURIComponent(bio.photo.pathname)}`;
@@ -191,8 +225,19 @@ export function socialFromStoredPacket(packet: unknown): ApplicantProfileView["s
   );
 }
 
+function emptyAccount(network: SocialNetwork): SocialAccountView {
+  return { network, profileUrl: "", handle: "", connected: false, posts: [] };
+}
+
 /** Packet-safe bio. Tokens and extra keys are dropped. */
-export function publicApplicantBio(bio: ApplicantBio): ApplicantBio {
+export function publicApplicantBio(bio: ApplicantBioInput): {
+  photo: ApplicantBioInput["photo"];
+  text: string;
+  socialConsent: boolean;
+  socialConsentAt?: string;
+  draftId: string;
+  social: Record<SocialNetwork, SocialAccountView>;
+} {
   return {
     photo: bio.photo,
     text: (bio.text ?? "").slice(0, BIO_MAX_CHARS),
@@ -200,15 +245,15 @@ export function publicApplicantBio(bio: ApplicantBio): ApplicantBio {
     socialConsentAt: bio.socialConsentAt,
     draftId: bio.draftId ?? "",
     social: {
-      instagram: publicSocialAccount(bio.social?.instagram ?? { network: "instagram", profileUrl: "", handle: "", connected: false, posts: [] }),
-      tiktok: publicSocialAccount(bio.social?.tiktok ?? { network: "tiktok", profileUrl: "", handle: "", connected: false, posts: [] }),
-      facebook: publicSocialAccount(bio.social?.facebook ?? { network: "facebook", profileUrl: "", handle: "", connected: false, posts: [] }),
+      instagram: publicSocialAccount({ ...emptyAccount("instagram"), ...bio.social?.instagram }),
+      tiktok: publicSocialAccount({ ...emptyAccount("tiktok"), ...bio.social?.tiktok }),
+      facebook: publicSocialAccount({ ...emptyAccount("facebook"), ...bio.social?.facebook }),
     },
   };
 }
 
 /** Apply-state bio → landlord view. Used for local submissions and packet merge. */
-export function profileFromApplyBio(bio: ApplicantBio | undefined): ApplicantProfileView | undefined {
+export function profileFromApplyBio(bio: ApplicantBioInput | undefined): ApplicantProfileView | undefined {
   if (!bio) return undefined;
   const social = SOCIAL_NETWORKS.map((network) =>
     accountFromUnknown(network, bio.social?.[network])
@@ -234,7 +279,7 @@ export function mergeApplicantProfile(
       : "";
   const packetPhoto =
     packet && typeof packet === "object"
-      ? photoUrlFromBio((packet as { bio?: ApplicantBio }).bio)
+      ? photoUrlFromBio((packet as { bio?: ApplicantBioInput }).bio)
       : undefined;
 
   if (!stored && !fromPacket.length && !packetBio && !packetPhoto) return undefined;

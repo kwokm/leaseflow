@@ -1,5 +1,14 @@
 import type { ScreeningPackage } from "@/lib/data/mock-data";
 import { CREDIT_DISCLOSURE_BODY, FCRA_PACK_VERSION } from "@/lib/legal/fcra";
+import type { SocialAccountView, SocialNetwork } from "@/lib/social/snapshot";
+
+export {
+  BIO_MAX_CHARS,
+  SOCIAL_NETWORKS,
+  type SocialAccountView,
+  type SocialNetwork,
+  type SocialPostView,
+} from "@/lib/social/snapshot";
 
 export const APPLY_STATE_VERSION = 9;
 
@@ -216,32 +225,6 @@ export interface RentalProfile {
   relatives: ContactRecord[];
   disclosures: RentalDisclosures;
 }
-
-export const SOCIAL_NETWORKS = ["instagram", "tiktok", "facebook"] as const;
-export type SocialNetwork = (typeof SOCIAL_NETWORKS)[number];
-
-export const BIO_MAX_CHARS = 400;
-
-/** Landlord-safe post tile. Never includes tokens. */
-export type SocialPostView = {
-  network: SocialNetwork;
-  position: number;
-  permalink: string;
-  caption: string;
-  takenAt: string | null;
-  thumbUrl?: string;
-  mediaType: string;
-};
-
-export type SocialAccountView = {
-  network: SocialNetwork;
-  profileUrl: string;
-  handle: string;
-  connected: boolean;
-  /** True when Facebook returned a personal profile with no Page — link only. */
-  personalProfile?: boolean;
-  posts: SocialPostView[];
-};
 
 export interface ApplicantBio {
   photo: LocalFile | null;

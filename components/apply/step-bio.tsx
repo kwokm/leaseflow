@@ -40,7 +40,6 @@ export function StepBio({ state, patch, embedded }: StepProps) {
   }, [bio.draftId]);
 
   useEffect(() => {
-    const network = search.get("social");
     const ok = search.get("socialOk");
     const err = search.get("socialError");
     if (err) setConnectError(err);

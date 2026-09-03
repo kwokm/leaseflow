@@ -6,7 +6,7 @@ import { appOrigin, blobEnabled } from "@/lib/config/env";
 import { getDb } from "@/lib/db/client";
 import { socialConnections, socialPostSnapshots } from "@/lib/db/schema";
 import { newId } from "@/lib/ids";
-import type { SocialNetwork } from "@/lib/apply/types";
+import type { SocialNetwork } from "@/lib/social/snapshot";
 import {
   FACEBOOK_PERSONAL_MESSAGE,
   notConfiguredMessage,
@@ -326,7 +326,7 @@ export async function exchangeAndSnapshot(input: {
   const posts = snapshotPosts(input.network, items);
   for (const post of posts) {
     const blobPath = await copyThumb(
-      items.find((item) => item.permalink === post.permalink)?.thumbUrl,
+      items.find((item) => item.permalink === post.permalink)?.thumbUrl ?? undefined,
       input.network
     );
     await database.insert(socialPostSnapshots).values({

@@ -9,10 +9,17 @@ import {
   type SocialPostSnapshotRow,
 } from "@/lib/db/schema";
 import { newId } from "@/lib/ids";
-import type { ApplicantBio, SocialNetwork, SocialPostView } from "@/lib/apply/types";
-import { BIO_MAX_CHARS, SOCIAL_NETWORKS } from "@/lib/apply/types";
-import type { ApplicantProfileView } from "@/lib/data/mock-data";
-import { publicSocialAccount, publicSocialPost, snapshotPosts } from "@/lib/social/snapshot";
+import type { ApplicantBio } from "@/lib/apply/types";
+import {
+  BIO_MAX_CHARS,
+  SOCIAL_NETWORKS,
+  publicSocialAccount,
+  publicSocialPost,
+  snapshotPosts,
+  type ApplicantProfileView,
+  type SocialNetwork,
+  type SocialPostView,
+} from "@/lib/social/snapshot";
 
 function thumbUrl(blobPath: string | null): string | undefined {
   if (!blobPath) return undefined;
