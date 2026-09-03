@@ -10,6 +10,7 @@ import { PageWash } from "@/components/page-wash";
 import { Reveal } from "@/components/motion/reveal";
 import { SpatialMount, SpatialOrigin } from "@/components/motion/spatial";
 import { CreditConsentReceipt } from "@/components/apply/credit-consent-receipt";
+import { ApplicantAdverseActionNotices } from "@/components/desk/applicant-adverse-action";
 import { ApplicationToRent } from "@/components/rental-app/application-to-rent";
 import { Button } from "@/components/ui/button";
 import { checkApplicationDetails, checkApplyState } from "@/lib/docs/ai-check";
@@ -128,6 +129,9 @@ export default function SharedPacketPage({
                   }}
                 />
               </div>
+              <ApplicantAdverseActionNotices
+                applicationIds={[applicant.id, id, state?.applicationId ?? ""]}
+              />
               <div className="border-t border-line px-5 py-5 sm:px-6">
                 <AiDocCheck report={docCheck} scan={false} embedded />
               </div>

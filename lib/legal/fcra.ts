@@ -88,3 +88,50 @@ export function creditConsentReady(input: {
 }): boolean {
   return input.checkboxAuth && input.checkboxUse && input.typedFullName.trim().length > 0;
 }
+
+/**
+ * Adverse-action letter copy. Same pack (`lp-fcra-credit-v1.0` / pack v1.1).
+ * Do not paraphrase. Attorney-review required.
+ */
+
+export const ADVERSE_ACTION_SUBJECT =
+  "Notice about your application at {{property_address}}";
+
+export const ADVERSE_ACTION_HELPER =
+  "If you deny this applicant, require a co-signer, or set a higher deposit or rent than you would for another applicant, and this Experian report played any part in that decision, send the written adverse-action notice. Leaseproof can generate it. You are still the one taking the action.";
+
+export const LANDLORD_COVID_RENTAL_DEBT_LINE =
+  "Do not treat alleged COVID-19 rental debt as a negative factor when you evaluate this applicant (Cal. Civ. Code § 1785.20.4).";
+
+export const ADVERSE_ACTION_ACTIONS = [
+  { id: "denied", label: "Denied the application" },
+  { id: "required_cosigner", label: "Required a co-signer" },
+  {
+    id: "required_deposit",
+    label: "Required a deposit that would not be required of another applicant",
+  },
+  {
+    id: "required_larger_deposit",
+    label: "Required a larger deposit than would be required of another applicant",
+  },
+  {
+    id: "charged_higher_rent",
+    label: "Charged a higher rent than would be charged to another applicant",
+  },
+  { id: "other", label: "Other:" },
+] as const;
+
+export type AdverseActionType = (typeof ADVERSE_ACTION_ACTIONS)[number]["id"];
+
+export const CFPB_SUMMARY_OF_RIGHTS_HREF =
+  "/legal/cfpb-regulation-v-appendix-k-summary-of-rights.pdf";
+
+export const CFPB_SUMMARY_OF_RIGHTS_TITLE =
+  "A Summary of Your Rights Under the Fair Credit Reporting Act";
+
+export const EXPERIAN_NOTICE_CONTACTS = {
+  website: "experian.com",
+  phone: "(888) 397-3742",
+  annualCreditReport: "AnnualCreditReport.com",
+  annualCreditReportPhone: "(877) 322-8228",
+} as const;

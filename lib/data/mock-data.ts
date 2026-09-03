@@ -93,6 +93,9 @@ export interface ExperianPull {
   score: number;
   scoreModel: string;
   pulledAt: string;
+  /** Present only when the shared file included them. Do not invent a range. */
+  scoreRangeLow?: number;
+  scoreRangeHigh?: number;
   fileMatched: boolean;
   onTimePaymentRate: number;
   openAccounts: number;

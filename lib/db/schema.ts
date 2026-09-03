@@ -275,6 +275,45 @@ export const creditShares = pgTable(
   })
 );
 
+/**
+ * Append-only written adverse-action notices. Historical rows are never
+ * rewritten — a later send is a new row. `letter_text` is the verbatim letter
+ * as generated for the applicant.
+ */
+export const adverseActionNotices = pgTable(
+  "adverse_action_notices",
+  {
+    id: text("id").primaryKey(),
+    applicationId: text("application_id")
+      .notNull()
+      .references(() => applications.id, { onDelete: "cascade" }),
+    listingId: text("listing_id")
+      .notNull()
+      .references(() => listings.id, { onDelete: "cascade" }),
+    landlordId: text("landlord_id").references(() => users.id, { onDelete: "set null" }),
+    applicantUserId: text("applicant_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    actionTypes: jsonb("action_types").$type<string[]>().notNull(),
+    otherAction: text("other_action"),
+    letterText: text("letter_text").notNull(),
+    letterSubject: text("letter_subject").notNull(),
+    copyVersion: text("copy_version").notNull(),
+    sentAt: timestamp("sent_at", { withTimezone: true }).notNull(),
+    /** `email` when a mailer accepted the message; `packet` when email was queued. */
+    deliveryChannel: text("delivery_channel").notNull(),
+    /** Honest send status. Never recorded as sent unless a mailer accepted it. */
+    emailStatus: text("email_status").notNull(),
+    packetSnapshot: jsonb("packet_snapshot").$type<Record<string, unknown>>().notNull(),
+    scoreBlockIncluded: boolean("score_block_included").notNull().default(false),
+  },
+  (table) => ({
+    applicationIdx: index("adverse_action_notices_application_id_idx").on(table.applicationId),
+    listingIdx: index("adverse_action_notices_listing_id_idx").on(table.listingId),
+    landlordIdx: index("adverse_action_notices_landlord_id_idx").on(table.landlordId),
+  })
+);
+
 export type UserRow = typeof users.$inferSelect;
 export type ListingRow = typeof listings.$inferSelect;
 export type NewListingRow = typeof listings.$inferInsert;
@@ -285,3 +324,4 @@ export type ConsentRow = typeof consents.$inferSelect;
 export type CreditConsentRow = typeof creditConsents.$inferSelect;
 export type PaymentRow = typeof payments.$inferSelect;
 export type CreditShareRow = typeof creditShares.$inferSelect;
+export type AdverseActionNoticeRow = typeof adverseActionNotices.$inferSelect;

@@ -15,6 +15,13 @@
       "when": 1788395181452,
       "tag": "0001_credit_consents",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788396648970,
+      "tag": "0002_adverse_action_notices",
+      "breakpoints": true
     }
   ]
 }
