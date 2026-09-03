@@ -6,6 +6,7 @@ import "./desk-household.css";
 import { RuntimeConfigProvider } from "@/components/config/runtime-config";
 import { clerkEnabled, runtimeConfig } from "@/lib/config/env";
 import { clerkAppearance } from "@/lib/auth/clerk-appearance";
+import { LANDLORD_SIGN_IN_HREF, LANDLORD_SIGN_UP_HREF } from "@/lib/auth/roles";
 
 // Variable Inter so the optical-size axis (14–32) is available to headings.
 const inter = Inter({
@@ -39,5 +40,13 @@ export default function RootLayout({
   // renders the same tree without it.
   if (!clerkEnabled()) return tree;
 
-  return <ClerkProvider appearance={clerkAppearance}>{tree}</ClerkProvider>;
+  return (
+    <ClerkProvider
+      appearance={clerkAppearance}
+      signInUrl={LANDLORD_SIGN_IN_HREF}
+      signUpUrl={LANDLORD_SIGN_UP_HREF}
+    >
+      {tree}
+    </ClerkProvider>
+  );
 }

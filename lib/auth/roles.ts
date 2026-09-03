@@ -15,6 +15,14 @@ export const LANDLORD_SIGN_IN_HREF = "/signin";
 export const LANDLORD_SIGN_UP_HREF = "/signup";
 export const RENTER_SIGN_IN_HREF = "/signin?role=renter";
 
+/** Branded in-app sign-in, never Clerk's hosted accounts.dev page. */
+export function deskSignInHref(next?: string | null): string {
+  const dest = safeDeskNext(next);
+  return dest === "/dashboard" && !next
+    ? LANDLORD_SIGN_IN_HREF
+    : `${LANDLORD_SIGN_IN_HREF}?next=${encodeURIComponent(dest)}`;
+}
+
 /**
  * Only desk-relative paths survive. Anything absolute, protocol-relative, or
  * pointing back at the auth pages falls back to the desk, so `?next=` cannot be

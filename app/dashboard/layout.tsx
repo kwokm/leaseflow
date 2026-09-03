@@ -11,6 +11,7 @@ import { PrivateBetaGate } from "@/components/auth/private-beta-gate";
 import { getDeskLandlord } from "@/lib/auth/current-user";
 import { clerkEnabled, isDemoMode } from "@/lib/config/env";
 import { featuredApplyHref } from "@/lib/apply/public-cta";
+import { deskSignInHref } from "@/lib/auth/roles";
 
 /**
  * The desk is per-request by definition. Without this, a build that happens to
@@ -25,7 +26,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   // Middleware is the primary gate; this is the second one, so a misconfigured
   // matcher cannot expose landlord data.
-  if (desk.status === "signed-out") redirect("/signin?next=/dashboard");
+  if (desk.status === "signed-out") redirect(deskSignInHref("/dashboard"));
   if (desk.status === "not-invited") {
     return <PrivateBetaGate email={desk.email} />;
   }

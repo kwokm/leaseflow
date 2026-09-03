@@ -90,7 +90,7 @@ Documents are read back through `/api/uploads/file`, which requires a session โ€
 | Name | Required | Notes |
 | --- | --- | --- |
 | `LEASEPROOF_DEMO` | no | `1` seeds sample listings and leaves `/dashboard` ungated. **Never set in production.** |
-| `LEASEPROOF_BETA_EMAILS` | production | Comma-separated landlord emails, case-insensitive. **Empty in production means nobody new gets a desk.** Demo only: unset falls back to `michaelgkwok@gmail.com` and `aaisuzukillc@gmail.com`. Applicants are not on this list. |
+| `LEASEPROOF_BETA_EMAILS` | production | Comma-separated landlord emails, case-insensitive. **Empty in production means nobody new gets a desk.** Unset on `LEASEPROOF_DEMO=1` or Vercel Preview (`VERCEL_ENV=preview`) falls back to `michaelgkwok@gmail.com` and `aaisuzukillc@gmail.com`. Applicants are not on this list. |
 | `LEASEPROOF_LIVE_FEES` | no | `1` allows a live Stripe key to charge $24.99. **Defaults off.** Do not set until counsel clears Cal. Civ. Code ยง 1950.6. Test keys work without this. |
 | `NEXT_PUBLIC_APP_URL` | no | absolute origin for Stripe return URLs; falls back to `VERCEL_URL`, then localhost |
 

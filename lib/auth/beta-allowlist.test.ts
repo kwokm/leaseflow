@@ -5,6 +5,7 @@ import {
   isLandlordEmailAllowed,
   landlordBetaEmails,
   parseBetaEmails,
+  defaultBetaEmailsOn,
 } from "./beta-allowlist.ts";
 
 test("production with an unset allowlist admits nobody", () => {
@@ -34,6 +35,46 @@ test("demo does not invent other landlord names when the env is set", () => {
   const emails = parseBetaEmails("only@oc.example", true);
   assert.deepEqual(emails, ["only@oc.example"]);
   assert.equal(emails.includes("chorus"), false);
+});
+
+test("Vercel Preview defaults to the two known OC emails when the env is unset", () => {
+  assert.equal(defaultBetaEmailsOn({ VERCEL_ENV: "preview" } as NodeJS.ProcessEnv), true);
+  assert.deepEqual(
+    landlordBetaEmails({ VERCEL_ENV: "preview" } as NodeJS.ProcessEnv),
+    [...DEFAULT_DEMO_LANDLORD_EMAILS]
+  );
+  assert.equal(
+    isLandlordEmailAllowed(
+      "michaelgkwok@gmail.com",
+      landlordBetaEmails({ VERCEL_ENV: "preview" } as NodeJS.ProcessEnv)
+    ),
+    true
+  );
+});
+
+test("production Vercel still admits nobody when the allowlist is empty", () => {
+  assert.equal(defaultBetaEmailsOn({ VERCEL_ENV: "production" } as NodeJS.ProcessEnv), false);
+  assert.deepEqual(
+    landlordBetaEmails({ VERCEL_ENV: "production" } as NodeJS.ProcessEnv),
+    []
+  );
+  assert.deepEqual(
+    landlordBetaEmails({
+      VERCEL_ENV: "production",
+      LEASEPROOF_BETA_EMAILS: "",
+    } as NodeJS.ProcessEnv),
+    []
+  );
+});
+
+test("an explicit preview list still wins over the known OC emails", () => {
+  assert.deepEqual(
+    landlordBetaEmails({
+      VERCEL_ENV: "preview",
+      LEASEPROOF_BETA_EMAILS: "only@oc.example",
+    } as NodeJS.ProcessEnv),
+    ["only@oc.example"]
+  );
 });
 
 test("landlordBetaEmails reads LEASEPROOF_BETA_EMAILS and LEASEPROOF_DEMO", () => {
