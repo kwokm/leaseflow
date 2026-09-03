@@ -1,8 +1,16 @@
 import { NextResponse } from "next/server";
-import { getViewer } from "@/lib/auth/current-user";
-import { appOrigin, databaseEnabled, isDemoMode, stripeEnabled } from "@/lib/config/env";
+import { getDeskLandlord, getViewer } from "@/lib/auth/current-user";
+import { privateBetaResponse } from "@/lib/auth/desk-response";
+import {
+  appOrigin,
+  databaseEnabled,
+  isDemoMode,
+  liveChargesAllowed,
+  stripeEnabled,
+} from "@/lib/config/env";
 import { listDeskApplicants, markDemoPaid, submitApplication } from "@/lib/applications/service";
 import { createCheckoutSession } from "@/lib/payments/checkout";
+import { LIVE_CHARGES_BLOCKED_MESSAGE } from "@/lib/payments/live-fees";
 import type { ApplyState } from "@/lib/apply/types";
 
 export const dynamic = "force-dynamic";
@@ -17,7 +25,13 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
   if (!databaseEnabled()) return NextResponse.json({ applicants: [] });
 
-  const viewer = await getViewer("landlord");
+  const desk = await getDeskLandlord();
+  if (desk.status === "signed-out") {
+    return NextResponse.json({ error: "Sign in to view applications." }, { status: 401 });
+  }
+  if (desk.status === "not-invited") return privateBetaResponse();
+
+  const viewer = desk.viewer;
   if (!viewer?.user) {
     // Demo deployments have no session by design and no landlord rows to leak.
     if (isDemoMode()) return NextResponse.json({ applicants: [] });
@@ -100,6 +114,17 @@ export async function POST(request: Request) {
       checkoutUrl: null,
       demoSkippedPayment: true,
     });
+  }
+
+  if (!liveChargesAllowed()) {
+    return NextResponse.json(
+      {
+        error: LIVE_CHARGES_BLOCKED_MESSAGE,
+        applicationId: application.id,
+        code: "live_fees_off",
+      },
+      { status: 503 }
+    );
   }
 
   const checkout = await createCheckoutSession({

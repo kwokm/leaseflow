@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { getViewer } from "@/lib/auth/current-user";
+import { getDeskLandlord, getViewer } from "@/lib/auth/current-user";
+import { privateBetaResponse } from "@/lib/auth/desk-response";
 import { databaseEnabled, isDemoMode } from "@/lib/config/env";
 import { isAdverseActionType, parseActionTypes } from "@/lib/legal/adverse-action";
 import type { AdverseActionType } from "@/lib/legal/fcra";
@@ -70,11 +71,12 @@ export async function POST(
 ) {
   const { id } = await params;
   const demo = isDemoMode();
-  const viewer = await getViewer("landlord");
-
-  if (!demo && !viewer) {
+  const desk = await getDeskLandlord();
+  if (desk.status === "signed-out") {
     return NextResponse.json({ error: "Sign in to send this notice." }, { status: 401 });
   }
+  if (desk.status === "not-invited") return privateBetaResponse();
+  const viewer = desk.viewer;
 
   const body = (await request.json().catch(() => null)) as {
     listingId?: string;

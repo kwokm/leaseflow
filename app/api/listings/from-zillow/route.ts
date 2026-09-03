@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { getViewer } from "@/lib/auth/current-user";
+import { getDeskLandlord } from "@/lib/auth/current-user";
+import { privateBetaResponse } from "@/lib/auth/desk-response";
 import { isDemoMode } from "@/lib/config/env";
 import {
   ImportListingError,
@@ -19,10 +20,11 @@ export const runtime = "nodejs";
  * accepts Zillow, Redfin, Realtor.com, and similar listing URLs.
  */
 export async function POST(request: Request) {
-  const viewer = await getViewer("landlord");
-  if (!isDemoMode() && !viewer) {
+  const desk = await getDeskLandlord();
+  if (desk.status === "signed-out") {
     return NextResponse.json({ error: "Sign in to import a listing." }, { status: 401 });
   }
+  if (desk.status === "not-invited") return privateBetaResponse();
 
   let body: { url?: unknown };
   try {

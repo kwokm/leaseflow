@@ -9,6 +9,8 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "test:import": "node --experimental-strip-types --test lib/listings/import-listing.test.ts",
+    "test:beta": "node --experimental-strip-types --test lib/auth/beta-allowlist.test.ts lib/listings/demo-seed.test.ts lib/payments/live-fees.test.ts",
+    "test": "npm run test:import && npm run test:beta",
     "db:generate": "drizzle-kit generate",
     "db:deploy": "node scripts/migrate.mjs",
     "db:migrate": "drizzle-kit migrate",

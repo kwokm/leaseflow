@@ -5,6 +5,7 @@ import { getDb } from "@/lib/db/client";
 import { listings, type ListingRow } from "@/lib/db/schema";
 import { isDemoMode } from "@/lib/config/env";
 import { demoProperties, demoPropertyById, type Property } from "@/lib/data/mock-data";
+import { mergeDemoCatalogue } from "@/lib/listings/demo-seed";
 import { newId } from "@/lib/ids";
 
 /**
@@ -35,9 +36,7 @@ export function toProperty(row: ListingRow): Property {
 
 /** Demo seeds first so the featured listing keeps its place in the pipeline. */
 function withDemoSeeds(rows: Property[]): Property[] {
-  if (!isDemoMode()) return rows;
-  const seen = new Set(rows.map((row) => row.id));
-  return [...demoProperties().filter((row) => !seen.has(row.id)), ...rows];
+  return mergeDemoCatalogue(rows, demoProperties(), isDemoMode());
 }
 
 /**

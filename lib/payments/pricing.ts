@@ -9,4 +9,4 @@ export const STANDARD_SCREENING_FEE_CENTS = Math.round(STANDARD_SCREENING_FEE * 
 export const STANDARD_SCREENING_LABEL = "Leaseproof Standard screening";
 
 export const STANDARD_SCREENING_DESCRIPTION =
-  "Credit report through Experian Connect, income and ID review, and your application packet.";
+  "Application packet, ID and income review, and credit-share authorization. Not a collected landlord screening fee.";

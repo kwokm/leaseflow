@@ -8,8 +8,8 @@ Tenant screening: a landlord posts a listing, a renter applies, pays the $24.99 
 
 ### Landlord
 
-1. Sign in at `/signin` (Google or email, via Clerk).
-2. A new account opens an **empty** screening pipeline — seeded listings are demo-only.
+1. Sign in at `/signin` (Google or email, via Clerk). Desk signup is **invite-only** — the email must be on `LEASEPROOF_BETA_EMAILS`.
+2. A new allowlisted account opens an **empty** screening pipeline — seeded listings are demo-only (`LEASEPROOF_DEMO=1`).
 3. Create a property at `/dashboard/listings/new`, or **Import listing** from a public Zillow / Redfin / Realtor.com URL (JSON-LD and Open Graph; a blocked portal is a failed import, not invented data).
 4. Copy its apply link from the listing.
 5. Review submitted packets in `/dashboard/applications`.
@@ -72,7 +72,7 @@ Enable **Google** and **Email** as sign-in options in the Clerk dashboard. Roles
 
 | Name | Required | Notes |
 | --- | --- | --- |
-| `STRIPE_SECRET_KEY` | yes | use `sk_test_…` — this PR is test-mode only |
+| `STRIPE_SECRET_KEY` | yes | use `sk_test_…` — live charges stay off unless `LEASEPROOF_LIVE_FEES=1` |
 | `STRIPE_WEBHOOK_SECRET` | yes | `whsec_…` from the webhook endpoint |
 
 Point a Stripe webhook at `/api/stripe/webhook` and subscribe to `checkout.session.completed`. Locally: `stripe listen --forward-to localhost:3000/api/stripe/webhook`.
@@ -90,6 +90,8 @@ Documents are read back through `/api/uploads/file`, which requires a session �
 | Name | Required | Notes |
 | --- | --- | --- |
 | `LEASEPROOF_DEMO` | no | `1` seeds sample listings and leaves `/dashboard` ungated. **Never set in production.** |
+| `LEASEPROOF_BETA_EMAILS` | production | Comma-separated landlord emails, case-insensitive. **Empty in production means nobody new gets a desk.** Demo only: unset falls back to `michaelgkwok@gmail.com` and `aaisuzukillc@gmail.com`. Applicants are not on this list. |
+| `LEASEPROOF_LIVE_FEES` | no | `1` allows a live Stripe key to charge $24.99. **Defaults off.** Do not set until counsel clears Cal. Civ. Code § 1950.6. Test keys work without this. |
 | `NEXT_PUBLIC_APP_URL` | no | absolute origin for Stripe return URLs; falls back to `VERCEL_URL`, then localhost |
 
 ### Degradation
