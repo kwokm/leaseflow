@@ -185,6 +185,112 @@ async function facebookPages(
   };
 }
 
+async function writeNetworkSnapshots(
+  draftId: string,
+  network: SocialNetwork,
+  items: SnapshotInput[]
+): Promise<void> {
+  const database = getDb();
+  if (!database) return;
+
+  await database
+    .delete(socialPostSnapshots)
+    .where(and(eq(socialPostSnapshots.draftId, draftId), eq(socialPostSnapshots.network, network)));
+
+  const posts = snapshotPosts(network, items);
+  for (const post of posts) {
+    const blobPath = await copyThumb(
+      items.find((item) => item.permalink === post.permalink)?.thumbUrl ?? undefined,
+      network
+    );
+    await database.insert(socialPostSnapshots).values({
+      id: newId("sps"),
+      draftId,
+      network,
+      position: post.position,
+      permalink: post.permalink,
+      caption: post.caption,
+      takenAt: post.takenAt ? new Date(post.takenAt) : null,
+      blobPath,
+      mediaType: post.mediaType,
+    });
+  }
+}
+
+async function mediaForNetwork(
+  network: SocialNetwork,
+  token: string
+): Promise<{ handle: string; profileUrl: string; personalProfile: boolean; items: SnapshotInput[] }> {
+  if (network === "tiktok") {
+    const media = await tiktokMedia(token);
+    return { ...media, personalProfile: false };
+  }
+  if (network === "instagram") {
+    const media = await instagramMedia(token);
+    return { ...media, personalProfile: false };
+  }
+  return facebookPages(token);
+}
+
+async function instagramLongLived(shortLived: string): Promise<{ token: string; expiresAt?: Date }> {
+  try {
+    const url = new URL("https://graph.instagram.com/access_token");
+    url.searchParams.set("grant_type", "ig_exchange_token");
+    url.searchParams.set("client_secret", process.env.META_APP_SECRET ?? "");
+    url.searchParams.set("access_token", shortLived);
+    const response = await fetch(url);
+    const payload = (await response.json().catch(() => ({}))) as {
+      access_token?: string;
+      expires_in?: number;
+    };
+    if (!payload.access_token) return { token: shortLived };
+    return {
+      token: payload.access_token,
+      expiresAt: payload.expires_in ? new Date(Date.now() + payload.expires_in * 1000) : undefined,
+    };
+  } catch {
+    return { token: shortLived };
+  }
+}
+
+/**
+ * Re-read connected networks at submit and freeze a new 1–9 snapshot.
+ * If a token is dead or the vendor fails, keep the connect-time tiles.
+ */
+export async function refreshSnapshotsForDraft(draftId: string): Promise<void> {
+  const database = getDb();
+  if (!database || !draftId) return;
+
+  const connections = await database
+    .select()
+    .from(socialConnections)
+    .where(eq(socialConnections.draftId, draftId));
+
+  for (const connection of connections) {
+    const network = connection.network as SocialNetwork;
+    if (!networkConfigured(network) || !connection.accessToken) continue;
+    try {
+      const media = await mediaForNetwork(network, connection.accessToken);
+      const posts = snapshotPosts(network, media.items);
+      // An empty vendor payload is not a reason to erase tiles already frozen at connect.
+      if (posts.length || media.personalProfile) {
+        await writeNetworkSnapshots(draftId, network, media.items);
+      }
+      await database
+        .update(socialConnections)
+        .set({
+          handle: media.handle || connection.handle,
+          profileUrl: media.profileUrl || connection.profileUrl,
+          personalProfile: media.personalProfile,
+          updatedAt: new Date(),
+        })
+        .where(eq(socialConnections.id, connection.id));
+    } catch {
+      // Keep the connect-time snapshot. Do not invent posts.
+    }
+  }
+}
+
 export async function exchangeAndSnapshot(input: {
   network: SocialNetwork;
   code: string;
@@ -259,6 +365,9 @@ export async function exchangeAndSnapshot(input: {
     accessToken = token.access_token;
     if (token.expires_in) expiresAt = new Date(Date.now() + token.expires_in * 1000);
     if (input.network === "instagram") {
+      const longLived = await instagramLongLived(accessToken);
+      accessToken = longLived.token;
+      if (longLived.expiresAt) expiresAt = longLived.expiresAt;
       const media = await instagramMedia(accessToken);
       handle = media.handle;
       profileUrl = media.profileUrl;
@@ -314,33 +423,7 @@ export async function exchangeAndSnapshot(input: {
     });
   }
 
-  await database
-    .delete(socialPostSnapshots)
-    .where(
-      and(
-        eq(socialPostSnapshots.draftId, input.draftId),
-        eq(socialPostSnapshots.network, input.network)
-      )
-    );
-
-  const posts = snapshotPosts(input.network, items);
-  for (const post of posts) {
-    const blobPath = await copyThumb(
-      items.find((item) => item.permalink === post.permalink)?.thumbUrl ?? undefined,
-      input.network
-    );
-    await database.insert(socialPostSnapshots).values({
-      id: newId("sps"),
-      draftId: input.draftId,
-      network: input.network,
-      position: post.position,
-      permalink: post.permalink,
-      caption: post.caption,
-      takenAt: post.takenAt ? new Date(post.takenAt) : null,
-      blobPath,
-      mediaType: post.mediaType,
-    });
-  }
+  await writeNetworkSnapshots(input.draftId, input.network, items);
 
   return {
     handle,

@@ -42,6 +42,14 @@ test("owner-only profile payload never includes tokens", () => {
   assert.equal(hasTokenLeak(profile), false);
 });
 
+test("submit re-snapshots from stored tokens", () => {
+  const profile = readFileSync(new URL("./profile.ts", import.meta.url), "utf8");
+  const oauth = readFileSync(new URL("./oauth.ts", import.meta.url), "utf8");
+  assert.match(profile, /refreshSnapshotsForDraft/);
+  assert.match(oauth, /refreshSnapshotsForDraft/);
+  assert.match(oauth, /Keep the connect-time snapshot/);
+});
+
 test("profile API is owner-only and refuses token-bearing payloads", () => {
   const source = readFileSync(
     new URL("../../app/api/applications/[id]/profile/route.ts", import.meta.url),

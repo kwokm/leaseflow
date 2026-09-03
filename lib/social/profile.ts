@@ -9,6 +9,7 @@ import {
   type SocialPostSnapshotRow,
 } from "@/lib/db/schema";
 import { newId } from "@/lib/ids";
+import { refreshSnapshotsForDraft } from "@/lib/social/oauth";
 import type { ApplicantBio } from "@/lib/apply/types";
 import {
   BIO_MAX_CHARS,
@@ -162,6 +163,7 @@ export async function saveApplicantProfile(
   }
 
   if (bio.draftId) {
+    await refreshSnapshotsForDraft(bio.draftId);
     await database
       .update(socialConnections)
       .set({ applicationId, updatedAt: now })
@@ -170,6 +172,23 @@ export async function saveApplicantProfile(
       .update(socialPostSnapshots)
       .set({ applicationId })
       .where(eq(socialPostSnapshots.draftId, bio.draftId));
+
+    const attached = await database
+      .select({
+        id: socialConnections.id,
+        network: socialConnections.network,
+        profileUrl: socialConnections.profileUrl,
+      })
+      .from(socialConnections)
+      .where(eq(socialConnections.draftId, bio.draftId));
+    for (const connection of attached) {
+      const typedUrl = bio.social?.[connection.network as SocialNetwork]?.profileUrl?.trim();
+      if (!typedUrl || connection.profileUrl) continue;
+      await database
+        .update(socialConnections)
+        .set({ profileUrl: typedUrl, updatedAt: now })
+        .where(eq(socialConnections.id, connection.id));
+    }
   }
 }
 
