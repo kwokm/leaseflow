@@ -4,19 +4,32 @@ import { isDemoMode } from "@/lib/config/env";
 import {
   ImportListingError,
   importListingFromUrl,
+  type ListingPreview,
 } from "@/lib/listings/import-listing";
-import {
-  importToProperty,
-  isSeededZillow,
-  parseZillowUrl,
-  seededZillowImport,
-} from "@/lib/listings/zillow";
+import { importToProperty, isSeededZillow, seededZillowImport } from "@/lib/listings/zillow";
 
 export const runtime = "nodejs";
 
+function seededPreview(): ListingPreview {
+  const seeded = seededZillowImport();
+  return {
+    sourceUrl: seeded.zillowUrl,
+    portal: "zillow",
+    zpid: seeded.zpid,
+    address: seeded.address,
+    rent: seeded.rent,
+    bedrooms: seeded.bedrooms,
+    bathrooms: seeded.bathrooms,
+    sqft: seeded.sqft,
+    neighborhood: seeded.neighborhood,
+    propertyType: seeded.propertyType,
+    photos: seeded.photos,
+  };
+}
+
 /**
- * Kept for the existing pull button. New UI calls /api/listings/import, which
- * accepts Zillow, Redfin, Realtor.com, and similar listing URLs.
+ * Preview only. The landlord confirms on the form, then POST /api/listings
+ * creates the Neon row owned by their Clerk session.
  */
 export async function POST(request: Request) {
   const viewer = await getViewer("landlord");
@@ -33,14 +46,16 @@ export async function POST(request: Request) {
 
   const url = typeof body.url === "string" ? body.url.trim() : "";
   if (!url) {
-    return NextResponse.json({ error: "Paste a listing URL first." }, { status: 400 });
+    return NextResponse.json({ error: "Paste a public listing URL first." }, { status: 400 });
   }
 
-  const parsed = parseZillowUrl(url);
-  if (isDemoMode() && isSeededZillow(url, parsed?.zpid)) {
+  // Demo-only shortcut for the sample Irvine home. Production always reads the
+  // public page and fails clearly if the portal blocks the fetch.
+  if (isDemoMode() && isSeededZillow(url)) {
     return NextResponse.json({
       source: "seeded",
-      note: "Loaded the sample 170 Chorus, Irvine listing, so address, rent, and photos are filled.",
+      note: "Loaded the sample 170 Chorus, Irvine listing so you can preview the import.",
+      preview: seededPreview(),
       listing: importToProperty(seededZillowImport()),
     });
   }
@@ -49,22 +64,8 @@ export async function POST(request: Request) {
     const preview = await importListingFromUrl(url);
     return NextResponse.json({
       source: "live",
-      note: "Pulled from the public page — not a partnership. Edit anything that looks wrong before you save.",
-      listing: importToProperty({
-        source: "live",
-        id: preview.zpid ? `zillow-${preview.zpid}` : `import-${Date.now()}`,
-        zpid: preview.zpid,
-        zillowUrl: preview.sourceUrl,
-        address: preview.address ?? "",
-        rent: preview.rent ?? 0,
-        bedrooms: preview.bedrooms ?? 0,
-        bathrooms: preview.bathrooms ?? 0,
-        sqft: preview.sqft,
-        photos: preview.photos,
-        neighborhood: preview.neighborhood,
-        propertyType: preview.propertyType,
-        title: preview.address,
-      }),
+      note: `Pulled from the public ${preview.portal} page — not a partnership. Edit anything that looks wrong before you save.`,
+      preview,
     });
   } catch (error) {
     if (error instanceof ImportListingError) {

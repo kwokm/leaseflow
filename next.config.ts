@@ -13,6 +13,11 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "www.zillowstatic.com", pathname: "/**" },
       { protocol: "https", hostname: "static.zillowstatic.com", pathname: "/**" },
       { protocol: "https", hostname: "d36xftgacqn2p.cloudfront.net", pathname: "/**" },
+      { protocol: "https", hostname: "ssl.cdn-redfin.com", pathname: "/**" },
+      { protocol: "https", hostname: "sslx.cdn-redfin.com", pathname: "/**" },
+      { protocol: "https", hostname: "ap.rdcpix.com", pathname: "/**" },
+      { protocol: "https", hostname: "ar.rdcpix.com", pathname: "/**" },
+      { protocol: "https", hostname: "nh.rdcpix.com", pathname: "/**" },
     ],
   },
 };
