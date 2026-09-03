@@ -45,7 +45,7 @@ function HomePhoto({ property }: { property: Property }) {
     );
   }
 
-  const remote = /^https?:\/\//i.test(src) && !/zillowstatic\.com|d36xftgacqn2p\.cloudfront\.net/i.test(src);
+  const remote = /^https?:\/\//i.test(src) && !/zillowstatic\.com|d36xftgacqn2p\.cloudfront\.net|cdn-redfin\.com|rdcpix\.com/i.test(src);
 
   return (
     <div className="pipe-photo">
@@ -167,6 +167,9 @@ export function PipelineDesk({ preview = false }: { preview?: boolean }) {
           </p>
           <div className="mt-5 flex flex-wrap gap-2">
             <Button asChild>
+              <Link href="/dashboard/listings/new?mode=import">Import listing</Link>
+            </Button>
+            <Button asChild variant="outline">
               <Link href="/dashboard/listings/new">Create listing + get apply link</Link>
             </Button>
           </div>

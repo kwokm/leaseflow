@@ -48,6 +48,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
               </Button>
             ) : null}
             <Button asChild variant="outline">
+              <Link href="/dashboard/listings/new?mode=import">Import listing</Link>
+            </Button>
+            <Button asChild variant="outline">
               <Link href="/dashboard/listings/new">New listing</Link>
             </Button>
             {clerkEnabled() ? (

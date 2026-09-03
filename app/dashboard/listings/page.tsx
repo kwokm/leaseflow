@@ -22,6 +22,9 @@ export default function ListingsPage() {
     <Reveal>
       <DeskToolbar meta={`${properties.length} listings`}>
         <DeskPill active>All properties</DeskPill>
+        <Button asChild variant="outline" size="sm">
+          <Link href="/dashboard/listings/new?mode=import">Import listing</Link>
+        </Button>
         <Button asChild size="sm">
           <Link href="/dashboard/listings/new">New listing</Link>
         </Button>
