@@ -17,7 +17,6 @@ import {
   canWriteListingDecision,
   deskStatusFrom,
   isLandlordDecision,
-  type LandlordDecision,
 } from "@/lib/applications/decision";
 import { attachChecksToApplication, summariesByApplication } from "@/lib/income/service";
 import { newConfirmationId, newId } from "@/lib/ids";
