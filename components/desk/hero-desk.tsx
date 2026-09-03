@@ -115,7 +115,7 @@ export function HeroDesk({ quiet = false }: { quiet?: boolean }) {
       data-tab={active.label}
       onClickCapture={keepPreviewInPlace}
     >
-      <PacketWindow title={active.title} meta="Realtor desk • Demo sync">
+      <PacketWindow title={active.title} meta="Landlord desk • Demo">
         <div className="desk">
           <div className="hero-rail">
             <DeskSidebar

@@ -12,6 +12,7 @@ export function roleFrom(value: unknown, fallback: Role): Role {
 }
 
 export const LANDLORD_SIGN_IN_HREF = "/signin";
+export const LANDLORD_SIGN_UP_HREF = "/signup";
 export const RENTER_SIGN_IN_HREF = "/signin?role=renter";
 
 /**

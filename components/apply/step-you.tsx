@@ -62,7 +62,7 @@ export function StepYou({ state, patch, errors, embedded }: StepProps) {
         </div>
       </Panel>
 
-      <Panel title="Identity" description="Used to match your credit file in the demo pull.">
+      <Panel title="Identity" description="Used to match your credit file.">
         <FieldGrid>
           <MaskedField
             id="dateOfBirth"

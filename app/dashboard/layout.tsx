@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { PrivateBetaGate } from "@/components/auth/private-beta-gate";
 import { getDeskLandlord } from "@/lib/auth/current-user";
 import { clerkEnabled, isDemoMode } from "@/lib/config/env";
-import { FEATURED_LISTING_ID } from "@/lib/data/mock-data";
+import { featuredApplyHref } from "@/lib/apply/public-cta";
 
 /**
  * The desk is per-request by definition. Without this, a build that happens to
@@ -49,7 +49,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
                 off each listing. */}
             {demo ? (
               <Button asChild variant="outline">
-                <Link href={`/apply/${FEATURED_LISTING_ID}`}>Apply as renter</Link>
+                <Link href={featuredApplyHref()}>Apply as renter</Link>
               </Button>
             ) : null}
             <Button asChild variant="outline">

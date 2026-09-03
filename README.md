@@ -127,7 +127,8 @@ Tables: `users`, `listings`, `households`, `applications`, `documents`, `consent
 
 ## Main routes
 
-- `/` — landing, Platform, and Pricing sections
+- `/` — landing (Sign in / Sign up in the header)
+- `/apply` — ask-your-landlord apply page when there is no public listing
 - `/signin`, `/signup` — Clerk authentication
 - `/dashboard` — screening pipeline (Clerk session required in production)
 - `/dashboard/listings/new` — listing creation and Zillow import

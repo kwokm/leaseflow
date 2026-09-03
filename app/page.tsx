@@ -11,10 +11,13 @@ import { SplitWords } from "@/components/motion/split-words";
 import { Button } from "@/components/ui/button";
 import { ListingPhotoStrip } from "@/components/listings/photos";
 import { PillarExperian, PillarIncome, PillarPacket } from "@/components/demos/pillar-demos";
-import { LANDLORD_SIGN_IN_HREF } from "@/lib/auth/roles";
+import { applyAsRenterHref } from "@/lib/apply/public-cta";
+import { LANDLORD_SIGN_IN_HREF, LANDLORD_SIGN_UP_HREF } from "@/lib/auth/roles";
+import { isDemoMode } from "@/lib/config/env";
 import { FEATURED_LISTING_ID, demoPropertyById } from "@/lib/data/mock-data";
 
-const APPLY_HREF = `/apply/${FEATURED_LISTING_ID}`;
+/** Apply CTA depends on LEASEPROOF_DEMO — do not bake a listing href at build. */
+export const dynamic = "force-dynamic";
 
 const STEPS = [
   {
@@ -36,6 +39,8 @@ const STEPS = [
 ];
 
 export default function Home() {
+  const demo = isDemoMode();
+  const applyHref = applyAsRenterHref(demo);
   const property = demoPropertyById(FEATURED_LISTING_ID)!;
 
   return (
@@ -55,24 +60,12 @@ export default function Home() {
             <BrandWord />
           </Link>
 
-          <nav aria-label="Primary" className="hidden flex-1 items-center gap-7 md:flex">
-            {[
-              { href: "#platform", label: "Platform" },
-              { href: "#rates", label: "Pricing" },
-            ].map((item) => (
-              <Link
-                key={item.label}
-                href={item.href}
-                className="text-[14px] font-medium tracking-[-0.2px] text-mute transition-colors duration-200 ease-out hover:text-ink"
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-
           <div className="ml-auto flex items-center gap-2">
             <Button asChild variant="ghost">
-              <Link href={LANDLORD_SIGN_IN_HREF}>Sign in / Sign up</Link>
+              <Link href={LANDLORD_SIGN_IN_HREF}>Sign in</Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link href={LANDLORD_SIGN_UP_HREF}>Sign up</Link>
             </Button>
           </div>
         </div>
@@ -86,16 +79,16 @@ export default function Home() {
               <SplitWords>We screen, verify, and organize your lease for you</SplitWords>
             </h1>
             <p className="hero-sub reveal-tone">
-              Leaseproof is the screening service that collects applications, runs
-              credit and background checks, and utilizes AI to fully verify and
-              approve all income and bank statements
+              Leaseproof screens applicants, verifies income with AI Income Check,
+              and organizes the packet. Credit and background checks are included.
+              You decide who to approve.
             </p>
             <div className="hero-ctas reveal-cta">
               <Button asChild variant="lilac" size="cta">
-                <Link href="/dashboard">Screen as Landlord</Link>
+                <Link href={LANDLORD_SIGN_IN_HREF}>Screen as Landlord</Link>
               </Button>
               <Button asChild variant="outline" size="cta">
-                <Link href={APPLY_HREF}>Apply as renter</Link>
+                <Link href={applyHref}>Apply as renter</Link>
               </Button>
             </div>
           </InView>
@@ -241,30 +234,53 @@ export default function Home() {
         <section id="apply" className="pb-20" aria-labelledby="apply-title">
           <InView className="mx-auto max-w-shell px-5 sm:px-8">
             <div className="reveal-spatial">
-              <PacketWindow title={`Apply • ${property.address.split(",")[0]}`}>
-                <div className="flex flex-col gap-5 px-6 py-7 md:flex-row md:items-center md:justify-between">
-                  <div className="min-w-0">
-                    <p className="text-[13px] font-medium tracking-[-0.13px] text-mute">For renters</p>
-                    <h2
-                      id="apply-title"
-                      className="mt-2 text-[24px] font-medium leading-[27.6px] tracking-[-0.24px] text-ink"
-                    >
-                      Apply for {property.address.split(",")[0]}
-                    </h2>
-                    <p className="mt-1.5 text-[14px] font-medium text-mute">
-                      {property.bedrooms} bedroom · {property.bathrooms} bath ·{" "}
-                      <span className="num">${property.rent.toLocaleString()}</span> per month · you
-                      pay the screening fee.
-                    </p>
-                    <div className="mt-3">
-                      <ListingPhotoStrip photos={property.photos} alt={property.address} />
+              {demo ? (
+                <PacketWindow title={`Apply • ${property.address.split(",")[0]}`}>
+                  <div className="flex flex-col gap-5 px-6 py-7 md:flex-row md:items-center md:justify-between">
+                    <div className="min-w-0">
+                      <p className="text-[13px] font-medium tracking-[-0.13px] text-mute">For renters</p>
+                      <h2
+                        id="apply-title"
+                        className="mt-2 text-[24px] font-medium leading-[27.6px] tracking-[-0.24px] text-ink"
+                      >
+                        Apply for {property.address.split(",")[0]}
+                      </h2>
+                      <p className="mt-1.5 text-[14px] font-medium text-mute">
+                        {property.bedrooms} bedroom · {property.bathrooms} bath ·{" "}
+                        <span className="num">${property.rent.toLocaleString()}</span> per month · you
+                        pay the screening fee.
+                      </p>
+                      <div className="mt-3">
+                        <ListingPhotoStrip photos={property.photos} alt={property.address} />
+                      </div>
                     </div>
+                    <Button asChild size="cta" className="shrink-0">
+                      <Link href={applyHref}>Apply as renter</Link>
+                    </Button>
                   </div>
-                  <Button asChild size="cta" className="shrink-0">
-                    <Link href={APPLY_HREF}>Apply as renter</Link>
-                  </Button>
-                </div>
-              </PacketWindow>
+                </PacketWindow>
+              ) : (
+                <PacketWindow title="Apply">
+                  <div className="flex flex-col gap-5 px-6 py-7 md:flex-row md:items-center md:justify-between">
+                    <div className="min-w-0">
+                      <p className="text-[13px] font-medium tracking-[-0.13px] text-mute">For renters</p>
+                      <h2
+                        id="apply-title"
+                        className="mt-2 text-[24px] font-medium leading-[27.6px] tracking-[-0.24px] text-ink"
+                      >
+                        Get a link from your landlord
+                      </h2>
+                      <p className="mt-1.5 text-[14px] font-medium text-mute">
+                        Applications open from a listing your landlord shares. There is no public
+                        apply queue.
+                      </p>
+                    </div>
+                    <Button asChild size="cta" className="shrink-0">
+                      <Link href={applyHref}>Apply as renter</Link>
+                    </Button>
+                  </div>
+                </PacketWindow>
+              )}
             </div>
           </InView>
         </section>
