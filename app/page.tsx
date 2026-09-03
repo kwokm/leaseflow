@@ -126,7 +126,7 @@ export default function Home() {
                 },
                 {
                   lead: "One packet everyone can open.",
-                  tone: "Filled application, listing photos, Experian, income check, and a LeaseScore. Tenant, realtor, owner — same file.",
+                  tone: "Filled application, listing photos, Experian, income check, and a LeaseScore. Tenant, landlord, owner — same file.",
                   Demo: PillarPacket,
                 },
               ].map((pillar) => (
