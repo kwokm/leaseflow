@@ -24,6 +24,7 @@ const ALLOWED_KINDS = new Set([
   "bank_statement",
   "w2",
   "form_1099",
+  "profile_photo",
 ]);
 
 /**

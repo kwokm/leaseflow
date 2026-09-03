@@ -1,5 +1,6 @@
 import { ssnLast4 } from "@/lib/apply/format";
-import type { ApplyState, LocalFile } from "@/lib/apply/types";
+import { emptyApplicantBio, type ApplyState, type LocalFile } from "@/lib/apply/types";
+import { publicApplicantBio } from "@/lib/social/snapshot";
 
 /**
  * The packet as it is allowed to be stored.
@@ -9,6 +10,9 @@ import type { ApplyState, LocalFile } from "@/lib/apply/types";
  *  - the full SSN, which is reduced to its last four digits. The bureau share
  *    is brokered by Experian Connect, so we never need the number itself.
  *  - local object URLs, which are per-session and meaningless once stored.
+ *
+ * OAuth tokens never belong on the packet — bio.social is rebuilt from public
+ * fields only.
  */
 export type StoredFile = Omit<LocalFile, "url">;
 
@@ -27,6 +31,7 @@ export function toStoredPacket(state: ApplyState): StoredPacket {
   const { ssn, ...personal } = state.personal;
   const rest: Partial<ApplyState> = { ...state };
   delete rest.payment;
+  const bio = state.bio ?? emptyApplicantBio();
 
   return {
     ...rest,
@@ -35,5 +40,9 @@ export function toStoredPacket(state: ApplyState): StoredPacket {
     idBack: storedFile(state.idBack),
     paystubs: state.paystubs.map((file) => storedFile(file)!) as LocalFile[],
     statements: state.statements.map((file) => storedFile(file)!) as LocalFile[],
+    bio: {
+      ...publicApplicantBio(bio),
+      photo: storedFile(bio.photo),
+    },
   } as StoredPacket;
 }

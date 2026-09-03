@@ -1,7 +1,9 @@
 "use client";
 
+import { Suspense } from "react";
 import { StepBody } from "@/components/apply/motion";
 import { StageSection, StepHeading, type StepProps } from "@/components/apply/step-shell";
+import { StepBio } from "@/components/apply/step-bio";
 import { StepHousehold } from "@/components/apply/step-household";
 import { StepStart } from "@/components/apply/step-start";
 import { StepYou } from "@/components/apply/step-you";
@@ -23,6 +25,11 @@ export function StageYou(props: StepProps) {
       </StageSection>
       <StageSection label="Household">
         <StepHousehold {...props} embedded />
+      </StageSection>
+      <StageSection label="Bio">
+        <Suspense fallback={null}>
+          <StepBio {...props} embedded />
+        </Suspense>
       </StageSection>
     </StepBody>
   );

@@ -36,6 +36,13 @@
       "when": 1788465271856,
       "tag": "0004_application_decisions",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1788466141924,
+      "tag": "0005_applicant_profiles",
+      "breakpoints": true
     }
   ]
 }

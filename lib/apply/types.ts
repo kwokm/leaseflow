@@ -1,7 +1,7 @@
 import type { ScreeningPackage } from "@/lib/data/mock-data";
 import { CREDIT_DISCLOSURE_BODY, FCRA_PACK_VERSION } from "@/lib/legal/fcra";
 
-export const APPLY_STATE_VERSION = 8;
+export const APPLY_STATE_VERSION = 9;
 
 /**
  * A file the renter attached.
@@ -217,6 +217,60 @@ export interface RentalProfile {
   disclosures: RentalDisclosures;
 }
 
+export const SOCIAL_NETWORKS = ["instagram", "tiktok", "facebook"] as const;
+export type SocialNetwork = (typeof SOCIAL_NETWORKS)[number];
+
+export const BIO_MAX_CHARS = 400;
+
+/** Landlord-safe post tile. Never includes tokens. */
+export type SocialPostView = {
+  network: SocialNetwork;
+  position: number;
+  permalink: string;
+  caption: string;
+  takenAt: string | null;
+  thumbUrl?: string;
+  mediaType: string;
+};
+
+export type SocialAccountView = {
+  network: SocialNetwork;
+  profileUrl: string;
+  handle: string;
+  connected: boolean;
+  /** True when Facebook returned a personal profile with no Page — link only. */
+  personalProfile?: boolean;
+  posts: SocialPostView[];
+};
+
+export interface ApplicantBio {
+  photo: LocalFile | null;
+  text: string;
+  socialConsent: boolean;
+  socialConsentAt?: string;
+  /** Client draft key so OAuth can attach snapshots before submit. */
+  draftId: string;
+  social: Record<SocialNetwork, SocialAccountView>;
+}
+
+export function emptySocialAccount(network: SocialNetwork): SocialAccountView {
+  return { network, profileUrl: "", handle: "", connected: false, posts: [] };
+}
+
+export function emptyApplicantBio(): ApplicantBio {
+  return {
+    photo: null,
+    text: "",
+    socialConsent: false,
+    draftId: "",
+    social: {
+      instagram: emptySocialAccount("instagram"),
+      tiktok: emptySocialAccount("tiktok"),
+      facebook: emptySocialAccount("facebook"),
+    },
+  };
+}
+
 export interface ApplyState {
   version: number;
   listingId: string;
@@ -224,6 +278,7 @@ export interface ApplyState {
   furthestStep: number;
   screeningPackage: ScreeningPackage;
   personal: PersonalInfo;
+  bio: ApplicantBio;
   idFront: LocalFile | null;
   idBack: LocalFile | null;
   income: IncomeInfo;
@@ -503,6 +558,7 @@ export function createInitialState(listingId: string, pkg: ScreeningPackage): Ap
     consent: { checkboxAuth: false, checkboxUse: false, typedFullName: "", signature: "" },
     payment: { stage: "unpaid" },
     rental: emptyRentalProfile(),
+    bio: emptyApplicantBio(),
   };
 }
 
@@ -583,5 +639,9 @@ export function createDemoState(listingId: string, pkg: ScreeningPackage): Apply
     },
     payment: { stage: "unpaid" },
     rental: demoRentalProfile(),
+    bio: {
+      ...emptyApplicantBio(),
+      text: "Designer relocating to Orange County. Quiet household, remote work, and weekends at the beach.",
+    },
   };
 }

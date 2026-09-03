@@ -2683,3 +2683,33 @@
   border-color: #d8d2e6;
   color: #6b5b8c;
 }
+
+.bio-photo {
+  display: flex;
+  width: 88px;
+  height: 88px;
+  flex-shrink: 0;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px dashed var(--line-2);
+  background: var(--mist);
+}
+
+.bio-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.bio-tile {
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--ghost);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

@@ -52,6 +52,11 @@ import type { ApplicationStatus } from "@/lib/data/mock-data";
 import type { RentalApplication } from "@/lib/apply/rental-app";
 import { AdverseActionPanel } from "@/components/desk/adverse-action-panel";
 import { noticesForApplication } from "@/lib/desk/adverse-action-store";
+import { useRuntimeConfig } from "@/components/config/runtime-config";
+import { networkLabel, SocialGrid } from "@/components/desk/social-grid";
+import { SAMPLE_JANE_PROFILE } from "@/lib/data/mock-data";
+import { DEMO_APPLICANT_ID } from "@/lib/apply/sample-packet";
+import { FACEBOOK_PERSONAL_MESSAGE } from "@/lib/social/snapshot";
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
@@ -93,6 +98,7 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
   const [decideError, setDecideError] = useState<string | null>(null);
   const [deciding, setDeciding] = useState(false);
   const { checks: liveChecks, waiting: liveWaiting } = useApplicationIncomeChecks(id);
+  const { demo } = useRuntimeConfig();
   const { applicant: neonApplicant, ready: neonReady, refresh: refreshNeon } = useDeskApplicant(id);
   const { property: neonProperty, ready: neonListingReady } = useProperty(
     neonApplicant?.propertyId ?? ""
@@ -116,7 +122,9 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
     ? submission
       ? submissionApplicant(submission)
       : undefined
-    : getApplicantById(id);
+    : demo
+      ? getApplicantById(id)
+      : undefined;
   const live = !local && !seeded ? neonApplicant : undefined;
   const applicant = seeded
     ? { ...withDecision(seeded), ...(statusOverride ? { status: statusOverride } : {}) }
@@ -169,6 +177,9 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
     );
   }
 
+  const profile =
+    applicant.profile ??
+    (demo && applicant.id === DEMO_APPLICANT_ID ? SAMPLE_JANE_PROFILE : undefined);
   const fullName = `${applicant.firstName} ${applicant.lastName}`;
   const decided = applicant.status === "approved" || applicant.status === "declined";
   const credit = creditScore(applicant);
@@ -247,11 +258,21 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
       <Reveal>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4 sm:px-6">
         <div className="flex min-w-0 items-center gap-3">
-          <Avatar firstName={applicant.firstName} lastName={applicant.lastName} large />
+          <Avatar
+            firstName={applicant.firstName}
+            lastName={applicant.lastName}
+            photoUrl={profile?.photoUrl}
+            large
+          />
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="text-[18px] font-semibold tracking-[-0.3px] text-ink">{fullName}</h1>
               <StatusPill status={applicant.status} />
+              {profile?.sample ? (
+                <span className="text-[10px] font-medium uppercase tracking-[0.06em] text-mute-2">
+                  SAMPLE
+                </span>
+              ) : null}
             </div>
             <p className="mt-0.5 truncate text-[13px] text-mute">
               {shortAddress(property.address)} · {applicant.email}
@@ -357,6 +378,40 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
           />
         </dl>
       </Section>
+
+      {profile && (profile.bio || profile.photoUrl || profile.social.length) ? (
+          <Section title="Bio">
+            {profile.sample ? (
+              <p className="mb-3 text-[12px] font-medium uppercase tracking-[0.06em] text-mute-2">
+                SAMPLE
+              </p>
+            ) : null}
+            {profile.bio ? (
+              <p className="text-[14px] font-medium leading-5 text-ink">{profile.bio}</p>
+            ) : null}
+            <p className="mt-2 text-[12px] font-medium text-mute-2">
+              Read from their profiles, not verified.
+            </p>
+            {profile.social.map((account) => (
+              <div key={account.network} className="mt-3">
+                {account.profileUrl ? (
+                  <p className="text-[13px] font-medium text-ink">
+                    <a href={account.profileUrl} target="_blank" rel="noreferrer">
+                      {networkLabel(account.network)}
+                      {account.handle ? ` · @${account.handle}` : ""}
+                    </a>
+                  </p>
+                ) : (
+                  <p className="text-[13px] font-medium text-ink">{networkLabel(account.network)}</p>
+                )}
+                {account.personalProfile ? (
+                  <p className="mt-1 text-[12px] font-medium text-mute">{FACEBOOK_PERSONAL_MESSAGE}</p>
+                ) : null}
+                <SocialGrid label="" posts={account.posts} />
+              </div>
+            ))}
+          </Section>
+      ) : null}
 
       <Section title="LeaseScore">
         {report ? (

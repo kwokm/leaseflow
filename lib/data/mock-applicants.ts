@@ -79,6 +79,11 @@ export const mockApplicants: Applicant[] = [
     email: "jane.doe@leaseflow.dev",
     phone: "(555) 010-0142",
     appliedAt: "2026-08-10T12:00:00Z",
+    profile: {
+      bio: "Designer relocating to Orange County. Quiet household, remote work, and weekends at the beach.",
+      sample: true,
+      social: [],
+    },
   },
 ];
 

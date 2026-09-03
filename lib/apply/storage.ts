@@ -72,9 +72,19 @@ export function loadDraft(listingId: string, pkg: ScreeningPackage): ApplyState 
       statements: parsed.statements ?? fresh.statements,
       idFront: parsed.idFront ?? fresh.idFront,
       idBack: parsed.idBack ?? fresh.idBack,
+      bio: {
+        ...fresh.bio,
+        ...parsed.bio,
+        photo: parsed.bio?.photo ?? fresh.bio.photo,
+        social: {
+          instagram: { ...fresh.bio.social.instagram, ...parsed.bio?.social?.instagram, posts: parsed.bio?.social?.instagram?.posts ?? [] },
+          tiktok: { ...fresh.bio.social.tiktok, ...parsed.bio?.social?.tiktok, posts: parsed.bio?.social?.tiktok?.posts ?? [] },
+          facebook: { ...fresh.bio.social.facebook, ...parsed.bio?.social?.facebook, posts: parsed.bio?.social?.facebook?.posts ?? [] },
+        },
+      },
     };
 
-    stripUrls([merged.idFront, merged.idBack, ...merged.paystubs, ...merged.statements]);
+    stripUrls([merged.idFront, merged.idBack, merged.bio.photo, ...merged.paystubs, ...merged.statements]);
     return merged;
   } catch {
     return fresh;
@@ -120,7 +130,7 @@ export function loadSubmissions(): ApplyState[] {
       (entry) => entry && entry.version === APPLY_STATE_VERSION
     );
     for (const entry of submissions) {
-      stripUrls([entry.idFront, entry.idBack, ...entry.paystubs, ...entry.statements]);
+      stripUrls([entry.idFront, entry.idBack, entry.bio?.photo, ...entry.paystubs, ...entry.statements]);
     }
     return submissions;
   } catch {
@@ -138,6 +148,7 @@ export function saveSubmission(state: ApplyState): void {
     stripUrls([
       persisted.idFront,
       persisted.idBack,
+      persisted.bio?.photo,
       ...persisted.paystubs,
       ...persisted.statements,
     ]);

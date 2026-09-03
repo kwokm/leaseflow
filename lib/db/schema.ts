@@ -382,5 +382,85 @@ export type CreditConsentRow = typeof creditConsents.$inferSelect;
 export type PaymentRow = typeof payments.$inferSelect;
 export type CreditShareRow = typeof creditShares.$inferSelect;
 export type AdverseActionNoticeRow = typeof adverseActionNotices.$inferSelect;
+/**
+ * Optional tenant bio: square photo, short "who you are", and social consent.
+ * Tokens never live here — see social_connections.
+ */
+export const applicantProfiles = pgTable(
+  "applicant_profiles",
+  {
+    id: text("id").primaryKey(),
+    applicationId: text("application_id").references(() => applications.id, {
+      onDelete: "cascade",
+    }),
+    draftId: text("draft_id"),
+    listingId: text("listing_id").references(() => listings.id, { onDelete: "set null" }),
+    photoBlobPath: text("photo_blob_path"),
+    bio: text("bio").notNull().default(""),
+    socialConsentAt: timestamp("social_consent_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    applicationIdx: uniqueIndex("applicant_profiles_application_id_idx").on(table.applicationId),
+    draftIdx: index("applicant_profiles_draft_id_idx").on(table.draftId),
+  })
+);
+
+/**
+ * OAuth tokens for Instagram / TikTok / Facebook. Server-only. Never copied
+ * into packet JSON or landlord DTOs.
+ */
+export const socialConnections = pgTable(
+  "social_connections",
+  {
+    id: text("id").primaryKey(),
+    applicationId: text("application_id").references(() => applications.id, {
+      onDelete: "cascade",
+    }),
+    draftId: text("draft_id"),
+    listingId: text("listing_id").references(() => listings.id, { onDelete: "set null" }),
+    network: text("network").notNull(),
+    accessToken: text("access_token").notNull(),
+    refreshToken: text("refresh_token"),
+    tokenExpiresAt: timestamp("token_expires_at", { withTimezone: true }),
+    handle: text("handle"),
+    profileUrl: text("profile_url"),
+    personalProfile: boolean("personal_profile").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    applicationIdx: index("social_connections_application_id_idx").on(table.applicationId),
+    draftIdx: index("social_connections_draft_id_idx").on(table.draftId),
+  })
+);
+
+/** Frozen 1–9 post tiles the landlord sees. Later posts / expired tokens do not change this. */
+export const socialPostSnapshots = pgTable(
+  "social_post_snapshots",
+  {
+    id: text("id").primaryKey(),
+    applicationId: text("application_id").references(() => applications.id, {
+      onDelete: "cascade",
+    }),
+    draftId: text("draft_id"),
+    network: text("network").notNull(),
+    position: integer("position").notNull(),
+    permalink: text("permalink").notNull(),
+    caption: text("caption").notNull().default(""),
+    takenAt: timestamp("taken_at", { withTimezone: true }),
+    blobPath: text("blob_path"),
+    mediaType: text("media_type").notNull().default("image"),
+  },
+  (table) => ({
+    applicationIdx: index("social_post_snapshots_application_id_idx").on(table.applicationId),
+    draftIdx: index("social_post_snapshots_draft_id_idx").on(table.draftId),
+  })
+);
+
 export type IncomeCheckRow = typeof incomeChecks.$inferSelect;
 export type NewIncomeCheckRow = typeof incomeChecks.$inferInsert;
+export type ApplicantProfileRow = typeof applicantProfiles.$inferSelect;
+export type SocialConnectionRow = typeof socialConnections.$inferSelect;
+export type SocialPostSnapshotRow = typeof socialPostSnapshots.$inferSelect;

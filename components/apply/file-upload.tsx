@@ -19,7 +19,8 @@ export type UploadKind =
   | "paystub"
   | "bank_statement"
   | "w2"
-  | "form_1099";
+  | "form_1099"
+  | "profile_photo";
 
 function newId(): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) return crypto.randomUUID();

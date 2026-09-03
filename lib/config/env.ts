@@ -87,6 +87,11 @@ export type RuntimeConfig = {
   blob: boolean;
   liveFees: boolean;
   stripeLive: boolean;
+  social: {
+    instagram: boolean;
+    tiktok: boolean;
+    facebook: boolean;
+  };
 };
 
 /** Snapshot handed to the client so components can branch without env access. */
@@ -99,5 +104,12 @@ export function runtimeConfig(): RuntimeConfig {
     blob: blobEnabled(),
     liveFees: liveFeesEnabled(),
     stripeLive: stripeIsLiveMode(),
+    social: {
+      instagram: Boolean(process.env.META_APP_ID?.trim() && process.env.META_APP_SECRET?.trim()),
+      facebook: Boolean(process.env.META_APP_ID?.trim() && process.env.META_APP_SECRET?.trim()),
+      tiktok: Boolean(
+        process.env.TIKTOK_CLIENT_KEY?.trim() && process.env.TIKTOK_CLIENT_SECRET?.trim()
+      ),
+    },
   };
 }

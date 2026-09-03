@@ -19,6 +19,8 @@ import {
   isLandlordDecision,
 } from "@/lib/applications/decision";
 import { attachChecksToApplication, summariesByApplication } from "@/lib/income/service";
+import { profilesByApplication, saveApplicantProfile } from "@/lib/social/profile";
+import { mergeApplicantProfile } from "@/lib/social/snapshot";
 import { newConfirmationId, newId } from "@/lib/ids";
 import { toStoredPacket, type StoredPacket } from "@/lib/apply/sanitize";
 import type { ApplyState } from "@/lib/apply/types";
@@ -118,6 +120,7 @@ export async function submitApplication(
 
   await writeConsents(applicationId, state, context, now);
   await writeDocuments(applicationId, state);
+  await saveApplicantProfile(applicationId, listing.id, state.bio);
   const checkIds = [
     ...state.paystubs.map((file) => file.incomeCheckId),
     ...state.statements.map((file) => file.incomeCheckId),
@@ -208,6 +211,7 @@ async function writeDocuments(applicationId: string, state: ApplyState): Promise
   const entries = [
     ...(state.idFront ? [{ file: state.idFront, kind: "photo_id_front" }] : []),
     ...(state.idBack ? [{ file: state.idBack, kind: "photo_id_back" }] : []),
+    ...(state.bio?.photo ? [{ file: state.bio.photo, kind: "profile_photo" }] : []),
     ...state.paystubs.map((file) => ({ file, kind: "paystub" })),
     ...state.statements.map((file) => ({ file, kind: "bank_statement" })),
   ].filter((entry) => Boolean(entry.file.storedUrl));
@@ -477,15 +481,19 @@ async function decorateDeskApplicants(rows: ApplicationRow[]): Promise<Applicant
   if (!applicants.length) return applicants;
 
   const ids = applicants.map((row) => row.id);
+  const rowById = new Map(rows.map((row) => [row.id, row]));
   try {
-    const [summaries, screening] = await Promise.all([
+    const [summaries, screening, profiles] = await Promise.all([
       summariesByApplication(ids),
       screeningByApplication(ids),
+      profilesByApplication(ids),
     ]);
     for (const applicant of applicants) {
       const summary = summaries.get(applicant.id);
       if (summary) applicant.incomeCheck = summary;
       applicant.screening = screening.get(applicant.id) ?? applicant.screening;
+      const profile = mergeApplicantProfile(profiles.get(applicant.id), rowById.get(applicant.id)?.packet);
+      if (profile) applicant.profile = profile;
     }
   } catch (error) {
     console.error("[applications] Could not read screening ticks for the desk.", error);

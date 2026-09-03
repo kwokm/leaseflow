@@ -61,7 +61,38 @@ export interface Applicant {
    * screens.
    */
   incomeCheck?: LiveIncomeCheckSummary;
+  /** Optional tenant bio + social snapshots. Never includes OAuth tokens. */
+  profile?: ApplicantProfileView;
 }
+
+export type ApplicantProfileView = {
+  photoUrl?: string;
+  bio: string;
+  sample?: boolean;
+  social: Array<{
+    network: "instagram" | "tiktok" | "facebook";
+    profileUrl: string;
+    handle: string;
+    connected: boolean;
+    personalProfile?: boolean;
+    posts: Array<{
+      network: "instagram" | "tiktok" | "facebook";
+      position: number;
+      permalink: string;
+      caption: string;
+      takenAt: string | null;
+      thumbUrl?: string;
+      mediaType: string;
+    }>;
+  }>;
+};
+
+/** SAMPLE Jane Doe bio — no social tiles. Marketing / LEASEPROOF_DEMO only. */
+export const SAMPLE_JANE_PROFILE: ApplicantProfileView = {
+  bio: "Designer relocating to Orange County. Quiet household, remote work, and weekends at the beach.",
+  sample: true,
+  social: [],
+};
 
 /** Document kinds and credit-share state the desk needs for pipeline ticks. */
 export interface DeskScreeningInputs {
