@@ -3,10 +3,10 @@ import { PacketWindow } from "@/components/desk/packet-window";
 import { FEATURED_PHOTOS } from "@/lib/data/mock-data";
 
 const GLANCE_TICKS = [
-  { label: "Photo ID", state: "on" as const, note: "Sample" },
-  { label: "Experian", state: "on" as const, note: "Sample" },
-  { label: "AI Income Check", state: "on" as const, note: "Sample" },
-  { label: "Background", state: "off" as const, note: "Sample" },
+  { label: "Photo ID", state: "on" as const },
+  { label: "Experian", state: "on" as const },
+  { label: "AI Income Check", state: "on" as const },
+  { label: "Background", state: "off" as const },
 ];
 
 /**
@@ -57,22 +57,19 @@ export function HeroPacket() {
             </div>
           </div>
 
-          <ul className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <ul className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
             {GLANCE_TICKS.map((tick) => (
-              <li key={tick.label} className="min-w-0 rounded-md bg-mist px-2 py-2">
-                <p className="flex items-center justify-between gap-1 text-[13px] font-medium text-ink">
-                  <span className="truncate">{tick.label}</span>
-                  {tick.state === "on" ? (
-                    <span className="pillar-tick" aria-hidden>
-                      ✓
-                    </span>
-                  ) : (
-                    <span className="text-[13px] font-medium text-mute-2" aria-hidden>
-                      ·
-                    </span>
-                  )}
-                </p>
-                <p className="mt-0.5 text-[13px] font-medium text-mute">{tick.note}</p>
+              <li key={tick.label} className="flex items-center gap-1.5 text-[13px] font-medium text-ink">
+                {tick.state === "on" ? (
+                  <span className="pillar-tick" aria-hidden>
+                    ✓
+                  </span>
+                ) : (
+                  <span className="text-[13px] font-medium text-mute-2" aria-hidden>
+                    ·
+                  </span>
+                )}
+                <span>{tick.label}</span>
               </li>
             ))}
           </ul>

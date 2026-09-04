@@ -53,6 +53,7 @@ test("landing cuts redundant marketing and keeps a real footer", () => {
   const page = readFileSync(new URL("../../app/page.tsx", import.meta.url), "utf8");
   assert.match(page, /HeroPacket/);
   assert.match(page, /SiteFooter/);
+  assert.match(page, /hero-line/);
   assert.match(page, /Four steps, start to decision/);
   assert.match(page, /Applicants pay \$24\.99; Experian included/);
   assert.doesNotMatch(page, /What we do best/);

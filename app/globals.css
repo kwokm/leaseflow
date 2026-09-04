@@ -350,7 +350,7 @@
     z-index: 1;
     text-align: center;
     padding: 0 var(--pad);
-    max-width: 640px;
+    max-width: 52rem;
     margin: 0 auto 40px;
   }
 
@@ -378,6 +378,16 @@
     letter-spacing: -0.6px;
     line-height: 1.15;
     color: var(--ink);
+  }
+
+  .hero h1 .hero-line {
+    display: block;
+  }
+
+  @media (min-width: 640px) {
+    .hero h1 .hero-line {
+      white-space: nowrap;
+    }
   }
 
   .stage-wrap {

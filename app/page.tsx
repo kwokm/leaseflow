@@ -4,7 +4,6 @@ import { BrandMark, BrandWord } from "@/components/brand";
 import { PacketWindow } from "@/components/desk/packet-window";
 import { HeroPacket } from "@/components/desk/hero-packet";
 import { InView } from "@/components/motion/in-view";
-import { SplitWords } from "@/components/motion/split-words";
 import { SiteFooter } from "@/components/site-footer";
 import { Button } from "@/components/ui/button";
 import { ListingPhotoStrip } from "@/components/listings/photos";
@@ -73,12 +72,8 @@ export default function Home() {
           <div className="hero-wash" aria-hidden />
           <InView className="hero-copy">
             <h1 id="hero-title">
-              <span className="block">
-                <SplitWords>We screen, verify, and organize</SplitWords>
-              </span>
-              <span className="block">
-                <SplitWords>your lease for you.</SplitWords>
-              </span>
+              <span className="hero-line">We screen, verify, and organize</span>
+              <span className="hero-line">your lease for you.</span>
             </h1>
             <p className="hero-sub reveal-tone">
               Leaseproof screens applicants, verifies income with AI Income Check,
