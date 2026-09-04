@@ -49,16 +49,28 @@ test("landing packet is a static landlord glance, not a fading loop", () => {
   assert.doesNotMatch(hero, /verified/i);
 });
 
-test("landing cuts redundant marketing and keeps a real footer", () => {
+test("landing keeps one packet, four-step graphics, restored features, and a footer", () => {
   const page = readFileSync(new URL("../../app/page.tsx", import.meta.url), "utf8");
+  const pillars = readFileSync(new URL("../../components/demos/pillar-demos.tsx", import.meta.url), "utf8");
+  const steps = readFileSync(new URL("../../components/demos/step-demos.tsx", import.meta.url), "utf8");
   assert.match(page, /HeroPacket/);
   assert.match(page, /SiteFooter/);
   assert.match(page, /hero-line/);
   assert.match(page, /Four steps, start to decision/);
+  assert.match(page, /StepAddListing|StepShareLink|StepTheyApply|StepYouDecide/);
   assert.match(page, /Applicants pay \$24\.99; Experian included/);
-  assert.doesNotMatch(page, /What we do best/);
-  assert.doesNotMatch(page, /PillarExperian|PillarIncome|PillarPacket/);
+  assert.match(page, /What we do best/);
+  assert.match(page, /PillarExperian/);
+  assert.match(page, /PillarIncome/);
+  assert.match(page, /PillarPacket/);
   assert.doesNotMatch(page, /HeroDesk/);
   assert.doesNotMatch(page, /Applicants pay the fee/);
   assert.doesNotMatch(page, /leaseproof\.app\/packet/);
+  assert.doesNotMatch(pillars, /leaseproof\.app\/packet/);
+  assert.match(pillars, /Shared packet · everyone can open/);
+  assert.match(steps, /You/);
+  assert.match(steps, /Proof/);
+  assert.match(steps, /Credit/);
+  assert.match(steps, /Pay/);
+  assert.match(steps, /Approve/);
 });

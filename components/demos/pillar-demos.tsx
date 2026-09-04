@@ -133,8 +133,8 @@ export function PillarPacket() {
             <span className="d p-chip-c pillar-chip">Income · match</span>
             <span className="d p-chip-d pillar-chip is-score">LeaseScore 724</span>
           </div>
-          <p className="d p-share mt-3 text-[12px] font-medium text-mute">
-            leaseproof.app/packet/jane-doe
+          <p className="mt-3 text-[13px] font-medium text-mute">
+            Shared packet · everyone can open
           </p>
         </div>
       </PacketWindow>
