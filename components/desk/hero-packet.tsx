@@ -1,6 +1,4 @@
-import Image from "next/image";
 import { PacketWindow } from "@/components/desk/packet-window";
-import { FEATURED_PHOTOS } from "@/lib/data/mock-data";
 
 const GLANCE_TICKS = [
   { label: "Photo ID", state: "on" as const },
@@ -11,24 +9,14 @@ const GLANCE_TICKS = [
 
 /**
  * Jane Doe packet for the landing phone mock — a complete landlord glance.
- * Income is framed as read from upload. Background is on for this SAMPLE.
+ * Match / Current language only. Background is on for this SAMPLE.
  */
 export function HeroPacket() {
   return (
     <div className="hero-packet">
-      <PacketWindow title="Application packet · Jane Doe" meta="Screening · Standard" stamp="SAMPLE">
+      <PacketWindow title="Jane Doe" meta="Standard" stamp="SAMPLE">
         <div className="hero-packet-body">
-          <div className="relative h-14 overflow-hidden rounded-md border border-line bg-mist">
-            <Image
-              src={FEATURED_PHOTOS[0]}
-              alt=""
-              fill
-              sizes="280px"
-              className="object-cover"
-            />
-          </div>
-
-          <div className="mt-2.5 min-w-0">
+          <div className="min-w-0">
             <p className="text-[16px] font-medium leading-[22px] tracking-[-0.16px] text-ink">
               Jane Doe · 170 Chorus
             </p>

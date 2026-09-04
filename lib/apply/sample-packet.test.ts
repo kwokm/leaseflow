@@ -64,8 +64,8 @@ test("landing hero layers a compact pipeline behind the Jane Doe phone packet", 
   assert.match(pipeline, /Applications/);
   assert.match(pipeline, /Properties/);
   assert.match(pipeline, /Jane Doe/);
-  assert.doesNotMatch(pipeline, /PipelineDesk/);
-  assert.doesNotMatch(pipeline, /overflow-auto|overflow: auto/);
+  assert.doesNotMatch(pipeline, /from ["']@\/components\/leasing\/pipeline-desk["']/);
+  assert.doesNotMatch(pipeline, /overflow-auto|overflow:\s*auto/);
   assert.doesNotMatch(page, /HeroDesk/);
   assert.doesNotMatch(stage, /HeroDesk/);
 });

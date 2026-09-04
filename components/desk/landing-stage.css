@@ -20,7 +20,7 @@
 .hero-compose-wash {
   position: relative;
   isolation: isolate;
-  min-height: 420px;
+  min-height: 440px;
   overflow: hidden;
   border-radius: 16px;
   background: linear-gradient(
@@ -34,17 +34,17 @@
 .hero-desk-layer {
   position: relative;
   z-index: 1;
-  width: 112%;
-  margin: 28px 0 72px 14%;
+  width: 118%;
+  margin: 22px 0 56px 16%;
   filter: drop-shadow(0 22px 40px rgba(40, 50, 90, 0.22));
 }
 
 .hero-phone-layer {
   position: absolute;
   z-index: 2;
-  left: 18px;
-  bottom: 18px;
-  width: min(268px, 72%);
+  left: 16px;
+  bottom: 16px;
+  width: min(252px, 64%);
   filter: drop-shadow(0 20px 36px rgba(28, 29, 31, 0.28));
 }
 
@@ -81,8 +81,7 @@
 }
 
 .hero-phone .sample-banner {
-  padding: 6px 12px;
-  font-size: 11px;
+  display: none;
 }
 
 .hero-pipe-desk {
@@ -142,12 +141,12 @@
   }
 
   .hero-desk-layer {
-    width: 118%;
-    margin: 22px 0 88px 18%;
+    width: 122%;
+    margin: 18px 0 72px 20%;
   }
 
   .hero-phone-layer {
-    width: min(248px, 70%);
+    width: min(228px, 62%);
   }
 }
 
