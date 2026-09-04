@@ -1,14 +1,5 @@
-.hero-packet {
-  width: 100%;
-}
-
-.hero-packet .window,
 .hero-pipe .window {
   background: #fff;
-}
-
-.hero-packet-body {
-  padding: 12px 12px 14px;
 }
 
 .hero-compose {
@@ -20,7 +11,7 @@
 .hero-compose-wash {
   position: relative;
   isolation: isolate;
-  min-height: 440px;
+  min-height: 560px;
   overflow: hidden;
   border-radius: 16px;
   background: linear-gradient(
@@ -35,53 +26,155 @@
   position: relative;
   z-index: 1;
   width: 118%;
-  margin: 22px 0 56px 16%;
+  margin: 28px 0 72px 22%;
   filter: drop-shadow(0 22px 40px rgba(40, 50, 90, 0.22));
 }
 
 .hero-phone-layer {
   position: absolute;
   z-index: 2;
-  left: 16px;
-  bottom: 16px;
-  width: min(252px, 64%);
-  filter: drop-shadow(0 20px 36px rgba(28, 29, 31, 0.28));
+  left: 18px;
+  bottom: 18px;
 }
 
-.hero-phone {
-  padding: 8px 7px 10px;
-  border-radius: 26px;
-  background: linear-gradient(180deg, #2d3238 0%, #1c1d1f 100%);
+.hero-device {
+  width: 264px;
 }
 
-.hero-phone-screen {
+.hero-device-frame {
+  position: relative;
+  padding: 3px;
+  border-radius: 42px;
+  background: linear-gradient(160deg, #5a5d63 0%, #2a2c30 18%, #141516 72%, #0e0f10 100%);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+    0 1px 1px rgba(255, 255, 255, 0.16) inset,
+    0 28px 56px -18px rgba(28, 29, 31, 0.48);
+}
+
+.hero-device-screen {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 508px;
   overflow: hidden;
-  border-radius: 18px;
+  border-radius: 39px;
   background: #fff;
 }
 
-.hero-phone-bar {
-  display: block;
-  width: 72px;
-  height: 4px;
-  margin: 6px auto 0;
+.hero-device-status {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  height: 50px;
+  padding: 12px 22px 0;
+  color: var(--ink);
+}
+
+.hero-device-time {
+  width: 52px;
+  padding-top: 1px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  line-height: 18px;
+}
+
+.hero-device-island {
+  position: absolute;
+  left: 50%;
+  top: 11px;
+  width: 78px;
+  height: 22px;
+  transform: translateX(-50%);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.22);
+  background: #0a0a0b;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 
-.hero-phone .window {
-  box-shadow: none;
-  border: 0;
-  border-radius: 0;
+.hero-device-sigs {
+  display: flex;
+  width: 58px;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  padding-top: 3px;
 }
 
-.hero-phone .card-head {
+.hero-device-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 12px 0 6px;
+  border-bottom: 1px solid var(--line);
+}
+
+.hero-device-back {
+  display: inline-flex;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink);
+}
+
+.hero-device-brand {
+  display: inline-flex;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink);
+}
+
+.hero-device-body {
+  flex: 1;
+  padding: 14px 16px 8px;
+}
+
+.hero-device-glance {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: 12px;
+  margin-top: 14px;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--wash);
+}
+
+.hero-device-ticks {
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hero-device-ticks li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   min-height: 36px;
-  padding: 0 12px;
+  border-bottom: 1px solid var(--line);
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.16px;
+  color: var(--ink);
 }
 
-.hero-phone .sample-banner {
-  display: none;
+.hero-device-ticks li:last-child {
+  border-bottom: 0;
+}
+
+.hero-device-home {
+  display: block;
+  width: 108px;
+  height: 4px;
+  margin: 6px auto 10px;
+  border-radius: 999px;
+  background: #1c1d1f;
+  opacity: 0.18;
 }
 
 .hero-pipe-desk {
@@ -137,22 +230,26 @@
 
 @media (max-width: 1023px) {
   .hero-compose-wash {
-    min-height: 380px;
+    min-height: 520px;
   }
 
   .hero-desk-layer {
     width: 122%;
-    margin: 18px 0 72px 20%;
+    margin: 20px 0 80px 26%;
   }
 
-  .hero-phone-layer {
-    width: min(228px, 62%);
+  .hero-device {
+    width: 236px;
+  }
+
+  .hero-device-screen {
+    min-height: 456px;
   }
 }
 
 @media (max-width: 639px) {
   .hero-compose-wash {
-    min-height: 360px;
+    min-height: 500px;
   }
 
   .hero-pipe-desk {

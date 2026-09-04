@@ -24,21 +24,23 @@ test("unknown packet ids are not remapped onto Jane Doe", () => {
 });
 
 test("landing illustrations stamp SAMPLE instead of demo pull", () => {
-  const hero = readFileSync(new URL("../../components/desk/hero-packet.tsx", import.meta.url), "utf8");
+  const hero = readFileSync(new URL("../../components/desk/hero-phone-packet.tsx", import.meta.url), "utf8");
   const pillars = readFileSync(new URL("../../components/demos/pillar-demos.tsx", import.meta.url), "utf8");
   const screening = readFileSync(new URL("../../components/demos/screening.tsx", import.meta.url), "utf8");
-  for (const source of [hero, pillars]) {
-    assert.match(source, /stamp="SAMPLE"/);
-    assert.doesNotMatch(source, /demo pull/i);
-    assert.doesNotMatch(source, /Mock public-records note/);
-  }
+  assert.match(hero, /SAMPLE/);
+  assert.match(hero, /sample-stamp/);
+  assert.doesNotMatch(hero, /demo pull/i);
+  assert.doesNotMatch(hero, /Mock public-records note/);
+  assert.match(pillars, /stamp="SAMPLE"/);
+  assert.doesNotMatch(pillars, /demo pull/i);
+  assert.doesNotMatch(pillars, /Mock public-records note/);
   assert.match(screening, /Sample/);
   assert.doesNotMatch(screening, /demo pull/i);
   assert.doesNotMatch(screening, /Mock public-records note/);
 });
 
 test("landing packet is a static landlord glance, not a fading loop", () => {
-  const hero = readFileSync(new URL("../../components/desk/hero-packet.tsx", import.meta.url), "utf8");
+  const hero = readFileSync(new URL("../../components/desk/hero-phone-packet.tsx", import.meta.url), "utf8");
   assert.match(hero, /Monthly gross from AI Income Check/);
   assert.match(hero, /Match/);
   assert.match(hero, /Current/);
@@ -49,6 +51,7 @@ test("landing packet is a static landlord glance, not a fading loop", () => {
   assert.doesNotMatch(hero, /DemoPlay/);
   assert.doesNotMatch(hero, /p-score/);
   assert.doesNotMatch(hero, /verified/i);
+  assert.doesNotMatch(hero, /from ["']@\/components\/desk\/packet-window["']/);
 });
 
 test("landing hero layers a compact pipeline behind the Jane Doe phone packet", () => {
@@ -56,7 +59,7 @@ test("landing hero layers a compact pipeline behind the Jane Doe phone packet", 
   const stage = readFileSync(new URL("../../components/desk/hero-stage.tsx", import.meta.url), "utf8");
   const pipeline = readFileSync(new URL("../../components/desk/hero-pipeline.tsx", import.meta.url), "utf8");
   assert.match(page, /HeroStage/);
-  assert.match(stage, /HeroPacket/);
+  assert.match(stage, /HeroPhonePacket/);
   assert.match(stage, /HeroPipeline/);
   assert.match(pipeline, /170 Chorus/);
   assert.match(pipeline, /14 Modesto/);

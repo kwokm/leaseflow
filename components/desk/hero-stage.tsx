@@ -1,7 +1,7 @@
-import { HeroPacket } from "@/components/desk/hero-packet";
+import { HeroPhonePacket } from "@/components/desk/hero-phone-packet";
 import { HeroPipeline } from "@/components/desk/hero-pipeline";
 
-/** Layered landing hero: desk pipeline behind, Jane Doe packet in front. */
+/** Layered landing hero: desk pipeline behind, native Jane Doe phone in front. */
 export function HeroStage() {
   return (
     <div
@@ -13,12 +13,7 @@ export function HeroStage() {
           <HeroPipeline />
         </div>
         <div className="hero-phone-layer">
-          <div className="hero-phone">
-            <div className="hero-phone-screen">
-              <HeroPacket />
-            </div>
-            <span className="hero-phone-bar" aria-hidden />
-          </div>
+          <HeroPhonePacket />
         </div>
       </div>
     </div>
