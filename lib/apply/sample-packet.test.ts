@@ -41,7 +41,8 @@ test("landing illustrations stamp SAMPLE instead of demo pull", () => {
 
 test("landing packet is a static landlord glance, not a fading loop", () => {
   const hero = readFileSync(new URL("../../components/desk/hero-phone-packet.tsx", import.meta.url), "utf8");
-  assert.match(hero, /Monthly gross from AI Income Check/);
+  assert.match(hero, /Monthly gross/);
+  assert.match(hero, /AI Income Check/);
   assert.match(hero, /Match/);
   assert.match(hero, /Current/);
   assert.match(hero, /Photo ID/);

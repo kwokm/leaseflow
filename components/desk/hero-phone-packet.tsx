@@ -100,18 +100,19 @@ export function HeroPhonePacket() {
 
             <div className="hero-device-glance">
               <div className="min-w-0">
-                <p className="text-[13px] font-medium text-mute">Experian score</p>
+                <p className="text-[13px] font-medium text-mute">Experian</p>
                 <p className="num mt-1 text-[32px] font-semibold leading-none tracking-[-0.6px] text-ink">
                   724
                 </p>
                 <p className="mt-1 text-[13px] font-medium text-mute">Sample</p>
               </div>
               <div className="min-w-0">
-                <p className="text-[13px] font-medium text-mute">Monthly gross from AI Income Check</p>
+                <p className="text-[13px] font-medium text-mute">AI Income Check</p>
                 <p className="num mt-1 text-[32px] font-semibold leading-none tracking-[-0.6px] text-ink">
                   $8,500
                 </p>
-                <p className="mt-1.5 flex flex-wrap gap-1">
+                <p className="mt-1.5 flex flex-wrap items-center gap-1">
+                  <span className="text-[13px] font-medium text-mute">Monthly gross</span>
                   <span className="status status-ok">Match</span>
                   <span className="status status-ok">Current</span>
                 </p>

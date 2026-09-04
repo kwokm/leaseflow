@@ -137,10 +137,10 @@
 
 .hero-device-glance {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
-  gap: 12px;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 10px;
   margin-top: 14px;
-  padding: 12px;
+  padding: 12px 12px 11px;
   border-radius: 12px;
   background: var(--wash);
 }
