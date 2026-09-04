@@ -849,28 +849,9 @@
   .demo-play.is-frozen .p-chip-c,
   .demo-play.is-frozen .p-chip-d,
   .demo-play.is-frozen .p-fix,
-  .demo-play.is-frozen .p-share,
-  .demo-play.is-frozen .s-photo,
-  .demo-play.is-frozen .s-field-a,
-  .demo-play.is-frozen .s-field-b,
-  .demo-play.is-frozen .s-field-c,
-  .demo-play.is-frozen .s-link,
-  .demo-play.is-frozen .s-copy-on,
-  .demo-play.is-frozen .s-send-a,
-  .demo-play.is-frozen .s-send-b,
-  .demo-play.is-frozen .s-stage-a,
-  .demo-play.is-frozen .s-stage-b,
-  .demo-play.is-frozen .s-stage-c,
-  .demo-play.is-frozen .s-stage-d,
-  .demo-play.is-frozen .s-row,
-  .demo-play.is-frozen .s-approve {
+  .demo-play.is-frozen .p-share {
     opacity: 1 !important;
     transform: none !important;
-    animation: none !important;
-  }
-
-  .demo-play.is-frozen .s-copy-off {
-    opacity: 0 !important;
     animation: none !important;
   }
 

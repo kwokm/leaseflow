@@ -3,12 +3,6 @@ import "../components/desk/landing-stage.css";
 import { BrandMark, BrandWord } from "@/components/brand";
 import { PacketWindow } from "@/components/desk/packet-window";
 import { HeroPacket } from "@/components/desk/hero-packet";
-import {
-  StepAddListing,
-  StepShareLink,
-  StepTheyApply,
-  StepYouDecide,
-} from "@/components/demos/step-demos";
 import { PillarExperian, PillarIncome, PillarPacket } from "@/components/demos/pillar-demos";
 import { InView } from "@/components/motion/in-view";
 import { SplitWords } from "@/components/motion/split-words";
@@ -28,25 +22,17 @@ const STEPS = [
     n: "01",
     lead: "Add the listing.",
     tone: "Address, rent, and the Standard screening fee applicants pay.",
-    Demo: StepAddListing,
   },
-  {
-    n: "02",
-    lead: "Share the link.",
-    tone: "One link per listing, by text or email.",
-    Demo: StepShareLink,
-  },
+  { n: "02", lead: "Share the link.", tone: "One link per listing, by text or email." },
   {
     n: "03",
     lead: "They apply.",
     tone: "ID, pay stubs, bank statements, and a credit pull in about ten minutes.",
-    Demo: StepTheyApply,
   },
   {
     n: "04",
     lead: "You decide.",
     tone: "The packet lands scored. Approve or decline from the row.",
-    Demo: StepYouDecide,
   },
 ];
 
@@ -145,7 +131,7 @@ export default function Home() {
 
             <InView
               as="ol"
-              className="reveal-stagger mt-6 grid grid-cols-1 gap-px rounded-lg border border-line bg-line shadow-window sm:grid-cols-2"
+              className="reveal-stagger mt-6 grid grid-cols-1 gap-px rounded-lg border border-line bg-line shadow-window sm:grid-cols-2 lg:grid-cols-4"
             >
               {STEPS.map((step) => (
                 <li key={step.n} className="reveal-spatial">
@@ -157,9 +143,6 @@ export default function Home() {
                     <p className="mt-1 text-[13px] font-medium leading-5 text-mute">
                       {step.tone}
                     </p>
-                    <div className="mt-4">
-                      <step.Demo />
-                    </div>
                   </div>
                 </li>
               ))}
@@ -171,7 +154,41 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="apply" className="pb-12 sm:pb-16" aria-labelledby="apply-title">
+        <section id="pillars" className="bg-white pb-12 sm:pb-16" aria-labelledby="pillars-title">
+          <div className="mx-auto max-w-shell px-5 sm:px-8">
+            <InView>
+              <h2
+                id="pillars-title"
+                className="text-[30px] font-medium leading-[1.08] tracking-[-0.6px] text-ink sm:text-[40px] sm:leading-[44px] sm:tracking-[-0.4px]"
+              >
+                <SplitWords>What we do best.</SplitWords>
+              </h2>
+            </InView>
+
+            <InView
+              as="ul"
+              className="reveal-stagger mt-10 grid grid-cols-1 gap-8 lg:grid-cols-3 lg:gap-8"
+            >
+              {PILLARS.map((pillar) => (
+                <li key={pillar.lead} className="pillar-spatial flex flex-col gap-4">
+                  <article className="rounded-lg border border-line bg-paper shadow-window">
+                    <div className="p-6 sm:p-7">
+                      <h3 className="text-[16px] font-medium leading-[22px] tracking-[-0.16px] text-ink">
+                        <SplitWords>{pillar.lead}</SplitWords>
+                      </h3>
+                      <p className="tone reveal-tone mt-2 text-[13px] font-medium leading-5 text-mute">
+                        {pillar.tone}
+                      </p>
+                    </div>
+                  </article>
+                  <pillar.Demo />
+                </li>
+              ))}
+            </InView>
+          </div>
+        </section>
+
+        <section id="apply" className="pb-8" aria-labelledby="apply-title">
           <div className="mx-auto max-w-shell px-5 sm:px-8">
             {demo ? (
               <PacketWindow title={`Apply • ${property.address.split(",")[0]}`}>
@@ -220,40 +237,6 @@ export default function Home() {
                 </div>
               </PacketWindow>
             )}
-          </div>
-        </section>
-
-        <section id="pillars" className="bg-white pb-12 sm:pb-16" aria-labelledby="pillars-title">
-          <div className="mx-auto max-w-shell px-5 sm:px-8">
-            <InView>
-              <h2
-                id="pillars-title"
-                className="text-[30px] font-medium leading-[1.08] tracking-[-0.6px] text-ink sm:text-[40px] sm:leading-[44px] sm:tracking-[-0.4px]"
-              >
-                <SplitWords>What we do best.</SplitWords>
-              </h2>
-            </InView>
-
-            <InView
-              as="ul"
-              className="reveal-stagger mt-10 grid grid-cols-1 gap-8 lg:grid-cols-3 lg:gap-8"
-            >
-              {PILLARS.map((pillar) => (
-                <li key={pillar.lead} className="pillar-spatial flex flex-col gap-4">
-                  <article className="rounded-lg border border-line bg-paper shadow-window">
-                    <div className="p-6 sm:p-7">
-                      <h3 className="text-[16px] font-medium leading-[22px] tracking-[-0.16px] text-ink">
-                        <SplitWords>{pillar.lead}</SplitWords>
-                      </h3>
-                      <p className="tone reveal-tone mt-2 text-[13px] font-medium leading-5 text-mute">
-                        {pillar.tone}
-                      </p>
-                    </div>
-                  </article>
-                  <pillar.Demo />
-                </li>
-              ))}
-            </InView>
           </div>
         </section>
       </main>
