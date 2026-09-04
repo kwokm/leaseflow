@@ -307,16 +307,9 @@
   }
 
   /*
-   * Bloom sampled from Michael's landing PNG — pale lilac, not Attio blue.
-   * Do not use #E6ECFF / #BCCBFF / #86A0EE.
+   * Locked 62% bottom bloom for PageWash (auth, apply, legal, desk).
+   * Pale lilac from --wash tokens — not Attio blue.
    */
-  .hero {
-    position: relative;
-    padding: 56px 0 0;
-    overflow: hidden;
-    background: #fff;
-  }
-
   .hero-wash {
     position: absolute;
     left: 0;
@@ -345,18 +338,37 @@
     background: radial-gradient(70% 110% at 50% 0%, #ffffff 28%, rgba(255, 255, 255, 0) 68%);
   }
 
+  /*
+   * Two-column hero: copy on paper, layered mocks on a contained wash.
+   * Wash uses --wash tokens only — not a crypto neon clone.
+   */
+  .hero {
+    position: relative;
+    padding: 40px 0 48px;
+    overflow: hidden;
+    background: #fff;
+  }
+
+  .hero-shell {
+    display: grid;
+    gap: 36px;
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 var(--pad);
+    align-items: center;
+  }
+
   .hero-copy {
     position: relative;
     z-index: 1;
-    text-align: center;
-    padding: 0 var(--pad);
-    max-width: 52rem;
-    margin: 0 auto 40px;
+    text-align: left;
+    max-width: 34rem;
+    margin: 0;
   }
 
   .hero-sub {
-    margin: 0 auto 24px;
-    max-width: 42rem;
+    margin: 0 0 24px;
+    max-width: 34rem;
     font-size: 16px;
     line-height: 22px;
     color: var(--mute);
@@ -366,9 +378,20 @@
 
   .hero-ctas {
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 10px;
     flex-wrap: wrap;
+  }
+
+  @media (min-width: 1024px) {
+    .hero {
+      padding: 56px 0 64px;
+    }
+
+    .hero-shell {
+      grid-template-columns: minmax(20rem, 0.46fr) minmax(0, 0.54fr);
+      gap: 40px;
+    }
   }
 
   .hero h1 {
@@ -393,9 +416,7 @@
   .stage-wrap {
     position: relative;
     z-index: 1;
-    padding: 12px var(--pad) 48px;
-    max-width: 1240px;
-    margin: 0 auto;
+    min-width: 0;
   }
 
   .window {

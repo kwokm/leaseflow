@@ -2,7 +2,7 @@ import Link from "next/link";
 import "../components/desk/landing-stage.css";
 import { BrandMark, BrandWord } from "@/components/brand";
 import { PacketWindow } from "@/components/desk/packet-window";
-import { HeroPacket } from "@/components/desk/hero-packet";
+import { HeroStage } from "@/components/desk/hero-stage";
 import { PillarExperian, PillarIncome, PillarPacket } from "@/components/demos/pillar-demos";
 import { InView } from "@/components/motion/in-view";
 import { SplitWords } from "@/components/motion/split-words";
@@ -89,29 +89,29 @@ export default function Home() {
 
       <main id="main">
         <section className="hero" id="top" aria-labelledby="hero-title">
-          <div className="hero-wash" aria-hidden />
-          <InView className="hero-copy">
-            <h1 id="hero-title">
-              <span className="hero-line">We screen, verify, and organize</span>
-              <span className="hero-line">your lease for you.</span>
-            </h1>
-            <p className="hero-sub reveal-tone">
-              Leaseproof screens applicants, verifies income with AI Income Check,
-              and organizes the packet. Credit and background checks are included.
-              You decide who to approve.
-            </p>
-            <div className="hero-ctas reveal-cta">
-              <Button asChild variant="lilac" size="cta">
-                <Link href={LANDLORD_SIGN_IN_HREF}>Screen as Landlord</Link>
-              </Button>
-              <Button asChild variant="outline" size="cta">
-                <Link href={applyHref}>Apply as renter</Link>
-              </Button>
-            </div>
-          </InView>
+          <div className="hero-shell">
+            <InView className="hero-copy">
+              <h1 id="hero-title">
+                <span className="hero-line">We screen and organize</span>
+                <span className="hero-line">the packet. You decide.</span>
+              </h1>
+              <p className="hero-sub reveal-tone">
+                AI Income Check and Experian included. Applicants pay $24.99. The
+                landlord decides.
+              </p>
+              <div className="hero-ctas reveal-cta">
+                <Button asChild variant="lilac" size="cta">
+                  <Link href={LANDLORD_SIGN_IN_HREF}>Screen as Landlord</Link>
+                </Button>
+                <Button asChild variant="outline" size="cta">
+                  <Link href={applyHref}>Apply as renter</Link>
+                </Button>
+              </div>
+            </InView>
 
-          <div className="stage-wrap" id="packet">
-            <HeroPacket />
+            <div className="stage-wrap" id="packet">
+              <HeroStage />
+            </div>
           </div>
         </section>
 

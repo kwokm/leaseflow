@@ -40,19 +40,40 @@ test("landing illustrations stamp SAMPLE instead of demo pull", () => {
 test("landing packet is a static landlord glance, not a fading loop", () => {
   const hero = readFileSync(new URL("../../components/desk/hero-packet.tsx", import.meta.url), "utf8");
   assert.match(hero, /Monthly gross from AI Income Check/);
-  assert.match(hero, /Read from upload/);
+  assert.match(hero, /Match/);
+  assert.match(hero, /Current/);
   assert.match(hero, /Photo ID/);
   assert.match(hero, /AI Income Check/);
   assert.match(hero, /Background/);
+  assert.match(hero, /state: "on"/);
   assert.doesNotMatch(hero, /DemoPlay/);
   assert.doesNotMatch(hero, /p-score/);
   assert.doesNotMatch(hero, /verified/i);
 });
 
+test("landing hero layers a compact pipeline behind the Jane Doe phone packet", () => {
+  const page = readFileSync(new URL("../../app/page.tsx", import.meta.url), "utf8");
+  const stage = readFileSync(new URL("../../components/desk/hero-stage.tsx", import.meta.url), "utf8");
+  const pipeline = readFileSync(new URL("../../components/desk/hero-pipeline.tsx", import.meta.url), "utf8");
+  assert.match(page, /HeroStage/);
+  assert.match(stage, /HeroPacket/);
+  assert.match(stage, /HeroPipeline/);
+  assert.match(pipeline, /170 Chorus/);
+  assert.match(pipeline, /14 Modesto/);
+  assert.match(pipeline, /Pipeline/);
+  assert.match(pipeline, /Applications/);
+  assert.match(pipeline, /Properties/);
+  assert.match(pipeline, /Jane Doe/);
+  assert.doesNotMatch(pipeline, /PipelineDesk/);
+  assert.doesNotMatch(pipeline, /overflow-auto|overflow: auto/);
+  assert.doesNotMatch(page, /HeroDesk/);
+  assert.doesNotMatch(stage, /HeroDesk/);
+});
+
 test("landing keeps static four steps, restored features below them, then apply", () => {
   const page = readFileSync(new URL("../../app/page.tsx", import.meta.url), "utf8");
   const pillars = readFileSync(new URL("../../components/demos/pillar-demos.tsx", import.meta.url), "utf8");
-  assert.match(page, /HeroPacket/);
+  assert.match(page, /HeroStage/);
   assert.match(page, /SiteFooter/);
   assert.match(page, /hero-line/);
   assert.match(page, /Four steps, start to decision/);
