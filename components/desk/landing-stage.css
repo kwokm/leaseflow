@@ -4,21 +4,5 @@
 }
 
 .hero-packet .window {
-  background: linear-gradient(180deg, #fff 0%, #f4f0f8 100%);
-}
-
-.platform-desk {
-  position: relative;
-  z-index: 1;
-  max-width: 1240px;
-  margin: 0 auto;
-  padding: 0 var(--pad);
-}
-
-.platform-desk .hero-desk .desk {
-  min-height: 400px;
-}
-
-.platform-desk .hero-stage {
-  height: 400px;
+  background: #fff;
 }

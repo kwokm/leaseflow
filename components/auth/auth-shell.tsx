@@ -3,6 +3,7 @@ import { BrandMark, BrandWord } from "@/components/brand";
 import { PacketWindow } from "@/components/desk/packet-window";
 import { SpatialMount, SpatialOrigin } from "@/components/motion/spatial";
 import { PageWash } from "@/components/page-wash";
+import { SiteFooter } from "@/components/site-footer";
 import { deskSignUpHref } from "@/lib/auth/roles";
 
 /** Shared lilac-wash chrome for the Clerk sign-in and sign-up widgets. */
@@ -14,7 +15,7 @@ export function AuthShell({
   children: React.ReactNode;
 }) {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-white">
+    <div className="relative flex min-h-screen flex-col overflow-hidden bg-white">
       <SpatialOrigin>
         <PageWash />
       </SpatialOrigin>
@@ -28,12 +29,16 @@ export function AuthShell({
         </div>
       </header>
 
-      <div className="relative z-10 mx-auto max-w-[520px] px-5 py-10 sm:px-8 sm:py-16">
+      <div className="relative z-10 mx-auto w-full max-w-[520px] flex-1 px-5 py-10 sm:px-8 sm:py-16">
         <SpatialMount>
           <PacketWindow title="Leaseproof" meta={meta}>
-            <div className="px-6 py-7 sm:px-8">{children}</div>
+            <div className="auth-widget px-6 py-7 sm:px-8">{children}</div>
           </PacketWindow>
         </SpatialMount>
+      </div>
+
+      <div className="relative z-10">
+        <SiteFooter />
       </div>
     </div>
   );

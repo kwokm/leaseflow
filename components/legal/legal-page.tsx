@@ -4,6 +4,7 @@ import { PacketWindow } from "@/components/desk/packet-window";
 import { SpatialMount, SpatialOrigin } from "@/components/motion/spatial";
 import { PageWash } from "@/components/page-wash";
 import { BetaContactLink } from "@/components/legal/beta-contact";
+import { SiteFooter } from "@/components/site-footer";
 
 export function LegalPage({
   meta,
@@ -15,7 +16,7 @@ export function LegalPage({
   children: React.ReactNode;
 }) {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-white">
+    <div className="relative flex min-h-screen flex-col overflow-hidden bg-white">
       <SpatialOrigin>
         <PageWash />
       </SpatialOrigin>
@@ -29,7 +30,7 @@ export function LegalPage({
         </div>
       </header>
 
-      <div className="relative z-10 mx-auto max-w-[720px] px-5 py-10 sm:px-8 sm:py-16">
+      <div className="relative z-10 mx-auto w-full max-w-[720px] flex-1 px-5 py-10 sm:px-8 sm:py-16">
         <SpatialMount>
           <PacketWindow title="Leaseproof" meta={meta}>
             <div className="px-6 py-7 sm:px-8">
@@ -43,6 +44,10 @@ export function LegalPage({
             </div>
           </PacketWindow>
         </SpatialMount>
+      </div>
+
+      <div className="relative z-10">
+        <SiteFooter />
       </div>
     </div>
   );

@@ -312,7 +312,7 @@
    */
   .hero {
     position: relative;
-    padding: 88px 0 0;
+    padding: 56px 0 0;
     overflow: hidden;
     background: #fff;
   }
@@ -350,18 +350,18 @@
     z-index: 1;
     text-align: center;
     padding: 0 var(--pad);
-    max-width: 860px;
-    margin: 0 auto 52px;
+    max-width: 640px;
+    margin: 0 auto 40px;
   }
 
   .hero-sub {
-    margin: 0 auto 28px;
+    margin: 0 auto 24px;
     max-width: 42rem;
     font-size: 16px;
-    line-height: 20.8px;
+    line-height: 22px;
     color: var(--mute);
     font-weight: 500;
-    letter-spacing: -0.17px;
+    letter-spacing: -0.16px;
   }
 
   .hero-ctas {
@@ -372,24 +372,18 @@
   }
 
   .hero h1 {
-    margin: 0 0 18px;
-    font-size: clamp(40px, 5.6vw, 80px);
+    margin: 0 0 16px;
+    font-size: 36px;
     font-weight: 600;
-    letter-spacing: -1.12px;
-    line-height: 0.95;
+    letter-spacing: -0.6px;
+    line-height: 1.15;
     color: var(--ink);
-  }
-
-  @media (min-width: 1280px) {
-    .hero h1 {
-      letter-spacing: -2.4px;
-    }
   }
 
   .stage-wrap {
     position: relative;
     z-index: 1;
-    padding: 12px var(--pad) 92px;
+    padding: 12px var(--pad) 48px;
     max-width: 1240px;
     margin: 0 auto;
   }
@@ -725,6 +719,35 @@
 
   .skip-link:focus {
     top: 12px;
+  }
+
+  /*
+   * Clerk's footer (and hashed internals) default to a near-black panel when
+   * colorBackground was transparent. Keep ink-on-white so "Sign up" reads.
+   */
+  .auth-widget .cl-card,
+  .auth-widget .cl-cardBox,
+  .auth-widget .cl-main,
+  .auth-widget .cl-footer,
+  .auth-widget .cl-footerAction,
+  .auth-widget .cl-footerPages,
+  .auth-widget .cl-footer > [class^="cl-internal-"] {
+    background-color: #ffffff !important;
+    background-image: none !important;
+    box-shadow: none !important;
+  }
+
+  .auth-widget .cl-footer {
+    color: #1c1d1f !important;
+  }
+
+  .auth-widget .cl-footerActionText,
+  .auth-widget .cl-footerPagesLink {
+    color: #6d7988 !important;
+  }
+
+  .auth-widget .cl-footerActionLink {
+    color: #1c1d1f !important;
   }
 }
 

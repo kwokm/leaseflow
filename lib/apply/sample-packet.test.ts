@@ -36,3 +36,28 @@ test("landing illustrations stamp SAMPLE instead of demo pull", () => {
   assert.doesNotMatch(screening, /demo pull/i);
   assert.doesNotMatch(screening, /Mock public-records note/);
 });
+
+test("landing packet is a static landlord glance, not a fading loop", () => {
+  const hero = readFileSync(new URL("../../components/desk/hero-packet.tsx", import.meta.url), "utf8");
+  assert.match(hero, /Monthly gross from AI Income Check/);
+  assert.match(hero, /Read from upload/);
+  assert.match(hero, /Photo ID/);
+  assert.match(hero, /AI Income Check/);
+  assert.match(hero, /Background/);
+  assert.doesNotMatch(hero, /DemoPlay/);
+  assert.doesNotMatch(hero, /p-score/);
+  assert.doesNotMatch(hero, /verified/i);
+});
+
+test("landing cuts redundant marketing and keeps a real footer", () => {
+  const page = readFileSync(new URL("../../app/page.tsx", import.meta.url), "utf8");
+  assert.match(page, /HeroPacket/);
+  assert.match(page, /SiteFooter/);
+  assert.match(page, /Four steps, start to decision/);
+  assert.match(page, /Applicants pay \$24\.99; Experian included/);
+  assert.doesNotMatch(page, /What we do best/);
+  assert.doesNotMatch(page, /PillarExperian|PillarIncome|PillarPacket/);
+  assert.doesNotMatch(page, /HeroDesk/);
+  assert.doesNotMatch(page, /Applicants pay the fee/);
+  assert.doesNotMatch(page, /leaseproof\.app\/packet/);
+});
