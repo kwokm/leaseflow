@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { BrandMark, BrandWord } from "@/components/brand";
 import { RenterHelpActions } from "@/components/apply/renter-help";
 import { SpatialMount, SpatialOrigin } from "@/components/motion/spatial";
 import { PageWash } from "@/components/page-wash";
+import { SiteHeader } from "@/components/site-header";
 import { LANDLORD_SIGN_IN_HREF } from "@/lib/auth/roles";
 
 export default function NotFound() {
@@ -12,14 +12,7 @@ export default function NotFound() {
         <PageWash />
       </SpatialOrigin>
 
-      <header className="relative z-50 bg-white">
-        <div className="mx-auto flex h-16 max-w-header items-center gap-4 px-5 sm:px-8">
-          <Link href="/" className="flex items-center gap-2.5 text-ink">
-            <BrandMark />
-            <BrandWord />
-          </Link>
-        </div>
-      </header>
+      <SiteHeader />
 
       <div className="relative z-10 mx-auto max-w-shell px-5 py-24 sm:px-8">
         <SpatialMount>

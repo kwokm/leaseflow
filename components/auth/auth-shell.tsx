@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { BrandMark, BrandWord } from "@/components/brand";
 import { PacketWindow } from "@/components/desk/packet-window";
 import { SpatialMount, SpatialOrigin } from "@/components/motion/spatial";
 import { PageWash } from "@/components/page-wash";
 import { SiteFooter } from "@/components/site-footer";
+import { SiteHeader } from "@/components/site-header";
 import { deskSignUpHref } from "@/lib/auth/roles";
 
 /** Shared lilac-wash chrome for the Clerk sign-in and sign-up widgets. */
@@ -20,14 +20,7 @@ export function AuthShell({
         <PageWash />
       </SpatialOrigin>
 
-      <header className="relative z-50 bg-white">
-        <div className="mx-auto flex h-16 max-w-header items-center gap-4 px-5 sm:px-8">
-          <Link href="/" className="flex items-center gap-2.5 text-ink" aria-label="Leaseproof home">
-            <BrandMark />
-            <BrandWord />
-          </Link>
-        </div>
-      </header>
+      <SiteHeader />
 
       <div className="relative z-10 mx-auto w-full max-w-[520px] flex-1 px-5 py-10 sm:px-8 sm:py-16">
         <SpatialMount>

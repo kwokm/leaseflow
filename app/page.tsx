@@ -1,8 +1,8 @@
 import Link from "next/link";
 import "../components/desk/landing-stage.css";
-import { BrandMark, BrandWord } from "@/components/brand";
 import { PacketWindow } from "@/components/desk/packet-window";
 import { HeroStage } from "@/components/desk/hero-stage";
+import { SiteHeader } from "@/components/site-header";
 import { PillarExperian, PillarIncome, PillarPacket } from "@/components/demos/pillar-demos";
 import { InView } from "@/components/motion/in-view";
 import { SplitWords } from "@/components/motion/split-words";
@@ -10,7 +10,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { Button } from "@/components/ui/button";
 import { ListingPhotoStrip } from "@/components/listings/photos";
 import { applyAsRenterHref } from "@/lib/apply/public-cta";
-import { LANDLORD_SIGN_IN_HREF, LANDLORD_SIGN_UP_HREF } from "@/lib/auth/roles";
+import { LANDLORD_SIGN_IN_HREF } from "@/lib/auth/roles";
 import { isDemoMode } from "@/lib/config/env";
 import { FEATURED_LISTING_ID, demoPropertyById } from "@/lib/data/mock-data";
 
@@ -65,27 +65,7 @@ export default function Home() {
         Skip to content
       </a>
 
-      <header className="relative z-50 bg-white">
-        <div className="mx-auto flex h-16 max-w-header items-center gap-9 px-5 sm:px-8 lg:px-14">
-          <Link
-            href="/"
-            aria-label="Leaseproof home"
-            className="flex shrink-0 items-center gap-2.5 text-ink"
-          >
-            <BrandMark />
-            <BrandWord />
-          </Link>
-
-          <div className="ml-auto flex items-center gap-2">
-            <Button asChild variant="ghost">
-              <Link href={LANDLORD_SIGN_IN_HREF}>Sign in</Link>
-            </Button>
-            <Button asChild variant="outline">
-              <Link href={LANDLORD_SIGN_UP_HREF}>Sign up</Link>
-            </Button>
-          </div>
-        </div>
-      </header>
+      <SiteHeader />
 
       <main id="main">
         <section className="hero" id="top" aria-labelledby="hero-title">

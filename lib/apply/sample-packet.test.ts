@@ -78,6 +78,7 @@ test("landing keeps static four steps, restored features below them, then apply"
   const page = readFileSync(new URL("../../app/page.tsx", import.meta.url), "utf8");
   const pillars = readFileSync(new URL("../../components/demos/pillar-demos.tsx", import.meta.url), "utf8");
   assert.match(page, /HeroStage/);
+  assert.match(page, /SiteHeader/);
   assert.match(page, /SiteFooter/);
   assert.match(page, /hero-line/);
   assert.match(page, /Four steps, start to decision/);

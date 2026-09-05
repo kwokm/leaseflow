@@ -13,6 +13,7 @@ const nextConfig: NextConfig = {
       { source: "/sign-up/:path*", destination: "/signup/:path*", permanent: false },
       { source: "/sign-in", destination: "/signin", permanent: false },
       { source: "/sign-in/:path*", destination: "/signin/:path*", permanent: false },
+      { source: "/about-us", destination: "/about", permanent: false },
     ];
   },
   images: {
