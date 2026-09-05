@@ -7,7 +7,7 @@ export default async function NewListingPage({
 }) {
   const { mode } = await searchParams;
   const initialMode: ListingEntryMode =
-    mode === "import" ? "import" : mode === "manual" ? "manual" : "choose";
+    mode === "import" ? "import" : mode === "choose" ? "choose" : "manual";
 
   return <NewListingForm initialMode={initialMode} />;
 }

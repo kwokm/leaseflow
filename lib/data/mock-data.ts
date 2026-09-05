@@ -43,6 +43,74 @@ export interface Applicant {
   appliedAt: string;
   completedAt?: string;
   leaseScore?: number;
+  householdId?: string;
+  /**
+   * Stored landlord decision from Neon. When set, `status` already reflects it
+   * for the StatusPill — this is the raw column for reloads.
+   */
+  decision?: "approved" | "declined" | null;
+  decidedAt?: string;
+  /**
+   * Tick inputs from Neon. When present, pipeline ticks must not read mock-data
+   * — a real applicant with no Jane Doe row would otherwise show all empty.
+   */
+  screening?: DeskScreeningInputs;
+  /**
+   * Live AI Income Check rollup from Neon when the Studio worker has written
+   * a ready row. Absent on seeded mock packets that still use filename/demo
+   * screens.
+   */
+  incomeCheck?: LiveIncomeCheckSummary;
+  /** Optional tenant bio + social snapshots. Never includes OAuth tokens. */
+  profile?: ApplicantProfileView;
+}
+
+export type ApplicantProfileView = {
+  photoUrl?: string;
+  bio: string;
+  sample?: boolean;
+  social: Array<{
+    network: "instagram" | "tiktok" | "facebook";
+    profileUrl: string;
+    handle: string;
+    connected: boolean;
+    personalProfile?: boolean;
+    posts: Array<{
+      network: "instagram" | "tiktok" | "facebook";
+      position: number;
+      permalink: string;
+      caption: string;
+      takenAt: string | null;
+      thumbUrl?: string;
+      mediaType: string;
+    }>;
+  }>;
+};
+
+/** SAMPLE Jane Doe bio — no social tiles. Marketing / LEASEPROOF_DEMO only. */
+export const SAMPLE_JANE_PROFILE: ApplicantProfileView = {
+  bio: "Designer relocating to Orange County. Quiet household, remote work, and weekends at the beach.",
+  sample: true,
+  social: [],
+};
+
+/** Document kinds and credit-share state the desk needs for pipeline ticks. */
+export interface DeskScreeningInputs {
+  documentKinds: string[];
+  creditShareStatus: string | null;
+}
+
+/** Landlord-visible rollup of ready income_checks for one applicant. */
+export interface LiveIncomeCheckSummary {
+  status: "pending" | "claimed" | "ready" | "error";
+  monthlyGross: number | null;
+  monthlyGrossCents: number | null;
+  nameMatch: boolean | null;
+  recency: "current" | "stale" | "unknown" | null;
+  recencyLabel: string | null;
+  employer: string | null;
+  readyCount: number;
+  checkCount: number;
 }
 
 export interface CreditSummary {

@@ -7,6 +7,15 @@ const nextConfig: NextConfig = {
   // Pin the trace root to this project. Without it Next walks up and can pick a
   // parent directory's lockfile as the workspace root.
   outputFileTracingRoot: path.join(__dirname),
+  async redirects() {
+    return [
+      { source: "/sign-up", destination: "/signup", permanent: false },
+      { source: "/sign-up/:path*", destination: "/signup/:path*", permanent: false },
+      { source: "/sign-in", destination: "/signin", permanent: false },
+      { source: "/sign-in/:path*", destination: "/signin/:path*", permanent: false },
+      { source: "/about-us", destination: "/about", permanent: false },
+    ];
+  },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "photos.zillowstatic.com", pathname: "/**" },

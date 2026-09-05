@@ -1,0 +1,97 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { test } from "node:test";
+import {
+  DEMO_APPLICANT_ID,
+  isSampleMarketingPacket,
+  packetApplicantId,
+} from "./sample-packet.ts";
+
+test("jane-doe and jane resolve to the seeded sample applicant", () => {
+  assert.equal(DEMO_APPLICANT_ID, "app-jane");
+  assert.equal(isSampleMarketingPacket("jane-doe"), true);
+  assert.equal(isSampleMarketingPacket("jane"), true);
+  assert.equal(isSampleMarketingPacket("app-jane"), true);
+  assert.equal(isSampleMarketingPacket("resh-510"), true);
+  assert.equal(packetApplicantId("jane-doe"), "app-jane");
+  assert.equal(packetApplicantId("jane"), "app-jane");
+});
+
+test("unknown packet ids are not remapped onto Jane Doe", () => {
+  assert.equal(isSampleMarketingPacket("random-renter"), false);
+  assert.equal(packetApplicantId("random-renter"), "random-renter");
+  assert.equal(packetApplicantId("app-1"), "app-1");
+});
+
+test("landing illustrations stamp SAMPLE instead of demo pull", () => {
+  const hero = readFileSync(new URL("../../components/desk/hero-phone-packet.tsx", import.meta.url), "utf8");
+  const pillars = readFileSync(new URL("../../components/demos/pillar-demos.tsx", import.meta.url), "utf8");
+  const screening = readFileSync(new URL("../../components/demos/screening.tsx", import.meta.url), "utf8");
+  assert.match(hero, /SAMPLE/);
+  assert.match(hero, /sample-stamp/);
+  assert.doesNotMatch(hero, /demo pull/i);
+  assert.doesNotMatch(hero, /Mock public-records note/);
+  assert.match(pillars, /stamp="SAMPLE"/);
+  assert.doesNotMatch(pillars, /demo pull/i);
+  assert.doesNotMatch(pillars, /Mock public-records note/);
+  assert.match(screening, /Sample/);
+  assert.doesNotMatch(screening, /demo pull/i);
+  assert.doesNotMatch(screening, /Mock public-records note/);
+});
+
+test("landing packet is a static landlord glance, not a fading loop", () => {
+  const hero = readFileSync(new URL("../../components/desk/hero-phone-packet.tsx", import.meta.url), "utf8");
+  assert.match(hero, /Monthly gross/);
+  assert.match(hero, /AI Income Check/);
+  assert.match(hero, /Match/);
+  assert.match(hero, /Current/);
+  assert.match(hero, /Photo ID/);
+  assert.match(hero, /AI Income Check/);
+  assert.match(hero, /Background/);
+  assert.match(hero, /state: "on"/);
+  assert.doesNotMatch(hero, /DemoPlay/);
+  assert.doesNotMatch(hero, /p-score/);
+  assert.doesNotMatch(hero, /verified/i);
+  assert.doesNotMatch(hero, /from ["']@\/components\/desk\/packet-window["']/);
+});
+
+test("landing hero layers a compact pipeline behind the Jane Doe phone packet", () => {
+  const page = readFileSync(new URL("../../app/page.tsx", import.meta.url), "utf8");
+  const stage = readFileSync(new URL("../../components/desk/hero-stage.tsx", import.meta.url), "utf8");
+  const pipeline = readFileSync(new URL("../../components/desk/hero-pipeline.tsx", import.meta.url), "utf8");
+  assert.match(page, /HeroStage/);
+  assert.match(stage, /HeroPhonePacket/);
+  assert.match(stage, /HeroPipeline/);
+  assert.match(pipeline, /170 Chorus/);
+  assert.match(pipeline, /14 Modesto/);
+  assert.match(pipeline, /Pipeline/);
+  assert.match(pipeline, /Applications/);
+  assert.match(pipeline, /Properties/);
+  assert.match(pipeline, /Jane Doe/);
+  assert.doesNotMatch(pipeline, /from ["']@\/components\/leasing\/pipeline-desk["']/);
+  assert.doesNotMatch(pipeline, /overflow-auto|overflow:\s*auto/);
+  assert.doesNotMatch(page, /HeroDesk/);
+  assert.doesNotMatch(stage, /HeroDesk/);
+});
+
+test("landing keeps static four steps, restored features below them, then apply", () => {
+  const page = readFileSync(new URL("../../app/page.tsx", import.meta.url), "utf8");
+  const pillars = readFileSync(new URL("../../components/demos/pillar-demos.tsx", import.meta.url), "utf8");
+  assert.match(page, /HeroStage/);
+  assert.match(page, /SiteHeader/);
+  assert.match(page, /SiteFooter/);
+  assert.match(page, /hero-line/);
+  assert.match(page, /Four steps, start to decision/);
+  assert.match(page, /Applicants pay \$24\.99; Experian included/);
+  assert.match(page, /What we do best/);
+  assert.match(page, /PillarExperian/);
+  assert.match(page, /Get a link from your landlord/);
+  assert.doesNotMatch(page, /step-demos/);
+  assert.doesNotMatch(page, /StepAddListing|StepShareLink|StepTheyApply|StepYouDecide/);
+  assert.doesNotMatch(page, /HeroDesk/);
+  assert.doesNotMatch(page, /Applicants pay the fee/);
+  assert.doesNotMatch(page, /leaseproof\.app\/packet/);
+  assert.doesNotMatch(pillars, /leaseproof\.app\/packet/);
+  assert.match(pillars, /Shared packet · everyone can open/);
+  assert.ok(page.indexOf("What we do best") < page.indexOf("id=\"apply\""));
+});

@@ -1,5 +1,6 @@
 "use client";
 
+import { IncomeCheckPanel } from "@/components/apply/income-check-panel";
 import { StepBody } from "@/components/apply/motion";
 import { StageSection, StepHeading, type StepProps } from "@/components/apply/step-shell";
 import { StepBank, StepIncome, StepPhotoId } from "@/components/apply/step-uploads";
@@ -11,6 +12,7 @@ export function StageProof(props: StepProps) {
       <StepHeading lead="Proof." tone="Photo ID, income, and bank statements." />
       <p className="max-w-xl text-[15px] font-medium leading-[21px] tracking-[-0.16px] text-mute">
         Files upload to Leaseproof&rsquo;s private document storage. Images and PDFs both work.
+        AI Income Check reads paystubs and statements. You decide who to approve.
       </p>
       <StageSection label="Photo ID">
         <StepPhotoId {...props} embedded />
@@ -21,6 +23,7 @@ export function StageProof(props: StepProps) {
       <StageSection label="Bank">
         <StepBank {...props} embedded />
       </StageSection>
+      <IncomeCheckPanel state={props.state} />
     </StepBody>
   );
 }

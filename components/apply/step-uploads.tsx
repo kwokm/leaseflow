@@ -2,9 +2,10 @@
 
 import { Field } from "@/components/apply/field";
 import { FileSlot, FileStack } from "@/components/apply/file-upload";
+import { attachIncomeCheck } from "@/components/apply/income-check-panel";
 import { FieldGrid, Note, Panel, StepChrome } from "@/components/apply/step-shell";
 import type { StepProps } from "@/components/apply/step-shell";
-import type { BankInfo, IncomeInfo } from "@/lib/apply/types";
+import type { BankInfo, IncomeInfo, LocalFile } from "@/lib/apply/types";
 
 export function StepPhotoId({ state, patch, errors, embedded }: StepProps) {
   return (
@@ -111,6 +112,7 @@ export function StepIncome({ state, patch, errors, embedded }: StepProps) {
           files={state.paystubs}
           error={errors.paystubs}
           onChange={(files) => patch({ paystubs: files })}
+          onStored={(file: LocalFile) => attachIncomeCheck(file, "paystub", state)}
         />
       </Panel>
     </StepChrome>
@@ -160,6 +162,7 @@ export function StepBank({ state, patch, errors, embedded }: StepProps) {
           files={state.statements}
           error={errors.statements}
           onChange={(files) => patch({ statements: files })}
+          onStored={(file: LocalFile) => attachIncomeCheck(file, "bank_statement", state)}
         />
       </Panel>
 

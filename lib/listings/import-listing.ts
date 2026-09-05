@@ -42,13 +42,21 @@ export type ImportFailureCode =
 
 export class ImportListingError extends Error {
   readonly code: ImportFailureCode;
+  readonly preview?: ListingPreview;
 
-  constructor(code: ImportFailureCode, message: string) {
+  constructor(code: ImportFailureCode, message: string, preview?: ListingPreview) {
     super(message);
     this.name = "ImportListingError";
     this.code = code;
+    this.preview = preview;
   }
 }
+
+export const IMPORT_BOT_WALL_MESSAGE =
+  "That site blocked the automated read — Zillow, Redfin, and Realtor often do. Nothing was invented. Finish the address, rent, and photos on the form.";
+
+export const IMPORT_FALLBACK_MESSAGE =
+  "Could not import that listing. Portals often block automated reads. Use the form — we only keep fields we actually read.";
 
 const LISTING_HOSTS: { portal: ListingPortal; host: string }[] = [
   { portal: "zillow", host: "zillow.com" },
@@ -482,7 +490,8 @@ export function parseListingHtml(
   if (!preview.address) {
     throw new ImportListingError(
       "not_a_listing",
-      "That page is not a listing we can read — no address came back. Use the manual form."
+      "That page is not a listing we can read — no address came back. Use the manual form.",
+      preview
     );
   }
 
@@ -534,10 +543,7 @@ export async function fetchListingHtml(url: string): Promise<{ html: string; fin
   const html = (await response.text()).slice(0, MAX_HTML_BYTES);
 
   if (detectBotWall(html, response.status) || !response.ok) {
-    throw new ImportListingError(
-      "blocked",
-      "The listing site blocked the import. Nothing was invented — fill the address, rent, and photos by hand."
-    );
+    throw new ImportListingError("blocked", IMPORT_BOT_WALL_MESSAGE);
   }
 
   const type = response.headers.get("content-type") ?? "";

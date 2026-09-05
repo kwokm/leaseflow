@@ -16,6 +16,7 @@ const FALLBACK: RuntimeConfig = {
   blob: false,
   liveFees: false,
   stripeLive: false,
+  social: { instagram: false, tiktok: false, facebook: false },
 };
 
 const RuntimeConfigContext = createContext<RuntimeConfig>(FALLBACK);

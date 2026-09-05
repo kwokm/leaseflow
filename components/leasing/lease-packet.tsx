@@ -86,7 +86,7 @@ export function LeasePacket({
             Tenant occupies {lease.address} beginning {lease.startDate} at $
             {lease.rent.toLocaleString()} per month. Security deposit equals one month’s rent and
             queues to ACH after both parties sign. Pets, utilities, and house rules stay on the
-            packet the realtor already approved.
+            packet the landlord already approved.
           </p>
         </section>
 

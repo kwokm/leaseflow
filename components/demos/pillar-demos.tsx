@@ -8,14 +8,14 @@ import { cn } from "@/lib/utils";
 
 const EXPERIAN_CHECKS = [
   { motion: "p-check-a", label: "Photo ID", note: "Name matches Jane Doe" },
-  { motion: "p-check-b", label: "Credit", note: "VantageScore 3.0 · demo pull" },
-  { motion: "p-check-c", label: "Background", note: "Mock public-records note" },
+  { motion: "p-check-b", label: "Credit", note: "VantageScore 3.0 · Sample" },
+  { motion: "p-check-c", label: "Background", note: "Sample" },
 ] as const;
 
 export function PillarExperian() {
   return (
     <DemoPlay flush className="pillar-demo">
-      <PacketWindow title="Experian · Jane Doe" meta="Demo pull">
+      <PacketWindow title="Experian · Jane Doe" meta="Sample" stamp="SAMPLE">
         <div className="px-3.5 py-3 sm:px-4">
           <div className="flex items-center justify-between gap-2">
             <p className="text-[12px] font-medium text-mute">Jane Doe · 170 Chorus</p>
@@ -76,7 +76,7 @@ const INCOME_DOCS = [
 export function PillarIncome() {
   return (
     <DemoPlay flush className="pillar-demo">
-      <PacketWindow title="AI Income Check · Jane Doe" meta="Name + recency">
+      <PacketWindow title="AI Income Check · Jane Doe" meta="Name + recency" stamp="SAMPLE">
         <div className="px-3.5 py-3 sm:px-4">
           <p className="text-[12px] font-medium text-mute">
             Paystubs and statements. Names match. Last two months.
@@ -116,7 +116,7 @@ export function PillarIncome() {
 export function PillarPacket() {
   return (
     <DemoPlay flush className="pillar-demo">
-      <PacketWindow title="Shared packet · Jane Doe" meta="Same file">
+      <PacketWindow title="Shared packet · Jane Doe" meta="Sample" stamp="SAMPLE">
         <div className="px-3.5 py-3 sm:px-4">
           <div className="d p-chip-a relative h-16 overflow-hidden rounded-md border border-line bg-mist">
             <Image
@@ -133,8 +133,8 @@ export function PillarPacket() {
             <span className="d p-chip-c pillar-chip">Income · match</span>
             <span className="d p-chip-d pillar-chip is-score">LeaseScore 724</span>
           </div>
-          <p className="d p-share mt-3 text-[12px] font-medium text-mute">
-            leaseproof.app/packet/jane-doe
+          <p className="mt-3 text-[13px] font-medium text-mute">
+            Shared packet · everyone can open
           </p>
         </div>
       </PacketWindow>

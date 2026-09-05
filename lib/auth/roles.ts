@@ -12,7 +12,23 @@ export function roleFrom(value: unknown, fallback: Role): Role {
 }
 
 export const LANDLORD_SIGN_IN_HREF = "/signin";
+export const LANDLORD_SIGN_UP_HREF = "/signup";
 export const RENTER_SIGN_IN_HREF = "/signin?role=renter";
+
+export function deskSignUpHref(next?: string | null): string {
+  const dest = safeDeskNext(next);
+  return dest === "/dashboard" && !next
+    ? LANDLORD_SIGN_UP_HREF
+    : `${LANDLORD_SIGN_UP_HREF}?next=${encodeURIComponent(dest)}`;
+}
+
+/** Branded in-app sign-in, never Clerk's hosted accounts.dev page. */
+export function deskSignInHref(next?: string | null): string {
+  const dest = safeDeskNext(next);
+  return dest === "/dashboard" && !next
+    ? LANDLORD_SIGN_IN_HREF
+    : `${LANDLORD_SIGN_IN_HREF}?next=${encodeURIComponent(dest)}`;
+}
 
 /**
  * Only desk-relative paths survive. Anything absolute, protocol-relative, or

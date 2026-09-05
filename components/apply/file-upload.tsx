@@ -13,7 +13,14 @@ import { cn } from "@/lib/utils";
 export const FILE_ACCEPT = "image/png,image/jpeg,image/heic,image/webp,application/pdf";
 
 /** Blob document type; also the folder the upload lands in. */
-export type UploadKind = "photo_id_front" | "photo_id_back" | "paystub" | "bank_statement";
+export type UploadKind =
+  | "photo_id_front"
+  | "photo_id_back"
+  | "paystub"
+  | "bank_statement"
+  | "w2"
+  | "form_1099"
+  | "profile_photo";
 
 function newId(): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) return crypto.randomUUID();
@@ -182,10 +189,20 @@ interface FileSlotProps {
   error?: string;
   file: LocalFile | null;
   onChange: (file: LocalFile | null) => void;
+  onStored?: (file: LocalFile) => Promise<LocalFile> | LocalFile;
 }
 
 /** Single-file slot — used for the front and back of a photo ID. */
-export function FileSlot({ id, label, kind, hint, error, file, onChange }: FileSlotProps) {
+export function FileSlot({
+  id,
+  label,
+  kind,
+  hint,
+  error,
+  file,
+  onChange,
+  onStored,
+}: FileSlotProps) {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const errorId = error ? `${id}-error` : undefined;
   const drop = useDropzone();
@@ -197,7 +214,10 @@ export function FileSlot({ id, label, kind, hint, error, file, onChange }: FileS
     const local = toLocalFile(picked);
     // Show it immediately, then swap in the stored copy when the upload lands.
     onChange(local);
-    void uploadLocalFile(local, picked, kind).then((stored) => onChange(stored));
+    void uploadLocalFile(local, picked, kind).then(async (stored) => {
+      const next = stored.pathname && onStored ? await onStored(stored) : stored;
+      onChange(next);
+    });
   };
 
   return (
@@ -267,10 +287,21 @@ interface FileStackProps {
   files: LocalFile[];
   max: number;
   onChange: (files: LocalFile[]) => void;
+  onStored?: (file: LocalFile) => Promise<LocalFile> | LocalFile;
 }
 
 /** Multi-file list with a hard cap — pay stubs (2) and bank statements (1–3). */
-export function FileStack({ id, label, kind, hint, error, files, max, onChange }: FileStackProps) {
+export function FileStack({
+  id,
+  label,
+  kind,
+  hint,
+  error,
+  files,
+  max,
+  onChange,
+  onStored,
+}: FileStackProps) {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const errorId = error ? `${id}-error` : undefined;
   const full = files.length >= max;
@@ -290,8 +321,9 @@ export function FileStack({ id, label, kind, hint, error, files, max, onChange }
 
     sources.forEach((source, index) => {
       const local = added[index];
-      void uploadLocalFile(local, source, kind).then((stored) => {
-        onChange(latest.current.map((entry) => (entry.id === local.id ? stored : entry)));
+      void uploadLocalFile(local, source, kind).then(async (stored) => {
+        const next = stored.pathname && onStored ? await onStored(stored) : stored;
+        onChange(latest.current.map((entry) => (entry.id === local.id ? next : entry)));
       });
     });
   };

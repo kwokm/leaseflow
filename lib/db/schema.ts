@@ -104,6 +104,13 @@ export const applications = pgTable(
     phone: text("phone"),
     /** Screening lifecycle: draft -> awaiting_payment -> paid -> screening -> completed. */
     status: text("status").notNull().default("draft"),
+    /**
+     * Landlord decision. Separate from `status` so approving does not erase
+     * paid / screening / completed history.
+     */
+    decision: text("decision"),
+    decidedAt: timestamp("decided_at", { withTimezone: true }),
+    decidedBy: text("decided_by").references(() => users.id, { onDelete: "set null" }),
     screeningPackage: text("screening_package").notNull().default("standard"),
     /**
      * The packet the renter filled in, minus anything sensitive. The API strips
@@ -314,6 +321,56 @@ export const adverseActionNotices = pgTable(
   })
 );
 
+/**
+ * Mac Studio pull-queue for AI Income Check. Vercel never calls the Studio;
+ * the worker claims a pending row, reads the blob through the worker file
+ * route, and writes extraction back. Bytes stay in Blob — this row is the
+ * extracted fields plus job state.
+ */
+export const incomeChecks = pgTable(
+  "income_checks",
+  {
+    id: text("id").primaryKey(),
+    applicationId: text("application_id").references(() => applications.id, {
+      onDelete: "set null",
+    }),
+    listingId: text("listing_id").references(() => listings.id, {
+      onDelete: "set null",
+    }),
+    documentId: text("document_id").references(() => documents.id, {
+      onDelete: "set null",
+    }),
+    applicantName: text("applicant_name").notNull().default(""),
+    docKind: text("doc_kind").notNull(),
+    blobPath: text("blob_path").notNull(),
+    fileName: text("file_name").notNull(),
+    /** pending -> claimed -> ready | error */
+    status: text("status").notNull().default("pending"),
+    claimedAt: timestamp("claimed_at", { withTimezone: true }),
+    claimedBy: text("claimed_by"),
+    errorText: text("error_text"),
+    monthlyGrossCents: integer("monthly_gross_cents"),
+    payFrequency: text("pay_frequency"),
+    employer: text("employer"),
+    periodStart: text("period_start"),
+    periodEnd: text("period_end"),
+    detectedName: text("detected_name"),
+    nameMatch: boolean("name_match"),
+    recency: text("recency"),
+    recencyLabel: text("recency_label"),
+    extractor: text("extractor"),
+    rawJson: jsonb("raw_json").$type<Record<string, unknown>>(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    statusIdx: index("income_checks_status_idx").on(table.status),
+    applicationIdx: index("income_checks_application_id_idx").on(table.applicationId),
+    listingIdx: index("income_checks_listing_id_idx").on(table.listingId),
+    createdIdx: index("income_checks_created_at_idx").on(table.createdAt),
+  })
+);
+
 export type UserRow = typeof users.$inferSelect;
 export type ListingRow = typeof listings.$inferSelect;
 export type NewListingRow = typeof listings.$inferInsert;
@@ -325,3 +382,85 @@ export type CreditConsentRow = typeof creditConsents.$inferSelect;
 export type PaymentRow = typeof payments.$inferSelect;
 export type CreditShareRow = typeof creditShares.$inferSelect;
 export type AdverseActionNoticeRow = typeof adverseActionNotices.$inferSelect;
+/**
+ * Optional tenant bio: square photo, short "who you are", and social consent.
+ * Tokens never live here — see social_connections.
+ */
+export const applicantProfiles = pgTable(
+  "applicant_profiles",
+  {
+    id: text("id").primaryKey(),
+    applicationId: text("application_id").references(() => applications.id, {
+      onDelete: "cascade",
+    }),
+    draftId: text("draft_id"),
+    listingId: text("listing_id").references(() => listings.id, { onDelete: "set null" }),
+    photoBlobPath: text("photo_blob_path"),
+    bio: text("bio").notNull().default(""),
+    socialConsentAt: timestamp("social_consent_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    applicationIdx: uniqueIndex("applicant_profiles_application_id_idx").on(table.applicationId),
+    draftIdx: index("applicant_profiles_draft_id_idx").on(table.draftId),
+  })
+);
+
+/**
+ * OAuth tokens for Instagram / TikTok / Facebook. Server-only. Never copied
+ * into packet JSON or landlord DTOs.
+ */
+export const socialConnections = pgTable(
+  "social_connections",
+  {
+    id: text("id").primaryKey(),
+    applicationId: text("application_id").references(() => applications.id, {
+      onDelete: "cascade",
+    }),
+    draftId: text("draft_id"),
+    listingId: text("listing_id").references(() => listings.id, { onDelete: "set null" }),
+    network: text("network").notNull(),
+    accessToken: text("access_token").notNull(),
+    refreshToken: text("refresh_token"),
+    tokenExpiresAt: timestamp("token_expires_at", { withTimezone: true }),
+    handle: text("handle"),
+    profileUrl: text("profile_url"),
+    personalProfile: boolean("personal_profile").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    applicationIdx: index("social_connections_application_id_idx").on(table.applicationId),
+    draftIdx: index("social_connections_draft_id_idx").on(table.draftId),
+  })
+);
+
+/** Frozen 1–9 post tiles the landlord sees. Later posts / expired tokens do not change this. */
+export const socialPostSnapshots = pgTable(
+  "social_post_snapshots",
+  {
+    id: text("id").primaryKey(),
+    applicationId: text("application_id").references(() => applications.id, {
+      onDelete: "cascade",
+    }),
+    draftId: text("draft_id"),
+    network: text("network").notNull(),
+    position: integer("position").notNull(),
+    permalink: text("permalink").notNull(),
+    caption: text("caption").notNull().default(""),
+    takenAt: timestamp("taken_at", { withTimezone: true }),
+    blobPath: text("blob_path"),
+    mediaType: text("media_type").notNull().default("image"),
+  },
+  (table) => ({
+    applicationIdx: index("social_post_snapshots_application_id_idx").on(table.applicationId),
+    draftIdx: index("social_post_snapshots_draft_id_idx").on(table.draftId),
+  })
+);
+
+export type IncomeCheckRow = typeof incomeChecks.$inferSelect;
+export type NewIncomeCheckRow = typeof incomeChecks.$inferInsert;
+export type ApplicantProfileRow = typeof applicantProfiles.$inferSelect;
+export type SocialConnectionRow = typeof socialConnections.$inferSelect;
+export type SocialPostSnapshotRow = typeof socialPostSnapshots.$inferSelect;

@@ -23,6 +23,7 @@ import { shortAddress } from "@/lib/desk/display";
 import { householdTotals, householdsFirst } from "@/lib/desk/household";
 import { SCREENING_TASKS, screeningChecks } from "@/lib/desk/screening";
 import { listingThumb } from "@/lib/listings/store";
+import { networkLabel, SocialGrid } from "@/components/desk/social-grid";
 import { cn } from "@/lib/utils";
 
 function sortHomes(properties: Property[]): Property[] {
@@ -73,18 +74,40 @@ function ApplicantRow({
   const content = (
     <>
       <span className="flex min-w-0 items-center gap-2">
-        <Avatar firstName={applicant.firstName} lastName={applicant.lastName} />
+        <Avatar
+          firstName={applicant.firstName}
+          lastName={applicant.lastName}
+          photoUrl={applicant.profile?.photoUrl}
+        />
         <span className="min-w-0">
           <span className="block truncate text-[13px] font-semibold tracking-[-0.16px] text-ink">
             {name}
             {nested ? (
               <span className="ml-1.5 text-[11px] font-medium text-mute">Co-tenant</span>
             ) : null}
+            {applicant.profile?.sample ? (
+              <span className="ml-1.5 text-[10px] font-medium uppercase tracking-[0.06em] text-mute-2">
+                SAMPLE
+              </span>
+            ) : null}
           </span>
           <StatusPill status={applicant.status} className="mt-1" />
+          {applicant.profile?.bio ? (
+            <span className="mt-1 block text-[12px] font-medium leading-4 text-mute">
+              {applicant.profile.bio}
+            </span>
+          ) : null}
           <span className="mt-1 block">
             <AiIncomeLine applicant={applicant} />
           </span>
+          {applicant.profile?.social.map((account) => (
+            <SocialGrid
+              key={account.network}
+              compact
+              label={networkLabel(account.network)}
+              posts={account.posts}
+            />
+          ))}
         </span>
       </span>
       <span className="pipe-tasks">
@@ -167,10 +190,10 @@ export function PipelineDesk({ preview = false }: { preview?: boolean }) {
           </p>
           <div className="mt-5 flex flex-wrap gap-2">
             <Button asChild>
-              <Link href="/dashboard/listings/new?mode=import">Import listing</Link>
+              <Link href="/dashboard/listings/new">Add listing</Link>
             </Button>
             <Button asChild variant="outline">
-              <Link href="/dashboard/listings/new">Create listing + get apply link</Link>
+              <Link href="/dashboard/listings/new?mode=import">Import listing</Link>
             </Button>
           </div>
         </section>

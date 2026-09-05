@@ -36,18 +36,27 @@ import {
   submissionReport,
 } from "@/lib/apply/to-packet";
 import { setDecision, withDecision } from "@/lib/desk/decisions";
+import { useDeskApplicant } from "@/lib/desk/use-desk-applicants";
 import { creditScore, incomeMultiple, shortAddress } from "@/lib/desk/display";
 import { householdTotals } from "@/lib/desk/household";
+import { useProperty } from "@/lib/listings/use-property";
 import { getHousehold } from "@/lib/data/household-model";
 import { Reveal } from "@/components/motion/reveal";
 import { AiDocCheck } from "@/components/docs/ai-check";
 import { SAMPLE_MISMATCH, checkApplicationDetails } from "@/lib/docs/ai-check";
+import { useApplicationIncomeChecks } from "@/components/apply/income-check-panel";
+import { reportFromIncomeChecks, summarizePublicChecks } from "@/lib/income/view";
 import { resolveRentalPacket } from "@/lib/apply/rental-app";
 import type { ApplyState } from "@/lib/apply/types";
 import type { ApplicationStatus } from "@/lib/data/mock-data";
 import type { RentalApplication } from "@/lib/apply/rental-app";
 import { AdverseActionPanel } from "@/components/desk/adverse-action-panel";
 import { noticesForApplication } from "@/lib/desk/adverse-action-store";
+import { useRuntimeConfig } from "@/components/config/runtime-config";
+import { networkLabel, SocialGrid } from "@/components/desk/social-grid";
+import { SAMPLE_JANE_PROFILE } from "@/lib/data/mock-data";
+import { DEMO_APPLICANT_ID } from "@/lib/apply/sample-packet";
+import { FACEBOOK_PERSONAL_MESSAGE } from "@/lib/social/snapshot";
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
@@ -86,6 +95,14 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
   const [showSample, setShowSample] = useState(false);
   const [tab, setTab] = useState<"packet" | "application">("packet");
   const [rental, setRental] = useState<RentalApplication | null>(null);
+  const [decideError, setDecideError] = useState<string | null>(null);
+  const [deciding, setDeciding] = useState(false);
+  const { checks: liveChecks, waiting: liveWaiting } = useApplicationIncomeChecks(id);
+  const { demo } = useRuntimeConfig();
+  const { applicant: neonApplicant, ready: neonReady, refresh: refreshNeon } = useDeskApplicant(id);
+  const { property: neonProperty, ready: neonListingReady } = useProperty(
+    neonApplicant?.propertyId ?? ""
+  );
 
   const local = isLocalApplicantId(id);
   const [submission, setSubmission] = useState<ApplyState | undefined>();
@@ -105,11 +122,16 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
     ? submission
       ? submissionApplicant(submission)
       : undefined
-    : getApplicantById(id);
+    : demo
+      ? getApplicantById(id)
+      : undefined;
+  const live = !local && !seeded ? neonApplicant : undefined;
   const applicant = seeded
     ? { ...withDecision(seeded), ...(statusOverride ? { status: statusOverride } : {}) }
+    : live;
+  const property = applicant
+    ? demoPropertyById(applicant.propertyId) ?? (live ? neonProperty : undefined)
     : undefined;
-  const property = applicant ? demoPropertyById(applicant.propertyId) : undefined;
   const report = local
     ? submission
       ? submissionReport(submission)
@@ -135,6 +157,10 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
     return <p className="px-6 py-12 text-[13px] text-mute">Loading the application…</p>;
   }
 
+  if (!local && !seeded && (!neonReady || (neonApplicant && !neonListingReady && !neonProperty))) {
+    return <p className="px-6 py-12 text-[13px] text-mute">Loading the application…</p>;
+  }
+
   if (!applicant || !property) {
     return (
       <Reveal className="px-6 py-12 text-center">
@@ -151,25 +177,77 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
     );
   }
 
+  const profile =
+    applicant.profile ??
+    (demo && applicant.id === DEMO_APPLICANT_ID ? SAMPLE_JANE_PROFILE : undefined);
   const fullName = `${applicant.firstName} ${applicant.lastName}`;
   const decided = applicant.status === "approved" || applicant.status === "declined";
-  const multiple = incomeMultiple(applicant);
   const credit = creditScore(applicant);
+  const liveSummary = summarizePublicChecks(liveChecks);
+  const applicantWithLive = liveSummary
+    ? { ...applicant, incomeCheck: liveSummary }
+    : applicant;
+  const multiple = incomeMultiple(applicantWithLive, property.rent);
   const household = applicant.householdId
     ? (() => {
         const seededMembers = getHousehold(applicant.householdId).filter(
           (row) => row.propertyId === applicant.propertyId,
         );
         const byId = new Map(seededMembers.map((row) => [row.id, row]));
-        byId.set(applicant.id, applicant);
+        byId.set(applicant.id, applicantWithLive);
         return [...byId.values()];
       })()
-    : [applicant];
-  const totals = household.length > 1 ? householdTotals(household, property.rent) : undefined;
-  const aiIncome = report?.aiIncome;
-  const monthly = aiIncome?.grossMonthly ?? report?.income.monthlyIncome;
+    : [applicantWithLive];
+  const householdWithLive = household;
+  const totals = householdWithLive.length > 1 ? householdTotals(householdWithLive, property.rent) : undefined;
+  const liveReport = reportFromIncomeChecks(liveChecks);
+  const filenameReport = checkApplicationDetails(
+    details,
+    fullName,
+    showSample ? [SAMPLE_MISMATCH] : [],
+  );
+  const docCheck = liveReport.checkedCount
+    ? liveReport
+    : local
+      ? {
+          rows: [],
+          passed: false,
+          namePass: false,
+          recencyPass: false,
+          checkedCount: 0,
+          live: true,
+          waiting: liveWaiting,
+        }
+      : filenameReport;
+  const aiIncome = liveSummary ? undefined : report?.aiIncome;
+  const monthly =
+    liveSummary?.monthlyGross ?? aiIncome?.grossMonthly ?? report?.income.monthlyIncome;
 
-  function decide(next: "approved" | "declined") {
+  async function decide(next: "approved" | "declined") {
+    if (live) {
+      setDeciding(true);
+      setDecideError(null);
+      try {
+        const response = await fetch(`/api/applications/${encodeURIComponent(id)}/decision`, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ decision: next }),
+        });
+        const payload = (await response.json().catch(() => ({}))) as { error?: string };
+        if (!response.ok) {
+          setDecideError(payload.error ?? "Could not save that decision.");
+          return;
+        }
+        await refreshNeon();
+      } catch {
+        setDecideError("Could not reach the desk. Try again.");
+        return;
+      } finally {
+        setDeciding(false);
+      }
+      return;
+    }
+
     setDecision(id, next);
     setStatusOverride(next);
     router.push("/dashboard/applications");
@@ -180,11 +258,21 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
       <Reveal>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4 sm:px-6">
         <div className="flex min-w-0 items-center gap-3">
-          <Avatar firstName={applicant.firstName} lastName={applicant.lastName} large />
+          <Avatar
+            firstName={applicant.firstName}
+            lastName={applicant.lastName}
+            photoUrl={profile?.photoUrl}
+            large
+          />
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="text-[18px] font-semibold tracking-[-0.3px] text-ink">{fullName}</h1>
               <StatusPill status={applicant.status} />
+              {profile?.sample ? (
+                <span className="text-[10px] font-medium uppercase tracking-[0.06em] text-mute-2">
+                  SAMPLE
+                </span>
+              ) : null}
             </div>
             <p className="mt-0.5 truncate text-[13px] text-mute">
               {shortAddress(property.address)} · {applicant.email}
@@ -227,19 +315,29 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
           </Button>
           {!decided && (
             <>
-              <Button size="sm" onClick={() => decide("approved")}>
+              <Button size="sm" disabled={deciding} onClick={() => void decide("approved")}>
                 Approve
               </Button>
-              <Button variant="destructive" size="sm" onClick={() => setDeclineOpen(true)}>
+              <Button
+                variant="destructive"
+                size="sm"
+                disabled={deciding}
+                onClick={() => setDeclineOpen(true)}
+              >
                 Decline
               </Button>
             </>
           )}
         </div>
+        {decideError ? (
+          <p role="alert" className="mt-2 w-full text-[13px] font-medium text-no">
+            {decideError}
+          </p>
+        ) : null}
       </div>
       </Reveal>
 
-      <PacketHouseholdChrome applicant={applicant} members={household} />
+      <PacketHouseholdChrome applicant={applicantWithLive} members={householdWithLive} />
 
       <div className="border-b border-line px-5 py-3 print:hidden sm:px-6">
         <div className="flex flex-wrap items-center gap-1.5">
@@ -280,6 +378,40 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
           />
         </dl>
       </Section>
+
+      {profile && (profile.bio || profile.photoUrl || profile.social.length) ? (
+          <Section title="Bio">
+            {profile.sample ? (
+              <p className="mb-3 text-[12px] font-medium uppercase tracking-[0.06em] text-mute-2">
+                SAMPLE
+              </p>
+            ) : null}
+            {profile.bio ? (
+              <p className="text-[14px] font-medium leading-5 text-ink">{profile.bio}</p>
+            ) : null}
+            <p className="mt-2 text-[12px] font-medium text-mute-2">
+              Read from their profiles, not verified.
+            </p>
+            {profile.social.map((account) => (
+              <div key={account.network} className="mt-3">
+                {account.profileUrl ? (
+                  <p className="text-[13px] font-medium text-ink">
+                    <a href={account.profileUrl} target="_blank" rel="noreferrer">
+                      {networkLabel(account.network)}
+                      {account.handle ? ` · @${account.handle}` : ""}
+                    </a>
+                  </p>
+                ) : (
+                  <p className="text-[13px] font-medium text-ink">{networkLabel(account.network)}</p>
+                )}
+                {account.personalProfile ? (
+                  <p className="mt-1 text-[12px] font-medium text-mute">{FACEBOOK_PERSONAL_MESSAGE}</p>
+                ) : null}
+                <SocialGrid label="" posts={account.posts} />
+              </div>
+            ))}
+          </Section>
+      ) : null}
 
       <Section title="LeaseScore">
         {report ? (
@@ -340,7 +472,26 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
       </Section>
 
       <Section title="Income">
-        {aiIncome ? (
+        {liveSummary ? (
+          <div className="mb-4 rounded-md border border-line bg-[#fbf9fd] p-3">
+            <AiIncomeLine applicant={applicantWithLive} />
+            <ul className="mt-2 space-y-1">
+              {liveChecks.map((check) => (
+                <li key={check.id} className="text-[12px] font-medium text-mute">
+                  {check.fileName}
+                  {check.monthlyGrossCents != null
+                    ? ` · $${Math.round(check.monthlyGrossCents / 100).toLocaleString()}/mo`
+                    : ""}
+                  {check.recencyLabel ? ` · ${check.recencyLabel}` : ""}
+                  {check.status !== "ready" ? ` · ${check.status}` : " · Read from your upload"}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-2 text-[12px] font-medium text-mute-2">
+              AI Income Check reads paystubs and statements. You decide who to approve.
+            </p>
+          </div>
+        ) : aiIncome ? (
           <div className="mb-4 rounded-md border border-line bg-[#fbf9fd] p-3">
             <AiIncomeLine screen={aiIncome} />
             <ul className="mt-2 space-y-1">
@@ -351,11 +502,11 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
               ))}
             </ul>
             <p className="mt-2 text-[12px] font-medium text-mute-2">
-              {aiIncome.verified
-                ? "Verified — names on the files match this applicant. Mock extraction, not a live model."
-                : "Mock extraction, not a live model."}
+              Sample extraction from filenames — not a live model.
             </p>
           </div>
+        ) : liveWaiting ? (
+          <p className="mb-4 text-[13px] font-medium text-mute">Waiting for income check…</p>
         ) : null}
         {report ? (
           <dl>
@@ -366,7 +517,20 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
               value={`$${(monthly ?? report.income.monthlyIncome).toLocaleString()}`}
             />
             <Row label="Rent multiple" value={multiple ? `${multiple.toFixed(1)}×` : "—"} />
-            <Row label="Verified" value={report.income.verified || aiIncome?.verified ? "Yes" : "No"} />
+            {liveSummary ? (
+              <Row
+                label="Read from your upload"
+                value={
+                  liveSummary.nameMatch === true
+                    ? "Name match"
+                    : liveSummary.nameMatch === false
+                      ? "Name mismatch"
+                      : "—"
+                }
+              />
+            ) : (
+              <Row label="Stated income" value={report.income.verified ? "On file" : "On file"} />
+            )}
           </dl>
         ) : details ? (
           <dl>
@@ -381,17 +545,15 @@ export default function ApplicationPacketPage({ params }: { params: Promise<{ id
         )}
       </Section>
 
-      <Section title="AI document check">
+      <Section title="AI Income Check">
         <AiDocCheck
-          report={checkApplicationDetails(
-            details,
-            fullName,
-            showSample ? [SAMPLE_MISMATCH] : [],
-          )}
+          report={docCheck}
           showSample={showSample}
-          onToggleSample={() => setShowSample((value) => !value)}
+          onToggleSample={liveReport.checkedCount ? undefined : () => setShowSample((value) => !value)}
           scan={false}
           embedded
+          live={Boolean(liveReport.checkedCount)}
+          waiting={liveWaiting}
         />
       </Section>
 

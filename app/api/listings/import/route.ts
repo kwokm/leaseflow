@@ -75,10 +75,17 @@ export async function POST(request: Request) {
         error.code === "blocked" || error.code === "timeout" || error.code === "fetch_failed"
           ? 422
           : 400;
-      return NextResponse.json({ error: error.message, code: error.code }, { status });
+      return NextResponse.json(
+        {
+          error: error.message,
+          code: error.code,
+          preview: error.preview ?? null,
+        },
+        { status }
+      );
     }
     return NextResponse.json(
-      { error: "Could not import that listing. Fill the form by hand." },
+      { error: "Could not import that listing. Portals often block automated reads. Use the form." },
       { status: 422 }
     );
   }

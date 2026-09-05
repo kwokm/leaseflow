@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { formatDateOnly, formatDollars } from "@/lib/apply/format";
 import { createDemoState } from "@/lib/apply/types";
 import { ListingPhotoStrip } from "@/components/listings/photos";
+import { useRuntimeConfig } from "@/components/config/runtime-config";
 import {
   STANDARD_PACKAGE_NAME,
   STANDARD_PRICING_STORY,
@@ -24,6 +25,8 @@ const STANDARD_FEATURES = [
 ];
 
 export function StepStart({ state, patch, property, embedded }: StepProps) {
+  const { demo } = useRuntimeConfig();
+
   useEffect(() => {
     if (state.screeningPackage !== "standard") {
       patch({ screeningPackage: "standard" });
@@ -42,19 +45,21 @@ export function StepStart({ state, patch, property, embedded }: StepProps) {
           back up.
         </p>
       ) : null}
-      <div>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={() => patch(createDemoState(property.id, "standard"))}
-        >
-          Fill demo
-        </Button>
-        <p className="mt-1.5 text-[12px] font-medium text-mute">
-          Optional: load Jane Doe&apos;s fictional details to preview the flow.
-        </p>
-      </div>
+      {demo ? (
+        <div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => patch(createDemoState(property.id, "standard"))}
+          >
+            Fill demo
+          </Button>
+          <p className="mt-1.5 text-[12px] font-medium text-mute">
+            Optional: load Jane Doe&apos;s fictional details to preview the flow.
+          </p>
+        </div>
+      ) : null}
 
       <Panel>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">

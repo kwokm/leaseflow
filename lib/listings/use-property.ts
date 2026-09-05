@@ -54,6 +54,14 @@ export function useProperty(id: string): { property: Property | undefined; ready
     let active = true;
     setReady(false);
 
+    if (!id) {
+      setProperty(undefined);
+      setReady(true);
+      return () => {
+        active = false;
+      };
+    }
+
     fetch(`/api/listings/${encodeURIComponent(id)}`)
       .then((response) => (response.ok ? response.json() : { listing: undefined }))
       .then((payload: { listing?: Property }) => {

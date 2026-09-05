@@ -307,16 +307,9 @@
   }
 
   /*
-   * Bloom sampled from Michael's landing PNG — pale lilac, not Attio blue.
-   * Do not use #E6ECFF / #BCCBFF / #86A0EE.
+   * Locked 62% bottom bloom for PageWash (auth, apply, legal, desk).
+   * Pale lilac from --wash tokens — not Attio blue.
    */
-  .hero {
-    position: relative;
-    padding: 88px 0 0;
-    overflow: hidden;
-    background: #fff;
-  }
-
   .hero-wash {
     position: absolute;
     left: 0;
@@ -345,53 +338,94 @@
     background: radial-gradient(70% 110% at 50% 0%, #ffffff 28%, rgba(255, 255, 255, 0) 68%);
   }
 
+  /*
+   * Two-column hero: copy on paper, layered mocks on a contained wash.
+   * Wash uses --wash tokens only — not a crypto neon clone.
+   */
+  .hero {
+    position: relative;
+    padding: 40px 0 48px;
+    overflow: hidden;
+    background: #fff;
+  }
+
+  .hero-shell {
+    display: grid;
+    gap: 36px;
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 var(--pad);
+    align-items: center;
+  }
+
   .hero-copy {
     position: relative;
     z-index: 1;
-    text-align: center;
-    padding: 0 var(--pad);
-    max-width: 860px;
-    margin: 0 auto 52px;
+    text-align: left;
+    max-width: 34rem;
+    margin: 0;
   }
 
   .hero-sub {
-    margin: 0 auto 28px;
-    max-width: 42rem;
+    margin: 0 0 24px;
+    max-width: 34rem;
     font-size: 16px;
-    line-height: 20.8px;
+    line-height: 22px;
     color: var(--mute);
     font-weight: 500;
-    letter-spacing: -0.17px;
+    letter-spacing: -0.16px;
   }
 
   .hero-ctas {
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 10px;
     flex-wrap: wrap;
   }
 
+  @media (min-width: 1024px) {
+    .hero {
+      padding: 56px 0 64px;
+    }
+
+    .hero-shell {
+      grid-template-columns: minmax(20rem, 0.46fr) minmax(0, 0.54fr);
+      align-items: start;
+      gap: 40px;
+    }
+
+    .hero-copy {
+      padding-top: 28px;
+    }
+  }
+
   .hero h1 {
-    margin: 0 0 18px;
-    font-size: clamp(40px, 5.6vw, 80px);
+    margin: 0 0 16px;
+    font-size: 30px;
     font-weight: 600;
-    letter-spacing: -1.12px;
-    line-height: 0.95;
+    letter-spacing: -0.6px;
+    line-height: 1.15;
     color: var(--ink);
   }
 
-  @media (min-width: 1280px) {
+  .hero h1 .hero-line {
+    display: block;
+  }
+
+  @media (min-width: 640px) {
     .hero h1 {
-      letter-spacing: -2.4px;
+      font-size: 36px;
+    }
+
+    .hero h1 .hero-line {
+      white-space: nowrap;
     }
   }
 
   .stage-wrap {
     position: relative;
     z-index: 1;
-    padding: 12px var(--pad) 92px;
-    max-width: 1240px;
-    margin: 0 auto;
+    min-width: 0;
   }
 
   .window {
@@ -425,10 +459,38 @@
   }
 
   .card-head-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     flex-shrink: 0;
     font-size: 12px;
     font-weight: 500;
     color: var(--mute-2);
+  }
+
+  .sample-stamp {
+    display: inline-flex;
+    align-items: center;
+    height: 18px;
+    padding: 0 6px;
+    border: 1px solid var(--ink);
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 650;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+
+  .sample-banner {
+    margin: 0;
+    padding: 8px 22px;
+    border-bottom: 1px solid var(--line);
+    background: #f4f0f8;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: -0.12px;
+    color: var(--ink-2);
   }
 
   .desk {
@@ -697,6 +759,35 @@
 
   .skip-link:focus {
     top: 12px;
+  }
+
+  /*
+   * Clerk's footer (and hashed internals) default to a near-black panel when
+   * colorBackground was transparent. Keep ink-on-white so "Sign up" reads.
+   */
+  .auth-widget .cl-card,
+  .auth-widget .cl-cardBox,
+  .auth-widget .cl-main,
+  .auth-widget .cl-footer,
+  .auth-widget .cl-footerAction,
+  .auth-widget .cl-footerPages,
+  .auth-widget .cl-footer > [class^="cl-internal-"] {
+    background-color: #ffffff !important;
+    background-image: none !important;
+    box-shadow: none !important;
+  }
+
+  .auth-widget .cl-footer {
+    color: #1c1d1f !important;
+  }
+
+  .auth-widget .cl-footerActionText,
+  .auth-widget .cl-footerPagesLink {
+    color: #6d7988 !important;
+  }
+
+  .auth-widget .cl-footerActionLink {
+    color: #1c1d1f !important;
   }
 }
 
@@ -2595,6 +2686,11 @@
   background: #fff;
 }
 
+.pillar-demo .sample-banner {
+  padding-left: 14px;
+  padding-right: 14px;
+}
+
 .pillar-pill {
   display: inline-flex;
   align-items: center;
@@ -2649,4 +2745,34 @@
   background: #e4e0f0;
   border-color: #d8d2e6;
   color: #6b5b8c;
+}
+
+.bio-photo {
+  display: flex;
+  width: 88px;
+  height: 88px;
+  flex-shrink: 0;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px dashed var(--line-2);
+  background: var(--mist);
+}
+
+.bio-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.bio-tile {
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--ghost);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

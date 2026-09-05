@@ -1,5 +1,6 @@
 import { NextResponse, type NextFetchEvent, type NextRequest } from "next/server";
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { LANDLORD_SIGN_IN_HREF, LANDLORD_SIGN_UP_HREF } from "@/lib/auth/roles";
 
 const isDesk = createRouteMatcher(["/dashboard(.*)"]);
 
@@ -12,10 +13,30 @@ const CLERK_CONFIGURED = Boolean(
   process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && process.env.CLERK_SECRET_KEY
 );
 
-const guarded = clerkMiddleware(async (auth, request) => {
-  if (isDesk(request)) await auth.protect();
-  return NextResponse.next();
-});
+function brandedSignIn(request: NextRequest): NextResponse {
+  const signIn = new URL(LANDLORD_SIGN_IN_HREF, request.url);
+  signIn.searchParams.set("next", request.nextUrl.pathname);
+  return NextResponse.redirect(signIn);
+}
+
+/**
+ * Desk visits stay on the in-app /signin card. `auth.protect()` without a
+ * sign-in URL falls through to Clerk's hosted accounts.dev page — the
+ * unbranded "leaseflow-clerk / Development mode" screen from the walk.
+ */
+const guarded = clerkMiddleware(
+  async (auth, request) => {
+    if (!isDesk(request)) return NextResponse.next();
+
+    const { userId } = await auth();
+    if (!userId) return brandedSignIn(request);
+    return NextResponse.next();
+  },
+  {
+    signInUrl: LANDLORD_SIGN_IN_HREF,
+    signUpUrl: LANDLORD_SIGN_UP_HREF,
+  }
+);
 
 /**
  * The desk requires a Clerk session in production. Two deliberate exceptions:
@@ -29,9 +50,7 @@ export default function middleware(request: NextRequest, event: NextFetchEvent) 
 
   if (!CLERK_CONFIGURED) {
     if (!isDesk(request)) return NextResponse.next();
-    const signIn = new URL("/signin", request.url);
-    signIn.searchParams.set("next", request.nextUrl.pathname);
-    return NextResponse.redirect(signIn);
+    return brandedSignIn(request);
   }
 
   return guarded(request, event);

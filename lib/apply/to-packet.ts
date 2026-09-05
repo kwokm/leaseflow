@@ -9,6 +9,7 @@ import { ensureHouseholdDemo, type AiIncomeScreen } from "@/lib/data/household-m
 import { getApplicantsByProperty, demoPropertyById } from "@/lib/data/mock-data";
 import { formatFileSize, ssnLast4 } from "./format";
 import type { ApplyState, LocalFile } from "./types";
+import { profileFromApplyBio } from "@/lib/social/snapshot";
 
 /** Applications submitted from this browser get a `local-` prefixed id. */
 export const LOCAL_ID_PREFIX = "local-";
@@ -118,6 +119,7 @@ export function submissionApplicant(state: ApplyState): Applicant {
     completedAt: state.submittedAt,
     leaseScore: state.experian.score,
     householdId: householdIdFromOccupants(state),
+    profile: profileFromApplyBio(state.bio),
   };
 }
 
